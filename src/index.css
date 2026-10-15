@@ -1,0 +1,293 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Design tokens — light (default) & dark
+   Nilai berupa RGB channel agar modifier opacity Tailwind tetap bekerja.
+   ========================================================================== */
+
+:root,
+.light {
+  --surface-0: 244 244 245; /* zinc-100 — latar aplikasi */
+  --surface-1: 255 255 255; /* putih — panel & kartu */
+  --surface-2: 228 228 231; /* zinc-200 — latar halus / chip */
+  --surface-3: 212 212 216; /* zinc-300 — latar lebih kuat */
+  --border: 228 228 231;
+  --border-strong: 212 212 216;
+  --text: 63 63 70; /* zinc-700 */
+  --text-strong: 24 24 27; /* zinc-900 */
+  --text-muted: 82 82 91; /* zinc-600 */
+  --text-faint: 113 113 122; /* zinc-500 */
+  --text-faintest: 161 161 170; /* zinc-400 */
+  --chart-grid: 228 228 231;
+  --chart-axis: 113 113 122;
+  --grid-line: 63 63 70;
+  --grid-opacity: 0.1;
+  --shadow-panel: 0 1px 2px 0 rgb(24 24 27 / 0.06), 0 12px 32px -20px rgb(24 24 27 / 0.22);
+}
+
+.dark {
+  --surface-0: 9 9 11; /* zinc-950 */
+  --surface-1: 23 23 27; /* coal-850 */
+  --surface-2: 39 39 46; /* zinc-800 */
+  --surface-3: 63 63 70; /* zinc-700 */
+  --border: 39 39 46;
+  --border-strong: 63 63 70;
+  --text: 212 212 216; /* zinc-300 */
+  --text-strong: 250 250 250; /* zinc-50 */
+  --text-muted: 161 161 170; /* zinc-400 */
+  --text-faint: 113 113 122; /* zinc-500 */
+  --text-faintest: 82 82 91; /* zinc-600 */
+  --chart-grid: 39 39 46;
+  --chart-axis: 113 113 122;
+  --grid-line: 63 63 70;
+  --grid-opacity: 0.18;
+  --shadow-panel: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 20px 40px -24px rgba(0, 0, 0, 0.9);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-surface-0 text-ink antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  * {
+    @apply border-line;
+  }
+
+  ::selection {
+    @apply bg-brand-500/30 text-brand-100;
+  }
+}
+
+@layer utilities {
+  /* Scrollbar */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-surface-3;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-faintest;
+  }
+
+  .grid-bg {
+    background-image: linear-gradient(
+        to right,
+        rgb(var(--grid-line) / var(--grid-opacity)) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgb(var(--grid-line) / var(--grid-opacity)) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-200 via-brand-400 to-brand-600 bg-clip-text text-transparent;
+  }
+
+  .glass {
+    @apply border border-white/5 bg-surface-1/70 backdrop-blur-xl;
+  }
+
+  .dark .glass {
+    @apply border-white/5;
+  }
+}
+
+@layer components {
+  /* ---------------- Surfaces ---------------- */
+  .panel {
+    @apply rounded-xl border border-line bg-surface-1;
+    box-shadow: var(--shadow-panel);
+  }
+  .panel-header {
+    @apply flex items-center justify-between gap-4 border-b border-line px-5 py-4;
+  }
+  .panel-title {
+    @apply text-sm font-semibold tracking-wide text-ink-strong;
+  }
+  .panel-sub {
+    @apply text-xs text-ink-faint;
+  }
+
+  /* ---------------- Buttons ---------------- */
+  .btn {
+    @apply inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg px-3.5 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500/40 disabled:pointer-events-none disabled:opacity-40;
+  }
+  .btn-sm {
+    @apply h-8 px-3 text-xs;
+  }
+  .btn-primary {
+    @apply bg-brand-500 text-zinc-950 hover:bg-brand-400 active:bg-brand-600;
+  }
+  .btn-secondary {
+    @apply border border-line-strong bg-surface-2 text-ink-strong hover:border-ink-faintest hover:bg-surface-3;
+  }
+  .btn-ghost {
+    @apply text-ink-muted hover:bg-surface-2 hover:text-ink-strong;
+  }
+  .btn-danger {
+    @apply bg-rose-600 text-white hover:bg-rose-500;
+  }
+  .btn-success {
+    @apply bg-emerald-600 text-white hover:bg-emerald-500;
+  }
+  .btn-outline {
+    @apply border border-line-strong text-ink-muted hover:border-brand-500/50 hover:text-brand-600;
+  }
+  .dark .btn-outline {
+    @apply hover:text-brand-400;
+  }
+
+  /* ---------------- Forms ---------------- */
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-ink-muted;
+  }
+  .input {
+    @apply h-9 w-full rounded-lg border border-line bg-surface-0 px-3 text-sm text-ink-strong transition-colors placeholder:text-ink-faintest focus:border-brand-500/60 focus:outline-none focus:ring-1 focus:ring-brand-500/25;
+  }
+  .dark .input {
+    @apply bg-surface-0;
+  }
+  .input-sm {
+    @apply h-8 text-xs;
+  }
+  select.input {
+    @apply cursor-pointer appearance-none bg-no-repeat pr-8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-size: 1.1em 1.1em;
+  }
+  textarea.input {
+    @apply h-auto min-h-[76px] py-2 leading-relaxed;
+  }
+  .checkbox {
+    @apply h-4 w-4 rounded border-line-strong bg-surface-0 text-brand-500 focus:ring-brand-500/40;
+  }
+
+  /* ---------------- Table ---------------- */
+  .tbl {
+    @apply w-full border-collapse text-sm;
+  }
+  .tbl thead th {
+    @apply sticky top-0 z-10 whitespace-nowrap border-b border-line bg-surface-1 px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-faint;
+  }
+  .tbl tbody td {
+    @apply whitespace-nowrap border-b border-line px-4 py-3 text-ink;
+  }
+  .tbl tbody tr {
+    @apply transition-colors hover:bg-surface-2/50;
+  }
+  .tbl tbody tr:last-child td {
+    @apply border-b-0;
+  }
+  .tbl-num {
+    @apply text-right font-mono tabular-nums;
+  }
+
+  /* ---------------- Badges ---------------- */
+  .badge {
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold;
+  }
+  .badge-neutral {
+    @apply border-line-strong bg-surface-2 text-ink-muted;
+  }
+  .badge-success {
+    @apply border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400;
+  }
+  .badge-warning {
+    @apply border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400;
+  }
+  .badge-danger {
+    @apply border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400;
+  }
+  .badge-info {
+    @apply border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400;
+  }
+  .badge-violet {
+    @apply border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-400;
+  }
+  .badge-amber {
+    @apply border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400;
+  }
+  .badge-emerald {
+    @apply border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400;
+  }
+  .badge-sky {
+    @apply border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400;
+  }
+  .badge-rose {
+    @apply border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400;
+  }
+
+  /* ---------------- Navigation ---------------- */
+  .nav-link {
+    @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink-muted transition-all duration-150 hover:bg-surface-2 hover:text-ink-strong;
+  }
+  .nav-link-active {
+    @apply bg-brand-500/10 text-brand-700 hover:bg-brand-500/10 hover:text-brand-700;
+  }
+  .dark .nav-link-active {
+    @apply text-brand-400;
+  }
+  .nav-group-label {
+    @apply px-3 pb-1.5 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-ink-faintest;
+  }
+
+  /* ---------------- Misc ---------------- */
+  .kpi-value {
+    @apply font-mono text-2xl font-bold tabular-nums tracking-tight text-ink-strong;
+  }
+  .stat-delta-up {
+    @apply text-emerald-600 dark:text-emerald-400;
+  }
+  .stat-delta-down {
+    @apply text-rose-600 dark:text-rose-400;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-md border border-line bg-surface-1 px-2 py-1 text-[11px] font-medium text-ink-muted;
+  }
+  .divider {
+    @apply my-4 border-t border-line;
+  }
+  .link {
+    @apply text-brand-600 underline-offset-2 hover:underline dark:text-brand-400;
+  }
+}
+
+/* Print: hanya konten laporan yang dicetak */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
