@@ -194,7 +194,7 @@ const REPORT_DEFS: ReportDef[] = [
       { key: 'Departemen', header: 'Departemen' },
       { key: 'Hari Hilang', header: 'Hari Hilang', align: 'right', sort: (r) => Number(r['Hari Hilang']), render: (r) => num(Number(r['Hari Hilang'])) },
       { key: 'Status', header: 'Status', render: (r) => <StatusBadge value={String(r.Status)} /> },
-      { key: 'Tindakan Korektif', header: 'Tindakan Korektif', render: (r) => <span className="text-[12px] text-zinc-400">{String(r['Tindakan Korektif'])}</span> },
+      { key: 'Tindakan Korektif', header: 'Tindakan Korektif', render: (r) => <span className="text-[12px] text-ink-muted">{String(r['Tindakan Korektif'])}</span> },
     ],
   },
   {
@@ -284,6 +284,138 @@ const REPORT_DEFS: ReportDef[] = [
       { key: 'Band Kalori', header: 'Band Kalori' },
       { key: 'Tarif (%)', header: 'Tarif', align: 'right', render: (r) => <Badge tone="warning">{Number(r['Tarif (%)'])}%</Badge> },
       { key: 'Royalti (USD)', header: 'Royalti', align: 'right', sort: (r) => Number(r['Royalti (USD)']), render: (r) => <span className="font-mono font-semibold text-rose-400">{usd(Number(r['Royalti (USD)']))}</span> },
+      { key: 'Status', header: 'Status', render: (r) => <StatusBadge value={String(r.Status)} /> },
+    ],
+  },
+  {
+    id: 'rpt-mineplan',
+    title: 'Laporan Rencana Tambang & Blending',
+    category: 'Operasional',
+    description: 'Rekapitulasi rencana produksi batubara dan pengupasan per pit/bench serta formulasi blending terhadap target spesifikasi.',
+    frequency: 'Bulanan',
+    authority: 'Internal · Perencanaan Tambang',
+    formats: ['Excel', 'CSV'],
+    build: (state) => [
+      ...state.minePlans.map((p) => ({
+        Kategori: 'Rencana Tambang',
+        Kode: p.code,
+        Site: state.sites.find((s) => s.id === p.siteId)?.code ?? '-',
+        Uraian: `${p.pit} · ${p.bench}`,
+        Rencana: p.planCoalMt,
+        Realisasi: p.actualCoalMt,
+        Satuan: 'MT',
+        Pencapaian: p.planCoalMt ? Number(((p.actualCoalMt / p.planCoalMt) * 100).toFixed(1)) : 0,
+        Status: p.status,
+      })),
+      ...state.blendingRecipes.map((b) => ({
+        Kategori: 'Blending',
+        Kode: b.code,
+        Site: state.sites.find((s) => s.id === b.siteId)?.code ?? '-',
+        Uraian: `${b.name} · target GCV ${b.targetGcv}`,
+        Rencana: b.volumeMt,
+        Realisasi: 0,
+        Satuan: 'MT',
+        Pencapaian: 0,
+        Status: b.status,
+      })),
+    ],
+    columns: [
+      { key: 'Kategori', header: 'Kategori', render: (r) => <Badge tone={String(r.Kategori) === 'Blending' ? 'violet' : 'amber'}>{String(r.Kategori)}</Badge> },
+      { key: 'Kode', header: 'Kode', render: (r) => <span className="font-mono text-xs">{String(r.Kode)}</span> },
+      { key: 'Site', header: 'Site' },
+      { key: 'Uraian', header: 'Pit / Resep', render: (r) => <span className="text-ink-muted">{String(r.Uraian)}</span> },
+      { key: 'Rencana', header: 'Rencana', align: 'right', sort: (r) => Number(r.Rencana), render: (r) => num(Number(r.Rencana)) },
+      { key: 'Realisasi', header: 'Realisasi', align: 'right', sort: (r) => Number(r.Realisasi), render: (r) => num(Number(r.Realisasi)) },
+      { key: 'Pencapaian', header: 'Pencapaian', align: 'right', sort: (r) => Number(r.Pencapaian), render: (r) => <span className="font-mono text-xs font-semibold">{pct1(Number(r.Pencapaian))}</span> },
+      { key: 'Status', header: 'Status', render: (r) => <StatusBadge value={String(r.Status)} /> },
+    ],
+  },
+  {
+    id: 'rpt-shipping',
+    title: 'Laporan Bongkar Muat & Pengiriman',
+    category: 'Operasional',
+    description: 'Rekapitulasi jadwal kapal/barge, tonase dimuat, fasilitas pelabuhan, dan status penerbitan Bill of Lading.',
+    frequency: 'Mingguan',
+    authority: 'Internal · Pelabuhan & Logistik',
+    formats: ['Excel', 'CSV'],
+    build: (state) => {
+      const jetty = (id: string) => state.jetties.find((j) => j.id === id)
+      const customer = (id: string) => state.customers.find((c) => c.id === id)?.name ?? '-'
+      return state.vessels.map((v) => ({
+        Kode: v.code,
+        'Kapal/Barge': v.name,
+        Tipe: v.type,
+        Fasilitas: jetty(v.jettyId)?.name ?? '-',
+        Pembeli: customer(v.customerId),
+        ETA: v.eta,
+        ETB: v.etb,
+        'Tonase (MT)': v.tonnageMt,
+        'Dimuat (MT)': v.loadedMt,
+        Progres: v.tonnageMt ? Number(((v.loadedMt / v.tonnageMt) * 100).toFixed(1)) : 0,
+        Surveyor: v.surveyor,
+        Tujuan: v.destination,
+        'BL Number': v.blNumber || '-',
+        Status: v.status,
+      }))
+    },
+    columns: [
+      { key: 'Kode', header: 'Kode', render: (r) => <span className="font-mono text-xs">{String(r.Kode)}</span> },
+      { key: 'Kapal/Barge', header: 'Kapal / Barge', sort: (r) => String(r['Kapal/Barge']) },
+      { key: 'Tipe', header: 'Tipe', render: (r) => <Badge tone="neutral">{String(r.Tipe)}</Badge> },
+      { key: 'Fasilitas', header: 'Fasilitas Muat' },
+      { key: 'Pembeli', header: 'Pembeli' },
+      { key: 'ETA', header: 'ETA', sort: (r) => String(r.ETA), render: (r) => <span className="text-xs">{dmy(String(r.ETA))}</span> },
+      { key: 'Tonase (MT)', header: 'Tonase', align: 'right', sort: (r) => Number(r['Tonase (MT)']), render: (r) => num(Number(r['Tonase (MT)'])) },
+      { key: 'Dimuat (MT)', header: 'Dimuat', align: 'right', sort: (r) => Number(r['Dimuat (MT)']), render: (r) => num(Number(r['Dimuat (MT)'])) },
+      { key: 'Progres', header: 'Progres', align: 'right', sort: (r) => Number(r.Progres), render: (r) => <span className="font-mono text-xs font-semibold">{pct1(Number(r.Progres))}</span> },
+      { key: 'BL Number', header: 'BL', render: (r) => <span className="font-mono text-[11px] text-ink-faint">{String(r['BL Number'])}</span> },
+      { key: 'Status', header: 'Status', render: (r) => <StatusBadge value={String(r.Status)} /> },
+    ],
+  },
+  {
+    id: 'rpt-legal',
+    title: 'Laporan Kepatuhan Izin & Regulasi',
+    category: 'Kepatuhan',
+    description: 'Status izin pertambangan (IUP OP/OPK, PKP2B, AMDAL), masa berlaku dokumen, dan kewajiban kepatuhan berjalan.',
+    frequency: 'Bulanan',
+    authority: 'Kementerian ESDM · Legal & Compliance',
+    formats: ['Excel', 'CSV'],
+    build: (state) => {
+      const daysLeft = (iso: string) => Math.round((new Date(iso).getTime() - new Date('2026-10-15').getTime()) / 86400000)
+      return [
+        ...state.permits.map((p) => ({
+          Kelompok: 'Izin',
+          Kode: p.code,
+          Uraian: `${p.type} · ${p.number}`,
+          Instansi: p.authority,
+          Site: state.sites.find((s) => s.id === p.siteId)?.code ?? '-',
+          'Jatuh Tempo': p.expiryDate,
+          'Sisa Hari': daysLeft(p.expiryDate),
+          PIC: p.pic,
+          Status: p.status,
+        })),
+        ...state.compliance.map((c) => ({
+          Kelompok: 'Kewajiban',
+          Kode: c.code,
+          Uraian: c.obligation,
+          Instansi: c.authority,
+          Site: state.sites.find((s) => s.id === c.siteId)?.code ?? '-',
+          'Jatuh Tempo': c.dueDate,
+          'Sisa Hari': daysLeft(c.dueDate),
+          PIC: c.pic,
+          Status: c.status,
+        })),
+      ]
+    },
+    columns: [
+      { key: 'Kelompok', header: 'Kelompok', render: (r) => <Badge tone={String(r.Kelompok) === 'Izin' ? 'amber' : 'violet'}>{String(r.Kelompok)}</Badge> },
+      { key: 'Kode', header: 'Kode', render: (r) => <span className="font-mono text-xs">{String(r.Kode)}</span> },
+      { key: 'Uraian', header: 'Uraian', render: (r) => <p className="max-w-xs">{String(r.Uraian)}</p> },
+      { key: 'Instansi', header: 'Instansi' },
+      { key: 'Site', header: 'Site' },
+      { key: 'Jatuh Tempo', header: 'Jatuh Tempo', sort: (r) => String(r['Jatuh Tempo']), render: (r) => dmy(String(r['Jatuh Tempo'])) },
+      { key: 'Sisa Hari', header: 'Sisa Hari', align: 'right', sort: (r) => Number(r['Sisa Hari']), render: (r) => <span className="font-mono text-xs">{num(Number(r['Sisa Hari']))}</span> },
+      { key: 'PIC', header: 'PIC' },
       { key: 'Status', header: 'Status', render: (r) => <StatusBadge value={String(r.Status)} /> },
     ],
   },
@@ -472,14 +604,14 @@ export default function Reports() {
           onChange={(v) => setCategory(v as typeof category)}
         />
         <div className="relative min-w-[220px] flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faintest" />
           <input className="input input-sm !pl-9" placeholder="Cari laporan…" value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((r) => (
-          <Card key={r.id} className="flex flex-col transition-colors hover:border-zinc-700">
+          <Card key={r.id} className="flex flex-col transition-colors hover:border-line-strong">
             <div className="flex-1 p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-amber-400">
@@ -487,22 +619,22 @@ export default function Reports() {
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <Badge tone="neutral">{r.category}</Badge>
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-600">{r.frequency}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-ink-faintest">{r.frequency}</span>
                 </div>
               </div>
-              <h3 className="mt-3.5 text-sm font-semibold text-zinc-50">{r.title}</h3>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-500">{r.description}</p>
+              <h3 className="mt-3.5 text-sm font-semibold text-ink-strong">{r.title}</h3>
+              <p className="mt-1.5 text-[12px] leading-relaxed text-ink-faint">{r.description}</p>
               <div className="mt-3 flex items-center gap-1.5">
-                <span className="text-[10px] text-zinc-600">Format:</span>
+                <span className="text-[10px] text-ink-faintest">Format:</span>
                 {r.formats.map((f) => (
                   <span key={f} className="chip !text-[10px]">
                     {f}
                   </span>
                 ))}
               </div>
-              <p className="mt-2 text-[11px] text-zinc-600">Otoritas: {r.authority}</p>
+              <p className="mt-2 text-[11px] text-ink-faintest">Otoritas: {r.authority}</p>
             </div>
-            <div className="flex items-center gap-2 border-t border-zinc-800 p-4">
+            <div className="flex items-center gap-2 border-t border-line p-4">
               <Button variant="primary" size="sm" icon={<FileBarChart className="h-3.5 w-3.5" />} onClick={() => setActive(r)} className="flex-1">
                 Generate
               </Button>
@@ -605,7 +737,7 @@ function ReportViewer({ report, onClose }: { report: ReportDef | null; onClose: 
     >
       <div className="space-y-5">
         {/* Parameter */}
-        <div className="grid grid-cols-1 gap-4 rounded-lg border border-zinc-800 bg-zinc-950/50 p-4 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 rounded-lg border border-line bg-surface-2/50 p-4 sm:grid-cols-4">
           <Field label="Periode">
             <Input type="month" value={period} onChange={(e) => setPeriod(e.target.value)} />
           </Field>
@@ -631,14 +763,14 @@ function ReportViewer({ report, onClose }: { report: ReportDef | null; onClose: 
             { label: 'Periode', value: monthLabel(period) },
             ...numericKeys.slice(0, 2).map((k) => ({ label: `Total ${k}`, value: num(sum(rows.map((r) => Number(r[k])))) })),
           ].map((s) => (
-            <div key={s.label} className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
-              <p className="text-[11px] text-zinc-500">{s.label}</p>
+            <div key={s.label} className="rounded-lg border border-line bg-surface-2/50 px-3 py-2.5">
+              <p className="text-[11px] text-ink-faint">{s.label}</p>
               <p className="mt-0.5 font-mono text-sm font-semibold text-amber-400">{s.value}</p>
             </div>
           ))}
         </div>
 
-        <div className="rounded-lg border border-zinc-800">
+        <div className="rounded-lg border border-line">
           <DataTable
             data={rows}
             columns={report.columns}
@@ -652,7 +784,7 @@ function ReportViewer({ report, onClose }: { report: ReportDef | null; onClose: 
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 p-4 text-[11px] text-zinc-500">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface-2/50 p-4 text-[11px] text-ink-faint">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
             Laporan dibuat pada {new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })} WIB

@@ -9,6 +9,7 @@ import {
   HelpCircle,
   LogOut,
   Menu,
+  Moon,
   Mountain,
   Plus,
   Search,
@@ -16,12 +17,14 @@ import {
   ShieldAlert,
   ShoppingCart,
   ClipboardList,
+  Sun,
   Truck,
 } from 'lucide-react'
 import { useERP } from '../store'
 import { cx } from '../lib/format'
 import { TODAY } from '../store'
 import { Button } from './ui'
+import { useTheme } from '../theme/ThemeProvider'
 
 const PAGE_META: Record<string, { title: string; section: string }> = {
   '/dashboard': { title: 'Dashboard Eksekutif', section: 'Utama' },
@@ -56,6 +59,7 @@ const QUICK_ACTIONS: Array<{ label: string; to: string; icon: React.ComponentTyp
 
 export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { state, actions } = useERP()
+  const { theme, toggle } = useTheme()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -108,7 +112,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const today = new Date(TODAY).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   return (
-    <header className="sticky top-0 z-30 border-b border-zinc-800 bg-zinc-950/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-line bg-surface-0/85 backdrop-blur-xl">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
         <button onClick={onMenuClick} className="btn btn-ghost !px-2 lg:hidden" aria-label="Menu">
           <Menu className="h-5 w-5" />
@@ -116,19 +120,19 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
         {/* Breadcrumb / title */}
         <div className="hidden min-w-0 md:block">
-          <div className="flex items-center gap-2 text-[11px] text-zinc-600">
+          <div className="flex items-center gap-2 text-[11px] text-ink-faintest">
             <span>{meta.section}</span>
-            <span className="text-zinc-700">/</span>
-            <span className="text-zinc-400">{meta.title}</span>
+            <span className="text-ink-faintest">/</span>
+            <span className="text-ink-muted">{meta.title}</span>
           </div>
-          <p className="truncate text-sm font-semibold text-zinc-100">{meta.title}</p>
+          <p className="truncate text-sm font-semibold text-ink-strong">{meta.title}</p>
         </div>
 
         <div className="flex-1" />
 
         {/* Global search */}
         <div ref={searchRef} className="relative hidden w-full max-w-md sm:block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faintest" />
           <input
             className="input !h-9 !pl-9 !pr-3"
             placeholder="Cari site, pelanggan, armada, SO, PO, karyawan…"
@@ -140,13 +144,13 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
             onFocus={() => setSearchOpen(true)}
           />
           {searchOpen && search.trim().length >= 2 && (
-            <div className="absolute left-0 right-0 top-11 max-h-96 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-900/95 shadow-panel backdrop-blur animate-fade-in scrollbar-thin">
+            <div className="absolute left-0 right-0 top-11 max-h-96 overflow-y-auto rounded-lg border border-line bg-surface-1/95 shadow-panel backdrop-blur animate-fade-in scrollbar-thin">
               {results.length === 0 ? (
-                <p className="px-4 py-6 text-center text-sm text-zinc-500">Tidak ada hasil untuk “{search}”</p>
+                <p className="px-4 py-6 text-center text-sm text-ink-faint">Tidak ada hasil untuk “{search}”</p>
               ) : (
                 Object.entries(grouped).map(([group, items]) => (
                   <div key={group}>
-                    <p className="sticky top-0 bg-zinc-900/95 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-600 backdrop-blur">{group}</p>
+                    <p className="sticky top-0 bg-surface-1/95 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-ink-faintest backdrop-blur">{group}</p>
                     {items.map((r) => (
                       <button
                         key={r.id + r.group}
@@ -155,11 +159,11 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
                           setSearch('')
                           setSearchOpen(false)
                         }}
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-zinc-800/60"
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-surface-2/60"
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm text-zinc-200">{r.label}</p>
-                          <p className="truncate text-[11px] text-zinc-500">{r.sub}</p>
+                          <p className="truncate text-sm text-ink">{r.label}</p>
+                          <p className="truncate text-[11px] text-ink-faint">{r.sub}</p>
                         </div>
                       </button>
                     ))}
@@ -180,8 +184,8 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
             <Plus className="h-4 w-4" />
           </button>
           {quickOpen && (
-            <div className="absolute right-0 top-11 w-60 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/95 shadow-panel backdrop-blur animate-fade-in">
-              <p className="border-b border-zinc-800 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-zinc-600">Buat baru</p>
+            <div className="absolute right-0 top-11 w-60 overflow-hidden rounded-lg border border-line bg-surface-1/95 shadow-panel backdrop-blur animate-fade-in">
+              <p className="border-b border-line px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-ink-faintest">Buat baru</p>
               {QUICK_ACTIONS.map((a) => (
                 <button
                   key={a.label}
@@ -189,7 +193,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
                     navigate(a.to)
                     setQuickOpen(false)
                   }}
-                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm text-zinc-300 hover:bg-zinc-800/60 hover:text-zinc-100"
+                  className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm text-ink hover:bg-surface-2/60 hover:text-ink-strong"
                 >
                   <a.icon className="h-4 w-4 text-amber-400" />
                   {a.label}
@@ -210,9 +214,9 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
             )}
           </button>
           {notifOpen && (
-            <div className="absolute right-0 top-11 w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/95 shadow-panel backdrop-blur animate-fade-in">
-              <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
-                <p className="text-sm font-semibold text-zinc-100">Notifikasi</p>
+            <div className="absolute right-0 top-11 w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-line bg-surface-1/95 shadow-panel backdrop-blur animate-fade-in">
+              <div className="flex items-center justify-between border-b border-line px-4 py-3">
+                <p className="text-sm font-semibold text-ink-strong">Notifikasi</p>
                 <button onClick={() => actions.markAllNotificationsRead()} className="text-[11px] font-medium text-amber-400 hover:text-amber-300">
                   Tandai semua dibaca
                 </button>
@@ -222,7 +226,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
                   <button
                     key={n.id}
                     onClick={() => actions.markNotificationRead(n.id)}
-                    className={cx('flex w-full gap-3 border-b border-zinc-800/60 px-4 py-3 text-left hover:bg-zinc-800/40', !n.read && 'bg-amber-500/[0.04]')}
+                    className={cx('flex w-full gap-3 border-b border-line/60 px-4 py-3 text-left hover:bg-surface-2/40', !n.read && 'bg-amber-500/[0.04]')}
                   >
                     <span
                       className={cx(
@@ -231,9 +235,9 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
                       )}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-zinc-200">{n.title}</p>
-                      <p className="mt-0.5 line-clamp-2 text-[11px] text-zinc-500">{n.body}</p>
-                      <p className="mt-1 text-[10px] text-zinc-600">{n.time}</p>
+                      <p className="truncate text-sm font-medium text-ink">{n.title}</p>
+                      <p className="mt-0.5 line-clamp-2 text-[11px] text-ink-faint">{n.body}</p>
+                      <p className="mt-1 text-[10px] text-ink-faintest">{n.time}</p>
                     </div>
                   </button>
                 ))}
@@ -249,29 +253,29 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
         {/* User */}
         <div ref={userRef} className="relative">
-          <button onClick={() => setUserOpen((v) => !v)} className="flex items-center gap-2 rounded-lg p-1 hover:bg-zinc-800/60">
+          <button onClick={() => setUserOpen((v) => !v)} className="flex items-center gap-2 rounded-lg p-1 hover:bg-surface-2/60">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-amber-400 to-orange-600 text-[11px] font-bold text-zinc-950">
               {state.currentUser.avatar}
             </span>
             <span className="hidden text-left lg:block">
-              <span className="block text-xs font-semibold text-zinc-200">{state.currentUser.name}</span>
-              <span className="block text-[10px] text-zinc-500">{state.currentUser.role}</span>
+              <span className="block text-xs font-semibold text-ink">{state.currentUser.name}</span>
+              <span className="block text-[10px] text-ink-faint">{state.currentUser.role}</span>
             </span>
-            <ChevronDown className="hidden h-3.5 w-3.5 text-zinc-600 lg:block" />
+            <ChevronDown className="hidden h-3.5 w-3.5 text-ink-faintest lg:block" />
           </button>
           {userOpen && (
-            <div className="absolute right-0 top-11 w-56 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/95 shadow-panel backdrop-blur animate-fade-in">
-              <div className="border-b border-zinc-800 px-4 py-3">
-                <p className="text-sm font-semibold text-zinc-100">{state.currentUser.name}</p>
-                <p className="truncate text-[11px] text-zinc-500">{state.currentUser.email}</p>
+            <div className="absolute right-0 top-11 w-56 overflow-hidden rounded-lg border border-line bg-surface-1/95 shadow-panel backdrop-blur animate-fade-in">
+              <div className="border-b border-line px-4 py-3">
+                <p className="text-sm font-semibold text-ink-strong">{state.currentUser.name}</p>
+                <p className="truncate text-[11px] text-ink-faint">{state.currentUser.email}</p>
               </div>
-              <Link to="/settings" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800/60">
-                <CircleUser className="h-4 w-4 text-zinc-500" /> Profil Saya
+              <Link to="/settings" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-surface-2/60">
+                <CircleUser className="h-4 w-4 text-ink-faint" /> Profil Saya
               </Link>
-              <Link to="/settings" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800/60">
-                <Settings2 className="h-4 w-4 text-zinc-500" /> Preferensi Sistem
+              <Link to="/settings" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-surface-2/60">
+                <Settings2 className="h-4 w-4 text-ink-faint" /> Preferensi Sistem
               </Link>
-              <button className="flex w-full items-center gap-2.5 border-t border-zinc-800 px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10">
+              <button className="flex w-full items-center gap-2.5 border-t border-line px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10">
                 <LogOut className="h-4 w-4" /> Keluar
               </button>
             </div>
@@ -297,8 +301,8 @@ export function PageHeader({
     <div className="mb-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-50">{title}</h1>
-          {subtitle && <p className="mt-1.5 max-w-3xl text-sm text-zinc-500">{subtitle}</p>}
+          <h1 className="text-2xl font-bold tracking-tight text-ink-strong">{title}</h1>
+          {subtitle && <p className="mt-1.5 max-w-3xl text-sm text-ink-faint">{subtitle}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </div>

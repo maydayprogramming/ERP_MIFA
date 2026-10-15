@@ -80,10 +80,10 @@ export default function Finance() {
   /* ------------------------------- Columns ------------------------------- */
   const journalColumns: Column<JournalEntry>[] = [
     { key: 'journalNo', header: 'No. Jurnal', sort: (r) => r.journalNo, render: (r) => <span className="font-mono text-[12px] text-amber-400">{r.journalNo}</span> },
-    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
+    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
     { key: 'module', header: 'Modul', sort: (r) => r.module, render: (r) => <Badge tone="neutral">{r.module}</Badge> },
-    { key: 'account', header: 'Akun', sort: (r) => r.account, render: (r) => <span className="font-mono text-[12px] text-zinc-200">{r.account}</span> },
-    { key: 'description', header: 'Keterangan', render: (r) => <span className="text-[12px] text-zinc-400">{r.description}</span> },
+    { key: 'account', header: 'Akun', sort: (r) => r.account, render: (r) => <span className="font-mono text-[12px] text-ink">{r.account}</span> },
+    { key: 'description', header: 'Keterangan', render: (r) => <span className="text-[12px] text-ink-muted">{r.description}</span> },
     { key: 'debit', header: 'Debit', align: 'right', sort: (r) => r.debit, render: (r) => <span className="font-mono text-emerald-400">{r.debit ? idr(r.debit) : '-'}</span> },
     { key: 'credit', header: 'Kredit', align: 'right', sort: (r) => r.credit, render: (r) => <span className="font-mono text-sky-400">{r.credit ? idr(r.credit) : '-'}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
@@ -91,9 +91,9 @@ export default function Finance() {
 
   const invoiceColumns: Column<Invoice>[] = [
     { key: 'invoiceNo', header: 'No. Invoice', sort: (r) => r.invoiceNo, render: (r) => <span className="font-mono text-[12px] font-medium text-amber-400">{r.invoiceNo}</span> },
-    { key: 'taxInvoiceNo', header: 'Faktur Pajak', render: (r) => <span className="font-mono text-[11px] text-zinc-500">{r.taxInvoiceNo}</span> },
-    { key: 'customerId', header: 'Pelanggan', sort: (r) => customerName(r.customerId), render: (r) => <span className="text-zinc-200">{customerName(r.customerId)}</span> },
-    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
+    { key: 'taxInvoiceNo', header: 'Faktur Pajak', render: (r) => <span className="font-mono text-[11px] text-ink-faint">{r.taxInvoiceNo}</span> },
+    { key: 'customerId', header: 'Pelanggan', sort: (r) => customerName(r.customerId), render: (r) => <span className="text-ink">{customerName(r.customerId)}</span> },
+    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
     {
       key: 'dueDate',
       header: 'Jatuh Tempo',
@@ -102,22 +102,22 @@ export default function Finance() {
         const od = daysBetween(r.dueDate, '2026-10-15')
         return (
           <div>
-            <p className="text-zinc-300">{dmy(r.dueDate)}</p>
+            <p className="text-ink">{dmy(r.dueDate)}</p>
             {r.status !== 'Paid' && od > 0 && <p className="text-[11px] text-rose-400">Terlambat {od} hari</p>}
           </div>
         )
       },
     },
     { key: 'amountUsd', header: 'Nilai', align: 'right', sort: (r) => r.amountUsd, render: (r) => <span className="font-mono font-semibold text-emerald-400">{usd(r.amountUsd)}</span> },
-    { key: 'amountIdr', header: 'Ekuivalen IDR', align: 'right', render: (r) => <span className="font-mono text-zinc-500">{idr(r.amountUsd * COMPANY.fx)}</span> },
+    { key: 'amountIdr', header: 'Ekuivalen IDR', align: 'right', render: (r) => <span className="font-mono text-ink-faint">{idr(r.amountUsd * COMPANY.fx)}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
   ]
 
   const billColumns: Column<Bill>[] = [
     { key: 'billNo', header: 'No. Tagihan', sort: (r) => r.billNo, render: (r) => <span className="font-mono text-[12px] font-medium text-amber-400">{r.billNo}</span> },
-    { key: 'vendorId', header: 'Vendor', sort: (r) => vendorName(r.vendorId), render: (r) => <span className="text-zinc-200">{vendorName(r.vendorId)}</span> },
-    { key: 'poId', header: 'Referensi PO', render: (r) => <span className="font-mono text-[11px] text-zinc-500">{state.purchaseOrders.find((p) => p.id === r.poId)?.poNo ?? '-'}</span> },
-    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
+    { key: 'vendorId', header: 'Vendor', sort: (r) => vendorName(r.vendorId), render: (r) => <span className="text-ink">{vendorName(r.vendorId)}</span> },
+    { key: 'poId', header: 'Referensi PO', render: (r) => <span className="font-mono text-[11px] text-ink-faint">{state.purchaseOrders.find((p) => p.id === r.poId)?.poNo ?? '-'}</span> },
+    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
     {
       key: 'dueDate',
       header: 'Jatuh Tempo',
@@ -126,7 +126,7 @@ export default function Finance() {
         const od = daysBetween(r.dueDate, '2026-10-15')
         return (
           <div>
-            <p className="text-zinc-300">{dmy(r.dueDate)}</p>
+            <p className="text-ink">{dmy(r.dueDate)}</p>
             {r.status !== 'Paid' && od > 0 && <p className="text-[11px] text-rose-400">Terlambat {od} hari</p>}
           </div>
         )
@@ -137,9 +137,9 @@ export default function Finance() {
   ]
 
   const budgetColumns: Column<BudgetLine>[] = [
-    { key: 'category', header: 'Kategori Biaya', sort: (r) => r.category, render: (r) => <span className="text-zinc-200">{r.category}</span> },
+    { key: 'category', header: 'Kategori Biaya', sort: (r) => r.category, render: (r) => <span className="text-ink">{r.category}</span> },
     { key: 'siteId', header: 'Site', sort: (r) => siteCode(r.siteId), render: (r) => <span className="chip">{siteCode(r.siteId)}</span> },
-    { key: 'period', header: 'Periode', render: (r) => <span className="text-zinc-400">{r.period}</span> },
+    { key: 'period', header: 'Periode', render: (r) => <span className="text-ink-muted">{r.period}</span> },
     { key: 'budgetIdr', header: 'Anggaran', align: 'right', sort: (r) => r.budgetIdr, render: (r) => <span className="font-mono">{idr(r.budgetIdr)}</span> },
     { key: 'actualIdr', header: 'Realisasi', align: 'right', sort: (r) => r.actualIdr, render: (r) => <span className="font-mono text-emerald-400">{idr(r.actualIdr)}</span> },
     {
@@ -158,7 +158,7 @@ export default function Finance() {
       render: (r) => (
         <div className="w-28">
           <Progress value={(r.actualIdr / r.budgetIdr) * 100} tone={r.actualIdr > r.budgetIdr ? 'rose' : r.actualIdr / r.budgetIdr > 0.9 ? 'amber' : 'emerald'} />
-          <p className="mt-1 text-[10px] text-zinc-600">{pct1((r.actualIdr / r.budgetIdr) * 100)}</p>
+          <p className="mt-1 text-[10px] text-ink-faintest">{pct1((r.actualIdr / r.budgetIdr) * 100)}</p>
         </div>
       ),
     },
@@ -166,10 +166,10 @@ export default function Finance() {
 
   const capexColumns: Column<CapexProject>[] = [
     { key: 'code', header: 'Kode', sort: (r) => r.code, render: (r) => <span className="font-mono text-[12px] text-amber-400">{r.code}</span> },
-    { key: 'name', header: 'Nama Proyek', sort: (r) => r.name, render: (r) => <span className="text-zinc-200">{r.name}</span> },
+    { key: 'name', header: 'Nama Proyek', sort: (r) => r.name, render: (r) => <span className="text-ink">{r.name}</span> },
     { key: 'siteId', header: 'Site', sort: (r) => siteCode(r.siteId), render: (r) => <span className="chip">{siteCode(r.siteId)}</span> },
-    { key: 'startDate', header: 'Mulai', sort: (r) => r.startDate, render: (r) => <span className="text-zinc-400">{dmy(r.startDate)}</span> },
-    { key: 'endDate', header: 'Target Selesai', sort: (r) => r.endDate, render: (r) => <span className="text-zinc-400">{dmy(r.endDate)}</span> },
+    { key: 'startDate', header: 'Mulai', sort: (r) => r.startDate, render: (r) => <span className="text-ink-muted">{dmy(r.startDate)}</span> },
+    { key: 'endDate', header: 'Target Selesai', sort: (r) => r.endDate, render: (r) => <span className="text-ink-muted">{dmy(r.endDate)}</span> },
     { key: 'budgetIdr', header: 'Anggaran', align: 'right', sort: (r) => r.budgetIdr, render: (r) => <span className="font-mono">{idr(r.budgetIdr)}</span> },
     { key: 'spentIdr', header: 'Terpakai', align: 'right', sort: (r) => r.spentIdr, render: (r) => <span className="font-mono text-emerald-400">{idr(r.spentIdr)}</span> },
     {
@@ -178,7 +178,7 @@ export default function Finance() {
       render: (r) => (
         <div className="w-28">
           <Progress value={r.progressPct} tone={r.progressPct > 90 ? 'emerald' : 'amber'} />
-          <p className="mt-1 text-[10px] text-zinc-600">{r.progressPct}%</p>
+          <p className="mt-1 text-[10px] text-ink-faintest">{r.progressPct}%</p>
         </div>
       ),
     },
@@ -186,11 +186,11 @@ export default function Finance() {
   ]
 
   const royaltyColumns: Column<RoyaltyRecord>[] = [
-    { key: 'period', header: 'Periode', sort: (r) => r.period, render: (r) => <span className="font-mono text-zinc-200">{monthLabel(r.period)}</span> },
+    { key: 'period', header: 'Periode', sort: (r) => r.period, render: (r) => <span className="font-mono text-ink">{monthLabel(r.period)}</span> },
     { key: 'siteId', header: 'Site', sort: (r) => siteCode(r.siteId), render: (r) => <span className="chip">{siteCode(r.siteId)}</span> },
     { key: 'volumeMt', header: 'Volume', align: 'right', sort: (r) => r.volumeMt, render: (r) => <span className="font-mono">{num(r.volumeMt)} MT</span> },
     { key: 'salesValueUsd', header: 'Nilai Penjualan', align: 'right', sort: (r) => r.salesValueUsd, render: (r) => <span className="font-mono">{usd(r.salesValueUsd)}</span> },
-    { key: 'gcvBand', header: 'Band Kalori', render: (r) => <span className="text-[12px] text-zinc-400">{r.gcvBand}</span> },
+    { key: 'gcvBand', header: 'Band Kalori', render: (r) => <span className="text-[12px] text-ink-muted">{r.gcvBand}</span> },
     { key: 'ratePct', header: 'Tarif', align: 'right', sort: (r) => r.ratePct, render: (r) => <Badge tone="warning">{r.ratePct}%</Badge> },
     { key: 'royaltyUsd', header: 'Royalti PNBP', align: 'right', sort: (r) => r.royaltyUsd, render: (r) => <span className="font-mono font-semibold text-rose-400">{usd(r.royaltyUsd)}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
@@ -294,20 +294,20 @@ export default function Finance() {
               <CardHeader title="Ringkasan Piutang" subtitle="Eksposur piutang usaha" icon={<Wallet className="h-4 w-4" />} />
               <div className="space-y-3 p-5">
                 {arAging.map((a) => (
-                  <div key={a.label} className="flex items-center justify-between border-b border-zinc-800 pb-2.5 last:border-0">
-                    <span className="text-xs text-zinc-400">{a.label}</span>
+                  <div key={a.label} className="flex items-center justify-between border-b border-line pb-2.5 last:border-0">
+                    <span className="text-xs text-ink-muted">{a.label}</span>
                     <div className="text-right">
                       <p className={`font-mono text-sm font-semibold ${a.tone === 'rose' ? 'text-rose-400' : a.tone === 'amber' ? 'text-amber-400' : 'text-emerald-400'}`}>{usd(a.amount)}</p>
-                      <p className="text-[10px] text-zinc-600">{a.count} invoice</p>
+                      <p className="text-[10px] text-ink-faintest">{a.count} invoice</p>
                     </div>
                   </div>
                 ))}
-                <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
+                <div className="rounded-lg border border-line bg-surface-2/50 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-zinc-300">Total Outstanding</span>
+                    <span className="text-xs font-semibold text-ink">Total Outstanding</span>
                     <span className="font-mono text-sm font-bold text-amber-400">{usd(m.arOutstanding)}</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-zinc-600">Ekuivalen {idr(m.arOutstanding * COMPANY.fx)}</p>
+                  <p className="mt-1 text-[11px] text-ink-faintest">Ekuivalen {idr(m.arOutstanding * COMPANY.fx)}</p>
                 </div>
               </div>
             </Card>
@@ -351,20 +351,20 @@ export default function Finance() {
               <CardHeader title="Ringkasan Utang" subtitle="Eksposur utang usaha" icon={<Receipt className="h-4 w-4" />} />
               <div className="space-y-3 p-5">
                 {apAging.map((a) => (
-                  <div key={a.label} className="flex items-center justify-between border-b border-zinc-800 pb-2.5 last:border-0">
-                    <span className="text-xs text-zinc-400">{a.label}</span>
+                  <div key={a.label} className="flex items-center justify-between border-b border-line pb-2.5 last:border-0">
+                    <span className="text-xs text-ink-muted">{a.label}</span>
                     <div className="text-right">
-                      <p className="font-mono text-sm font-semibold text-zinc-100">{idr(a.amount)}</p>
-                      <p className="text-[10px] text-zinc-600">{a.count} tagihan</p>
+                      <p className="font-mono text-sm font-semibold text-ink-strong">{idr(a.amount)}</p>
+                      <p className="text-[10px] text-ink-faintest">{a.count} tagihan</p>
                     </div>
                   </div>
                 ))}
-                <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
+                <div className="rounded-lg border border-line bg-surface-2/50 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-zinc-300">Total Utang</span>
+                    <span className="text-xs font-semibold text-ink">Total Utang</span>
                     <span className="font-mono text-sm font-bold text-violet-400">{idr(m.apOutstanding)}</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-zinc-600">{num(m.poPending)} PO menunggu persetujuan</p>
+                  <p className="mt-1 text-[11px] text-ink-faintest">{num(m.poPending)} PO menunggu persetujuan</p>
                 </div>
               </div>
             </Card>
@@ -412,28 +412,28 @@ export default function Finance() {
               <div className="space-y-5 p-5">
                 <div>
                   <Progress value={m.rkabPct} tone={m.rkabPct > 100 ? 'rose' : 'emerald'} label="Biaya operasional" />
-                  <p className="mt-1.5 text-[11px] text-zinc-600">
+                  <p className="mt-1.5 text-[11px] text-ink-faintest">
                     {idr(m.actualTotal)} dari {idr(m.budgetTotal)}
                   </p>
                 </div>
                 <div>
                   <Progress value={82.6} tone="amber" label="Biaya produksi" />
-                  <p className="mt-1.5 text-[11px] text-zinc-600">Rp 1,42 T dari Rp 1,72 T</p>
+                  <p className="mt-1.5 text-[11px] text-ink-faintest">Rp 1,42 T dari Rp 1,72 T</p>
                 </div>
                 <div>
                   <Progress value={64.1} tone="sky" label="Investasi CAPEX" />
-                  <p className="mt-1.5 text-[11px] text-zinc-600">
+                  <p className="mt-1.5 text-[11px] text-ink-faintest">
                     {idr(capexSpent)} dari {idr(capexTotal)}
                   </p>
                 </div>
-                <div className="space-y-2 border-t border-zinc-800 pt-3">
+                <div className="space-y-2 border-t border-line pt-3">
                   {[
                     { label: 'Selisih (hemat)', value: idr(m.budgetTotal - m.actualTotal), tone: 'text-emerald-400' },
-                    { label: 'Kategori terbesar', value: 'Jasa Kontraktor', tone: 'text-zinc-200' },
+                    { label: 'Kategori terbesar', value: 'Jasa Kontraktor', tone: 'text-ink' },
                     { label: 'Deviasi tertinggi', value: 'Tyres & Ban (+7,4%)', tone: 'text-rose-400' },
                   ].map((r) => (
                     <div key={r.label} className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-500">{r.label}</span>
+                      <span className="text-ink-faint">{r.label}</span>
                       <span className={`font-mono font-semibold ${r.tone}`}>{r.value}</span>
                     </div>
                   ))}
@@ -540,7 +540,7 @@ export default function Finance() {
 
             <Card>
               <CardHeader title="Struktur Tarif Royalti" subtitle="Berdasarkan PP No. 9/2010 jo. PP No. 1/2017" icon={<Landmark className="h-4 w-4" />} />
-              <div className="divide-y divide-zinc-800">
+              <div className="divide-y divide-line">
                 {[
                   { band: 'GAR > 5.200', rate: 4 },
                   { band: 'GAR 4.201 – 5.200', rate: 5 },
@@ -550,17 +550,17 @@ export default function Finance() {
                   { band: 'GAR ≤ 2.100', rate: 9 },
                 ].map((r) => (
                   <div key={r.band} className="flex items-center justify-between px-5 py-2.5">
-                    <span className="text-[12px] text-zinc-400">{r.band}</span>
+                    <span className="text-[12px] text-ink-muted">{r.band}</span>
                     <Badge tone={m.royaltyRate.band === r.band ? 'amber' : 'neutral'}>{r.rate}%</Badge>
                   </div>
                 ))}
               </div>
-              <div className="border-t border-zinc-800 p-4">
-                <p className="text-[11px] text-zinc-500">Tarif berlaku periode berjalan</p>
+              <div className="border-t border-line p-4">
+                <p className="text-[11px] text-ink-faint">Tarif berlaku periode berjalan</p>
                 <p className="mt-1 text-sm font-semibold text-amber-400">
                   {m.royaltyRate.band} &middot; {m.royaltyRate.rate}%
                 </p>
-                <p className="mt-1 text-[11px] text-zinc-600">Rata-rata GCV bulan ini {num(m.avgGcv)} kcal/kg</p>
+                <p className="mt-1 text-[11px] text-ink-faintest">Rata-rata GCV bulan ini {num(m.avgGcv)} kcal/kg</p>
               </div>
             </Card>
           </div>
@@ -576,9 +576,9 @@ export default function Finance() {
                   { label: 'PBB & Retribusi', value: idr(4_200_000_000) },
                   { label: 'Bea Masuk Alat Berat', value: idr(6_800_000_000) },
                 ].map((r) => (
-                  <div key={r.label} className="flex items-center justify-between border-b border-zinc-800 pb-2.5 last:border-0">
-                    <span className="text-xs text-zinc-400">{r.label}</span>
-                    <span className="font-mono text-sm font-semibold text-zinc-100">{r.value}</span>
+                  <div key={r.label} className="flex items-center justify-between border-b border-line pb-2.5 last:border-0">
+                    <span className="text-xs text-ink-muted">{r.label}</span>
+                    <span className="font-mono text-sm font-semibold text-ink-strong">{r.value}</span>
                   </div>
                 ))}
               </div>
@@ -611,13 +611,13 @@ export default function Finance() {
         ].map((s) => (
           <Card key={s.label}>
             <div className="flex items-start gap-3 p-5">
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zinc-800/60 text-zinc-400">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-surface-2/60 text-ink-muted">
                 <s.icon className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-zinc-500">{s.label}</p>
+                <p className="text-[11px] uppercase tracking-wider text-ink-faint">{s.label}</p>
                 <p className={`mt-1 font-mono text-xl font-bold ${s.tone}`}>{s.value}</p>
-                <p className="text-[11px] text-zinc-600">{s.sub}</p>
+                <p className="text-[11px] text-ink-faintest">{s.sub}</p>
               </div>
             </div>
           </Card>

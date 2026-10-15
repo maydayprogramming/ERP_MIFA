@@ -15,6 +15,12 @@ import type {
   Invoice,
   JournalEntry,
   MaintenanceJob,
+  MinePlan,
+  BlendingRecipe,
+  Jetty,
+  Vessel,
+  Permit,
+  ComplianceObligation,
   Notification,
   ProductionRecord,
   PurchaseOrder,
@@ -40,6 +46,12 @@ export interface AppState {
   incidents: Incident[]
   training: TrainingRecord[]
   environmental: EnvironmentalReading[]
+  minePlans: MinePlan[]
+  blendingRecipes: BlendingRecipe[]
+  jetties: Jetty[]
+  vessels: Vessel[]
+  permits: Permit[]
+  compliance: ComplianceObligation[]
   customers: Customer[]
   contracts: Contract[]
   salesOrders: SalesOrder[]
@@ -72,6 +84,12 @@ function freshState(): AppState {
     incidents: SEED.INCIDENTS,
     training: SEED.TRAINING,
     environmental: SEED.ENVIRONMENTAL,
+    minePlans: SEED.MINE_PLANS,
+    blendingRecipes: SEED.BLENDING_RECIPES,
+    jetties: SEED.JETTIES,
+    vessels: SEED.VESSELS,
+    permits: SEED.PERMITS,
+    compliance: SEED.COMPLIANCE,
     customers: SEED.CUSTOMERS,
     contracts: SEED.CONTRACTS,
     salesOrders: SEED.SALES_ORDERS,
@@ -136,6 +154,15 @@ interface AppContextValue {
     addCapex: (r: Omit<CapexProject, 'id'>) => void
     addCustomer: (r: Omit<Customer, 'id' | 'outstandingIdr' | 'status' | 'code'>) => void
     addVendor: (r: Omit<Vendor, 'id' | 'totalSpendIdr' | 'status' | 'rating' | 'code'>) => void
+    addMinePlan: (r: Omit<MinePlan, 'id' | 'code' | 'actualCoalMt' | 'actualObBcm' | 'status'>) => void
+    setMinePlanStatus: (id: string, status: MinePlan['status']) => void
+    addBlendingRecipe: (r: Omit<BlendingRecipe, 'id' | 'code' | 'status'>) => void
+    setBlendingStatus: (id: string, status: BlendingRecipe['status']) => void
+    setVesselStatus: (id: string, status: Vessel['status']) => void
+    addVessel: (r: Omit<Vessel, 'id' | 'code' | 'status' | 'loadedMt' | 'blNumber'>) => void
+    addPermit: (r: Omit<Permit, 'id' | 'code' | 'status'>) => void
+    setPermitStatus: (id: string, status: Permit['status']) => void
+    setComplianceStatus: (id: string, status: ComplianceObligation['status']) => void
     markNotificationRead: (id: string) => void
     markAllNotificationsRead: () => void
     resetData: () => void
@@ -340,6 +367,55 @@ export function AppProvider({ children }: { children: ReactNode }) {
           vendors: [{ ...r, id: uid('vnd'), code, totalSpendIdr: 0, status: 'Pending', rating: 3 }, ...s.vendors],
         }))
         toast('Vendor terdaftar', 'success')
+      },
+      addMinePlan: (r) => {
+        const code = `MP-${r.period}-${String(Math.floor(Math.random() * 900) + 100)}`
+        setState((s) => ({ ...s, minePlans: [{ ...r, id: uid('mp'), code, actualCoalMt: 0, actualObBcm: 0, status: 'Draft' }, ...s.minePlans] }))
+        logActivity(`membuat rencana tambang ${code}`, 'Perencanaan Tambang')
+        toast('Rencana tambang berhasil dibuat', 'success')
+      },
+      setMinePlanStatus: (id, status) => {
+        setState((s) => ({ ...s, minePlans: s.minePlans.map((m) => (m.id === id ? { ...m, status } : m)) }))
+        toast(`Status rencana tambang menjadi ${status}`, 'info')
+      },
+      addBlendingRecipe: (r) => {
+        const code = `BLD-${String(Math.floor(Math.random() * 900) + 100)}`
+        setState((s) => ({ ...s, blendingRecipes: [{ ...r, id: uid('bl'), code, status: 'Draft' }, ...s.blendingRecipes] }))
+        logActivity(`membuat resep blending ${code}`, 'Perencanaan Tambang')
+        toast('Resep blending berhasil dibuat', 'success')
+      },
+      setBlendingStatus: (id, status) => {
+        setState((s) => ({ ...s, blendingRecipes: s.blendingRecipes.map((b) => (b.id === id ? { ...b, status } : b)) }))
+        toast(`Resep blending menjadi ${status}`, 'info')
+      },
+      setVesselStatus: (id, status) => {
+        setState((s) => ({
+          ...s,
+          vessels: s.vessels.map((v) =>
+            v.id === id ? { ...v, status, blNumber: status === 'Sailed' && !v.blNumber ? `BL-2026-${String(Math.floor(Math.random() * 900) + 1000)}` : v.blNumber } : v,
+          ),
+        }))
+        toast(`Status kapal/barge menjadi ${status}`, 'info')
+      },
+      addVessel: (r) => {
+        const code = `VSL-${String(Math.floor(Math.random() * 900) + 100)}`
+        setState((s) => ({ ...s, vessels: [{ ...r, id: uid('vsl'), code, status: 'Waiting', loadedMt: 0, blNumber: '' }, ...s.vessels] }))
+        logActivity(`menjadwalkan kedatangan ${code}`, 'Pelabuhan')
+        toast('Jadwal kapal/barge terdaftar', 'success')
+      },
+      addPermit: (r) => {
+        const code = `IZN-${String(Math.floor(Math.random() * 900) + 100)}`
+        setState((s) => ({ ...s, permits: [{ ...r, id: uid('prm'), code, status: 'Aktif' }, ...s.permits] }))
+        logActivity(`mendaftarkan izin ${code}`, 'Legal & Compliance')
+        toast('Izin berhasil didaftarkan', 'success')
+      },
+      setPermitStatus: (id, status) => {
+        setState((s) => ({ ...s, permits: s.permits.map((p) => (p.id === id ? { ...p, status } : p)) }))
+        toast(`Status izin menjadi ${status}`, 'info')
+      },
+      setComplianceStatus: (id, status) => {
+        setState((s) => ({ ...s, compliance: s.compliance.map((c) => (c.id === id ? { ...c, status } : c)) }))
+        toast(`Kewajiban kepatuhan menjadi ${status}`, 'info')
       },
       markNotificationRead: (id) => {
         setState((s) => ({

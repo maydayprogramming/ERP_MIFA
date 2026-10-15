@@ -9,17 +9,39 @@ export default {
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
-        coal: {
-          950: '#0a0a0b',
-          900: '#121215',
-          850: '#17171b',
-          800: '#1e1e23',
-          700: '#2a2a31',
+        /* Semantic surface tokens — didefinisikan sebagai RGB channel agar
+           modifier opacity Tailwind (mis. bg-surface-0/85) tetap berfungsi. */
+        surface: {
+          0: 'rgb(var(--surface-0) / <alpha-value>)',
+          1: 'rgb(var(--surface-1) / <alpha-value>)',
+          2: 'rgb(var(--surface-2) / <alpha-value>)',
+          3: 'rgb(var(--surface-3) / <alpha-value>)',
+        },
+        line: {
+          DEFAULT: 'rgb(var(--border) / <alpha-value>)',
+          strong: 'rgb(var(--border-strong) / <alpha-value>)',
+        },
+        ink: {
+          DEFAULT: 'rgb(var(--text) / <alpha-value>)',
+          strong: 'rgb(var(--text-strong) / <alpha-value>)',
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+          faint: 'rgb(var(--text-faint) / <alpha-value>)',
+          faintest: 'rgb(var(--text-faintest) / <alpha-value>)',
+        },
+        brand: {
+          50: '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#f59e0b',
+          600: '#d97706',
+          700: '#b45309',
         },
       },
       boxShadow: {
-        glow: '0 0 0 1px rgba(245,158,11,0.25), 0 8px 30px -12px rgba(245,158,11,0.35)',
-        panel: '0 1px 0 0 rgba(255,255,255,0.03) inset, 0 20px 40px -24px rgba(0,0,0,0.9)',
+        glow: '0 0 0 1px rgb(var(--border) / 0.25), 0 8px 30px -12px rgba(245, 158, 11, 0.35)',
+        panel: '0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 20px 40px -24px rgba(0, 0, 0, 0.25)',
       },
       keyframes: {
         'fade-in': {
@@ -33,9 +55,6 @@ export default {
         'scale-in': {
           '0%': { opacity: '0', transform: 'scale(0.96)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
-        },
-        shimmer: {
-          '100%': { transform: 'translateX(100%)' },
         },
       },
       animation: {

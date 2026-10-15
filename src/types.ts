@@ -341,6 +341,116 @@ export interface RoyaltyRecord {
   status: 'Accrued' | 'Paid' | 'Pending'
 }
 
+/* ------------------------ Perencanaan Tambang ----------------------- */
+
+export interface MinePlan {
+  id: ID
+  code: string
+  siteId: ID
+  period: string
+  pit: string
+  bench: string
+  planCoalMt: number
+  planObBcm: number
+  actualCoalMt: number
+  actualObBcm: number
+  status: 'Draft' | 'Approved' | 'In Progress' | 'Completed' | 'Revised'
+  engineer: string
+  notes: string
+}
+
+export interface BlendingComponent {
+  stockpileId: ID
+  pct: number
+}
+
+export interface BlendingRecipe {
+  id: ID
+  code: string
+  name: string
+  siteId: ID
+  targetGcv: number
+  targetAsh: number
+  targetSulfur: number
+  components: BlendingComponent[]
+  volumeMt: number
+  status: 'Draft' | 'Active' | 'Archived'
+}
+
+/* --------------------- Pelabuhan & Bongkar Muat --------------------- */
+
+export interface Jetty {
+  id: ID
+  code: string
+  name: string
+  siteId: ID
+  capacityMtPerDay: number
+  maxDraftM: number
+  status: 'Operating' | 'Maintenance' | 'Idle'
+  bargesLoading: number
+}
+
+export interface Vessel {
+  id: ID
+  code: string
+  name: string
+  type: 'Barge' | 'Vessel' | 'Tug Boat'
+  dwtMt: number
+  customerId: ID
+  contractId: ID
+  jettyId: ID
+  eta: string
+  etb: string
+  status: 'Waiting' | 'Loading' | 'Loaded' | 'Sailed' | 'Cancelled'
+  tonnageMt: number
+  loadedMt: number
+  loadingRateMtPerDay: number
+  blNumber: string
+  surveyor: 'SGS' | 'Cointeste' | 'Intertek' | 'Geoservices'
+  destination: string
+}
+
+/* ---------------------- Legal & Compliance IUP ---------------------- */
+
+export type PermitType =
+  | 'IUP OPK'
+  | 'IUP OP'
+  | 'PKP2B'
+  | 'AMDAL'
+  | 'UKL-UPL'
+  | 'RKAB'
+  | 'SIMBAT'
+  | 'HO'
+  | 'PNBP'
+  | 'Izin Lingkungan'
+
+export interface Permit {
+  id: ID
+  code: string
+  type: PermitType
+  siteId: ID
+  number: string
+  authority: string
+  issuedDate: string
+  expiryDate: string
+  status: 'Aktif' | 'Akan Berakhir' | 'Expired' | 'Proses Perpanjangan'
+  pic: string
+}
+
+export interface ComplianceObligation {
+  id: ID
+  code: string
+  obligation: string
+  authority: string
+  category: 'Lingkungan' | 'Keselamatan' | 'Fiskal' | 'Tenaga Kerja' | 'Operasional'
+  siteId: ID
+  dueDate: string
+  frequency: 'Bulanan' | 'Triwulan' | 'Tahunan' | 'Insidentil'
+  status: 'Terpenuhi' | 'Proses' | 'Terlambat' | 'Belum Jatuh Tempo'
+  evidence: string
+  pic: string
+}
+
 /* ---------------------------- Sistem ---------------------------- */
 
 export interface Notification {

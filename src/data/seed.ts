@@ -6,6 +6,12 @@
 import type {
   Site,
   Employee,
+  MinePlan,
+  BlendingRecipe,
+  Jetty,
+  Vessel,
+  Permit,
+  ComplianceObligation,
   ProductionRecord,
   Stockpile,
   WarehouseItem,
@@ -449,7 +455,7 @@ export const CONTRACTS: Contract[] = [
 
 /* ----------------------------- Sales Orders -------------------------- */
 
-const VESSELS = ['MV Bara Jaya', 'MV Coal Horizon', 'Barge TBH-12', 'Barge TBH-07', 'MV Nusantara IX', 'Barge KMS-21', 'MV Samudra Permai', 'Barge TBH-19']
+const VESSEL_NAMES = ['MV Bara Jaya', 'MV Coal Horizon', 'Barge TBH-12', 'Barge TBH-07', 'MV Nusantara IX', 'Barge KMS-21', 'MV Samudra Permai', 'Barge TBH-19']
 const SO_STATUSES: SalesOrder['status'][] = ['Draft', 'Confirmed', 'Loading', 'Loaded', 'Shipped', 'Invoiced', 'Paid', 'Paid', 'Paid', 'Confirmed', 'Loading']
 
 export const SALES_ORDERS: SalesOrder[] = Array.from({ length: 22 }, (_, i) => {
@@ -466,7 +472,7 @@ export const SALES_ORDERS: SalesOrder[] = Array.from({ length: 22 }, (_, i) => {
     tonnageMt: tonnage,
     priceUsdPerMt: contract.priceUsdPerMt,
     incoterm: contract.incoterm,
-    vesselBarge: VESSELS[i % VESSELS.length],
+    vesselBarge: VESSEL_NAMES[i % VESSEL_NAMES.length],
     eta: daysAhead(between(-14, 30)),
     surveyor: pick(['SGS', 'Cointeste', 'Intertek', 'Geoservices'] as const),
     coaGcv: between(contract.priceUsdPerMt > 58 ? 4800 : 3900, contract.priceUsdPerMt > 58 ? 5200 : 4400),
@@ -666,6 +672,87 @@ export const NOTIFICATIONS: Notification[] = [
   { id: 'nt-6', title: 'Faktor debu melebihi ambang', body: 'Haul Road KP 4 tercatat 168 µg/m³ (ambang 150 µg/m³) — tindakan korektif diperlukan.', time: '1 hari lalu', type: 'alert', read: false },
   { id: 'nt-7', title: 'Kontrak ekspirasi dalam 45 hari', body: 'KTR/2025/014 dengan Trafigura Pte Ltd berakhir 30 November 2026.', time: '2 hari lalu', type: 'warning', read: true },
   { id: 'nt-8', title: 'Pembayaran invoice terlambat', body: 'INV/2026/7002 untuk PT Indocement tunggakan > 60 hari.', time: '3 hari lalu', type: 'alert', read: true },
+]
+
+/* ==========================================================================
+   Modul baru: Perencanaan Tambang, Pelabuhan, Legal & Compliance
+   ========================================================================== */
+
+export const MINE_PLANS: MinePlan[] = [
+  { id: 'mp-1', code: 'MP-2026-Q4-LHT', siteId: 'site-lht', period: '2026-Q4', pit: 'Pit Utara', bench: 'Bench 60–80 m', planCoalMt: 145000, planObBcm: 612000, actualCoalMt: 98400, actualObBcm: 431000, status: 'In Progress', engineer: 'Ir. Hendra Wijaya', notes: 'Fokus ekspansi pit utara, tambah 2 unit haul truck' },
+  { id: 'mp-2', code: 'MP-2026-Q4-LHT-S', siteId: 'site-lht', period: '2026-Q4', pit: 'Pit Selatan', bench: 'Bench 40–60 m', planCoalMt: 98000, planObBcm: 402000, actualCoalMt: 62800, actualObBcm: 268000, status: 'In Progress', engineer: 'Ir. Hendra Wijaya', notes: 'Akses jalan haul menuju ROM stockpile B' },
+  { id: 'mp-3', code: 'MP-2026-Q4-ME', siteId: 'site-me', period: '2026-Q4', pit: 'Pit Tengah', bench: 'Bench 20–40 m', planCoalMt: 76000, planObBcm: 298000, actualCoalMt: 54100, actualObBcm: 214000, status: 'In Progress', engineer: 'Ir. Siti Nurhaliza', notes: 'Optimasi blending pad untuk grade 4100' },
+  { id: 'mp-4', code: 'MP-2026-Q4-TE', siteId: 'site-te', period: '2026-Q4', pit: 'Pit Barat', bench: 'Bench 0–20 m', planCoalMt: 42000, planObBcm: 168000, actualCoalMt: 18900, actualObBcm: 81000, status: 'In Progress', engineer: 'Ir. Siti Nurhaliza', notes: 'Ramp-up produksi, target 4.200 MT/hari' },
+  { id: 'mp-5', code: 'MP-2026-Q4-BRU', siteId: 'site-berau', period: '2026-Q4', pit: 'Pit Timur', bench: 'Bench 80–100 m', planCoalMt: 186000, planObBcm: 742000, actualCoalMt: 121400, actualObBcm: 502000, status: 'In Progress', engineer: 'Ir. Agus Salim', notes: 'Prioritas kontrak ekspor GAR 5000' },
+  { id: 'mp-6', code: 'MP-2026-Q4-BRU-W', siteId: 'site-berau', period: '2026-Q4', pit: 'Pit Barat', bench: 'Bench 40–60 m', planCoalMt: 112000, planObBcm: 468000, actualCoalMt: 58200, actualObBcm: 254000, status: 'Approved', engineer: 'Ir. Agus Salim', notes: 'Menunggu alokasi alat berat tambahan' },
+  { id: 'mp-7', code: 'MP-2027-Q1-LHT', siteId: 'site-lht', period: '2027-Q1', pit: 'Pit Utara', bench: 'Bench 60–80 m', planCoalMt: 152000, planObBcm: 640000, actualCoalMt: 0, actualObBcm: 0, status: 'Draft', engineer: 'Ir. Hendra Wijaya', notes: 'Draft awal RKAB 2027' },
+  { id: 'mp-8', code: 'MP-2026-Q3-ME', siteId: 'site-me', period: '2026-Q3', pit: 'Pit Tengah', bench: 'Bench 20–40 m', planCoalMt: 71000, planObBcm: 276000, actualCoalMt: 72400, actualObBcm: 281000, status: 'Completed', engineer: 'Ir. Siti Nurhaliza', notes: 'Realisasi 102% dari rencana' },
+  { id: 'mp-9', code: 'MP-2026-Q3-BRU', siteId: 'site-berau', period: '2026-Q3', pit: 'Pit Timur', bench: 'Bench 80–100 m', planCoalMt: 178000, planObBcm: 712000, actualCoalMt: 169200, actualObBcm: 698000, status: 'Completed', engineer: 'Ir. Agus Salim', notes: 'Capaian 95% — kendala cuaca musim hujan' },
+  { id: 'mp-10', code: 'MP-2026-Q4-KBR', siteId: 'site-kubar', period: '2026-Q4', pit: 'Blok Timur', bench: 'Studi kelayakan', planCoalMt: 0, planObBcm: 0, actualCoalMt: 0, actualObBcm: 0, status: 'Draft', engineer: 'Ir. Rudi Hartono', notes: 'Tahap studi kelayakan, belum produksi' },
+]
+
+export const BLENDING_RECIPES: BlendingRecipe[] = [
+  { id: 'bl-1', code: 'BLD-001', name: 'Blend Ekspor GAR 4200', siteId: 'site-lht', targetGcv: 4200, targetAsh: 6, targetSulfur: 0.6, components: [{ stockpileId: 'sp-1', pct: 55 }, { stockpileId: 'sp-2', pct: 30 }, { stockpileId: 'sp-6', pct: 15 }], volumeMt: 68000, status: 'Active' },
+  { id: 'bl-2', code: 'BLD-002', name: 'Blend Domestik GAR 4100', siteId: 'site-me', targetGcv: 4100, targetAsh: 5.5, targetSulfur: 0.5, components: [{ stockpileId: 'sp-3', pct: 60 }, { stockpileId: 'sp-7', pct: 40 }], volumeMt: 42000, status: 'Active' },
+  { id: 'bl-3', code: 'BLD-003', name: 'Premium GAR 5000 (Ekspor)', siteId: 'site-te', targetGcv: 5000, targetAsh: 4, targetSulfur: 0.35, components: [{ stockpileId: 'sp-4', pct: 75 }, { stockpileId: 'sp-5', pct: 25 }], volumeMt: 18500, status: 'Active' },
+  { id: 'bl-4', code: 'BLD-004', name: 'Blend Jetty Berau GAR 4800', siteId: 'site-berau', targetGcv: 4800, targetAsh: 4.5, targetSulfur: 0.4, components: [{ stockpileId: 'sp-5', pct: 80 }, { stockpileId: 'sp-6', pct: 20 }], volumeMt: 96000, status: 'Active' },
+  { id: 'bl-5', code: 'BLD-005', name: 'Blend Rendah GAR 3800', siteId: 'site-te', targetGcv: 3800, targetAsh: 8.5, targetSulfur: 0.85, components: [{ stockpileId: 'sp-8', pct: 45 }, { stockpileId: 'sp-6', pct: 35 }, { stockpileId: 'sp-3', pct: 20 }], volumeMt: 24000, status: 'Draft' },
+]
+
+export const JETTIES: Jetty[] = [
+  { id: 'jty-1', code: 'JTY-BRU-01', name: 'Jetty Berau Utara', siteId: 'site-berau', capacityMtPerDay: 28000, maxDraftM: 14.5, status: 'Operating', bargesLoading: 2 },
+  { id: 'jty-2', code: 'JTY-TE-01', name: 'Jetty Tanjung Enim', siteId: 'site-te', capacityMtPerDay: 12000, maxDraftM: 9.5, status: 'Operating', bargesLoading: 1 },
+  { id: 'jty-3', code: 'JTY-LHT-01', name: 'Barge Loader Lahat', siteId: 'site-lht', capacityMtPerDay: 9000, maxDraftM: 7.2, status: 'Operating', bargesLoading: 1 },
+  { id: 'jty-4', code: 'JTY-BRU-02', name: 'Jetty Berau Selatan', siteId: 'site-berau', capacityMtPerDay: 22000, maxDraftM: 12.8, status: 'Maintenance', bargesLoading: 0 },
+]
+
+export const VESSELS: Vessel[] = [
+  { id: 'vsl-1', code: 'VSL-001', name: 'MV Bara Jaya', type: 'Vessel', dwtMt: 58000, customerId: 'cus-6', contractId: 'ctr-2', jettyId: 'jty-1', eta: '2026-10-14', etb: '2026-10-14', status: 'Loading', tonnageMt: 55000, loadedMt: 38200, loadingRateMtPerDay: 26000, blNumber: '', surveyor: 'SGS', destination: 'Port of Qinzhou, China' },
+  { id: 'vsl-2', code: 'VSL-002', name: 'MV Coal Horizon', type: 'Vessel', dwtMt: 63000, customerId: 'cus-7', contractId: 'ctr-4', jettyId: 'jty-1', eta: '2026-10-16', etb: '2026-10-17', status: 'Waiting', tonnageMt: 60000, loadedMt: 0, loadingRateMtPerDay: 28000, blNumber: '', surveyor: 'Cointeste', destination: 'Mundra Port, India' },
+  { id: 'vsl-3', code: 'VSL-003', name: 'Barge TBH-12', type: 'Barge', dwtMt: 12000, customerId: 'cus-1', contractId: 'ctr-1', jettyId: 'jty-3', eta: '2026-10-15', etb: '2026-10-15', status: 'Loading', tonnageMt: 11500, loadedMt: 8400, loadingRateMtPerDay: 8500, blNumber: '', surveyor: 'SGS', destination: 'PLTU Suralaya' },
+  { id: 'vsl-4', code: 'VSL-004', name: 'Barge TBH-07', type: 'Barge', dwtMt: 10500, customerId: 'cus-2', contractId: 'ctr-3', jettyId: 'jty-3', eta: '2026-10-18', etb: '2026-10-18', status: 'Waiting', tonnageMt: 10000, loadedMt: 0, loadingRateMtPerDay: 8200, blNumber: '', surveyor: 'Intertek', destination: 'Semen Baturaja' },
+  { id: 'vsl-5', code: 'VSL-005', name: 'MV Nusantara IX', type: 'Vessel', dwtMt: 47000, customerId: 'cus-6', contractId: 'ctr-2', jettyId: 'jty-1', eta: '2026-10-11', etb: '2026-10-11', status: 'Sailed', tonnageMt: 45000, loadedMt: 45000, loadingRateMtPerDay: 24000, blNumber: 'BL-2026-0451', surveyor: 'SGS', destination: 'Port of Qinzhou, China' },
+  { id: 'vsl-6', code: 'VSL-006', name: 'MV Samudra Permai', type: 'Vessel', dwtMt: 52000, customerId: 'cus-7', contractId: 'ctr-4', jettyId: 'jty-1', eta: '2026-10-09', etb: '2026-10-10', status: 'Sailed', tonnageMt: 50000, loadedMt: 50000, loadingRateMtPerDay: 25000, blNumber: 'BL-2026-0448', surveyor: 'Cointeste', destination: 'Mundra Port, India' },
+  { id: 'vsl-7', code: 'VSL-007', name: 'Barge KMS-21', type: 'Barge', dwtMt: 13000, customerId: 'cus-1', contractId: 'ctr-1', jettyId: 'jty-3', eta: '2026-10-07', etb: '2026-10-08', status: 'Sailed', tonnageMt: 13000, loadedMt: 13000, loadingRateMtPerDay: 8800, blNumber: 'BL-2026-0442', surveyor: 'SGS', destination: 'PLTU Suralaya' },
+  { id: 'vsl-8', code: 'VSL-008', name: 'Barge TBH-19', type: 'Barge', dwtMt: 11800, customerId: 'cus-3', contractId: 'ctr-5', jettyId: 'jty-2', eta: '2026-10-19', etb: '2026-10-20', status: 'Waiting', tonnageMt: 11000, loadedMt: 0, loadingRateMtPerDay: 7800, blNumber: '', surveyor: 'Geoservices', destination: 'Indocement Cirebon' },
+  { id: 'vsl-9', code: 'VSL-009', name: 'MV Bara Nusantara', type: 'Vessel', dwtMt: 41000, customerId: 'cus-9', contractId: 'ctr-6', jettyId: 'jty-1', eta: '2026-10-21', etb: '2026-10-22', status: 'Waiting', tonnageMt: 40000, loadedMt: 0, loadingRateMtPerDay: 21000, blNumber: '', surveyor: 'SGS', destination: 'Port of Kaohsiung, Taiwan' },
+  { id: 'vsl-10', code: 'VSL-010', name: 'Tug Boat Laut Jaya 3', type: 'Tug Boat', dwtMt: 0, customerId: 'cus-1', contractId: 'ctr-1', jettyId: 'jty-1', eta: '2026-10-13', etb: '2026-10-13', status: 'Loading', tonnageMt: 0, loadedMt: 0, loadingRateMtPerDay: 0, blNumber: '', surveyor: 'SGS', destination: 'Operasional penarik barge' },
+  { id: 'vsl-11', code: 'VSL-011', name: 'MV Coal Meridian', type: 'Vessel', dwtMt: 56000, customerId: 'cus-6', contractId: 'ctr-2', jettyId: 'jty-1', eta: '2026-10-24', etb: '2026-10-25', status: 'Waiting', tonnageMt: 54000, loadedMt: 0, loadingRateMtPerDay: 26000, blNumber: '', surveyor: 'SGS', destination: 'Port of Qinzhou, China' },
+  { id: 'vsl-12', code: 'VSL-012', name: 'Barge TBH-15', type: 'Barge', dwtMt: 10900, customerId: 'cus-4', contractId: 'ctr-7', jettyId: 'jty-2', eta: '2026-10-06', etb: '2026-10-06', status: 'Sailed', tonnageMt: 10500, loadedMt: 10500, loadingRateMtPerDay: 7600, blNumber: 'BL-2026-0438', surveyor: 'Intertek', destination: 'Tjiwi Kimia Sidoarjo' },
+]
+
+export const PERMITS: Permit[] = [
+  { id: 'prm-1', code: 'IZN-001', type: 'IUP OP', siteId: 'site-lht', number: '420/KAB-BPPT/2019', authority: 'Bupati Lahat', issuedDate: '2019-06-14', expiryDate: '2029-06-13', status: 'Aktif', pic: 'Legal & Compliance' },
+  { id: 'prm-2', code: 'IZN-002', type: 'PKP2B', siteId: 'site-lht', number: 'PKP2B-0032/2019', authority: 'Kementerian ESDM', issuedDate: '2019-08-20', expiryDate: '2039-08-19', status: 'Aktif', pic: 'Legal & Compliance' },
+  { id: 'prm-3', code: 'IZN-003', type: 'AMDAL', siteId: 'site-lht', number: 'AMDAL-021/LH/2019', authority: 'Dinas LH Sumsel', issuedDate: '2019-05-02', expiryDate: '2027-05-01', status: 'Akan Berakhir', pic: 'HSE' },
+  { id: 'prm-4', code: 'IZN-004', type: 'UKL-UPL', siteId: 'site-lht', number: 'UKL-UPL-018/LH/2019', authority: 'Dinas LH Sumsel', issuedDate: '2019-05-02', expiryDate: '2027-05-01', status: 'Akan Berakhir', pic: 'HSE' },
+  { id: 'prm-5', code: 'IZN-005', type: 'IUP OP', siteId: 'site-me', number: '415/KAB-BPPT/2018', authority: 'Bupati Muara Enim', issuedDate: '2018-09-10', expiryDate: '2028-09-09', status: 'Aktif', pic: 'Legal & Compliance' },
+  { id: 'prm-6', code: 'IZN-006', type: 'AMDAL', siteId: 'site-me', number: 'AMDAL-045/LH/2018', authority: 'Dinas LH Sumsel', issuedDate: '2018-08-15', expiryDate: '2026-08-14', status: 'Proses Perpanjangan', pic: 'HSE' },
+  { id: 'prm-7', code: 'IZN-007', type: 'IUP OPK', siteId: 'site-te', number: '430/KAB-BPPT/2021', authority: 'Bupati Tanjung Enim', issuedDate: '2021-03-18', expiryDate: '2031-03-17', status: 'Aktif', pic: 'Legal & Compliance' },
+  { id: 'prm-8', code: 'IZN-008', type: 'RKAB', siteId: 'site-lht', number: 'RKAB-2026/LHT', authority: 'Kementerian ESDM', issuedDate: '2026-01-05', expiryDate: '2026-12-31', status: 'Aktif', pic: 'Perencanaan Tambang' },
+  { id: 'prm-9', code: 'IZN-009', type: 'RKAB', siteId: 'site-berau', number: 'RKAB-2026/BRU', authority: 'Kementerian ESDM', issuedDate: '2026-01-08', expiryDate: '2026-12-31', status: 'Aktif', pic: 'Perencanaan Tambang' },
+  { id: 'prm-10', code: 'IZN-010', type: 'IUP OP', siteId: 'site-berau', number: '890/KALTIM-BPPT/2017', authority: 'Bupati Berau', issuedDate: '2017-11-22', expiryDate: '2027-11-21', status: 'Aktif', pic: 'Legal & Compliance' },
+  { id: 'prm-11', code: 'IZN-011', type: 'AMDAL', siteId: 'site-berau', number: 'AMDAL-112/LH/2017', authority: 'Dinas LH Kaltim', issuedDate: '2017-10-05', expiryDate: '2027-10-04', status: 'Aktif', pic: 'HSE' },
+  { id: 'prm-12', code: 'IZN-012', type: 'SIMBAT', siteId: 'site-lht', number: 'SIPB-089/LH/2019', authority: 'Dinas LH Sumsel', issuedDate: '2019-07-11', expiryDate: '2026-12-31', status: 'Akan Berakhir', pic: 'HSE' },
+  { id: 'prm-13', code: 'IZN-013', type: 'HO', siteId: 'site-berau', number: 'HO-2026-BRU-112', authority: 'Kementerian ESDM', issuedDate: '2026-02-14', expiryDate: '2026-12-31', status: 'Aktif', pic: 'Perencanaan Tambang' },
+  { id: 'prm-14', code: 'IZN-014', type: 'PNBP', siteId: 'site-lht', number: 'PNBP-SPD-2026-0891', authority: 'Kementerian ESDM', issuedDate: '2026-01-15', expiryDate: '2026-12-31', status: 'Aktif', pic: 'Keuangan' },
+  { id: 'prm-15', code: 'IZN-015', type: 'Izin Lingkungan', siteId: 'site-te', number: 'SK-045/DLH/2021', authority: 'Dinas LH Sumsel', issuedDate: '2021-04-20', expiryDate: '2026-04-19', status: 'Expired', pic: 'HSE' },
+  { id: 'prm-16', code: 'IZN-016', type: 'IUP OPK', siteId: 'site-kubar', number: '905/KALTIM-BPPT/2020', authority: 'Bupati Kutai Barat', issuedDate: '2020-07-30', expiryDate: '2030-07-29', status: 'Aktif', pic: 'Legal & Compliance' },
+]
+
+export const COMPLIANCE: ComplianceObligation[] = [
+  { id: 'cmp-1', code: 'KPS-001', obligation: 'Laporan Bulanan Produksi & Pengupasan (e-SPN)', authority: 'Kementerian ESDM', category: 'Operasional', siteId: 'site-lht', dueDate: '2026-11-10', frequency: 'Bulanan', status: 'Proses', evidence: 'Laporan Oktober 2026 (draft)', pic: 'Perencanaan Tambang' },
+  { id: 'cmp-2', code: 'KPS-002', obligation: 'Pembayaran Royalti PNBP', authority: 'Kementerian ESDM', category: 'Fiskal', siteId: 'site-lht', dueDate: '2026-11-15', frequency: 'Bulanan', status: 'Belum Jatuh Tempo', evidence: 'SSP PNBP Oktober', pic: 'Keuangan' },
+  { id: 'cmp-3', code: 'KPS-003', obligation: 'Laporan K3LH Bulanan (SMKP)', authority: 'Kementerian ESDM', category: 'Keselamatan', siteId: 'site-berau', dueDate: '2026-11-05', frequency: 'Bulanan', status: 'Terlambat', evidence: 'Menunggu data insiden Oktober', pic: 'Manager HSE' },
+  { id: 'cmp-4', code: 'KPS-004', obligation: 'Laporan Limbah B3 & Manifest', authority: 'Dinas LH Kaltim', category: 'Lingkungan', siteId: 'site-berau', dueDate: '2026-10-28', frequency: 'Triwulan', status: 'Proses', evidence: 'Manifest Q4 2026', pic: 'Environmental Officer' },
+  { id: 'cmp-5', code: 'KPS-005', obligation: 'Pembayaran PPh Final 22 Ekspor', authority: 'Direktorat Jenderal Pajak', category: 'Fiskal', siteId: 'site-berau', dueDate: '2026-11-20', frequency: 'Bulanan', status: 'Belum Jatuh Tempo', evidence: 'e-Billing PPh 22', pic: 'Tax Specialist' },
+  { id: 'cmp-6', code: 'KPS-006', obligation: 'Laporan Reklamasi & Pasca Tambang', authority: 'Dinas LH Sumsel', category: 'Lingkungan', siteId: 'site-lht', dueDate: '2026-11-30', frequency: 'Tahunan', status: 'Proses', evidence: 'Laporan reklamasi 2026', pic: 'Environmental Officer' },
+  { id: 'cmp-7', code: 'KPS-007', obligation: 'Laporan BPJS Ketenagakerjaan', authority: 'BPJS Ketenagakerjaan', category: 'Tenaga Kerja', siteId: 'site-lht', dueDate: '2026-11-10', frequency: 'Bulanan', status: 'Terpenuhi', evidence: 'Bukti setor Oktober', pic: 'HR Generalist' },
+  { id: 'cmp-8', code: 'KPS-008', obligation: 'Laporan Penerimaan Tenaga Kerja Asing', authority: 'Kementerian Ketenagakerjaan', category: 'Tenaga Kerja', siteId: 'site-berau', dueDate: '2026-11-15', frequency: 'Triwulan', status: 'Terpenuhi', evidence: 'RPTKA Q4 2026', pic: 'HR Generalist' },
+  { id: 'cmp-9', code: 'KPS-009', obligation: 'Uji Emisi Kendaraan & Alat Berat', authority: 'Dinas Perhubungan', category: 'Lingkungan', siteId: 'site-me', dueDate: '2026-10-31', frequency: 'Tahunan', status: 'Proses', evidence: 'Jadwal uji emisi', pic: 'HSE Officer' },
+  { id: 'cmp-10', code: 'KPS-010', obligation: 'Laporan Kegiatan Pemberdayaan Masyarakat', authority: 'Dinas ESDM', category: 'Operasional', siteId: 'site-te', dueDate: '2026-12-15', frequency: 'Tahunan', status: 'Proses', evidence: 'Laporan CSR 2026', pic: 'Legal & Compliance' },
+  { id: 'cmp-11', code: 'KPS-011', obligation: 'Inspeksi Keselamatan Kerja Periodik', authority: 'Kementerian Ketenagakerjaan', category: 'Keselamatan', siteId: 'site-lht', dueDate: '2026-11-25', frequency: 'Tahunan', status: 'Belum Jatuh Tempo', evidence: 'Undangan inspeksi', pic: 'Safety Supervisor' },
+  { id: 'cmp-12', code: 'KPS-012', obligation: 'Laporan Realisasi RKAB', authority: 'Kementerian ESDM', category: 'Operasional', siteId: 'site-me', dueDate: '2026-11-08', frequency: 'Bulanan', status: 'Proses', evidence: 'Realisasi Oktober 2026', pic: 'Cost Controller' },
 ]
 
 export const ACTIVITY: ActivityItem[] = [

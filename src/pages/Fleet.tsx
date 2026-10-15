@@ -53,7 +53,7 @@ export default function Fleet() {
       render: (r) => (
         <div>
           <p className="font-mono text-[13px] font-medium text-amber-400">{r.code}</p>
-          <p className="text-[11px] text-zinc-600">{siteName(r.siteId)}</p>
+          <p className="text-[11px] text-ink-faintest">{siteName(r.siteId)}</p>
         </div>
       ),
     },
@@ -63,8 +63,8 @@ export default function Fleet() {
       sort: (r) => r.name,
       render: (r) => (
         <div>
-          <p className="text-[13px] text-zinc-200">{r.name}</p>
-          <p className="text-[11px] text-zinc-600">
+          <p className="text-[13px] text-ink">{r.name}</p>
+          <p className="text-[11px] text-ink-faintest">
             {r.brand} &middot; {r.year}
           </p>
         </div>
@@ -80,7 +80,7 @@ export default function Fleet() {
       render: (r) => (
         <div>
           <p className={`font-mono ${r.availabilityPct < 80 ? 'text-rose-400' : r.availabilityPct < 90 ? 'text-amber-400' : 'text-emerald-400'}`}>{pct1(r.availabilityPct)}</p>
-          <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-zinc-800">
+          <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-surface-2">
             <div className="h-full rounded-full bg-sky-500" style={{ width: `${r.availabilityPct}%` }} />
           </div>
         </div>
@@ -93,14 +93,14 @@ export default function Fleet() {
       sort: (r) => r.utilizationPct,
       render: (r) => (
         <div>
-          <p className="font-mono text-zinc-200">{pct1(r.utilizationPct)}</p>
-          <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-zinc-800">
+          <p className="font-mono text-ink">{pct1(r.utilizationPct)}</p>
+          <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-surface-2">
             <div className="h-full rounded-full bg-violet-500" style={{ width: `${r.utilizationPct}%` }} />
           </div>
         </div>
       ),
     },
-    { key: 'fuelLph', header: 'BBM', align: 'right', sort: (r) => r.fuelLph, render: (r) => <span className="font-mono text-zinc-400">{num(r.fuelLph)} L/jam</span> },
+    { key: 'fuelLph', header: 'BBM', align: 'right', sort: (r) => r.fuelLph, render: (r) => <span className="font-mono text-ink-muted">{num(r.fuelLph)} L/jam</span> },
     {
       key: 'service',
       header: 'Servis Berikutnya',
@@ -109,13 +109,13 @@ export default function Fleet() {
       render: (r) => {
         const due = r.nextServiceHm - r.hourMeter
         return (
-          <span className={`font-mono ${due <= 0 ? 'text-rose-400' : due <= 60 ? 'text-amber-400' : 'text-zinc-400'}`}>
+          <span className={`font-mono ${due <= 0 ? 'text-rose-400' : due <= 60 ? 'text-amber-400' : 'text-ink-muted'}`}>
             {due <= 0 ? `Terlambat ${num(-due)} jam` : `${num(due)} jam`}
           </span>
         )
       },
     },
-    { key: 'tyreLifePct', header: 'Umur Ban', align: 'right', sort: (r) => r.tyreLifePct, render: (r) => <span className={`font-mono ${r.tyreLifePct < 20 ? 'text-rose-400' : 'text-zinc-400'}`}>{pct1(r.tyreLifePct)}</span> },
+    { key: 'tyreLifePct', header: 'Umur Ban', align: 'right', sort: (r) => r.tyreLifePct, render: (r) => <span className={`font-mono ${r.tyreLifePct < 20 ? 'text-rose-400' : 'text-ink-muted'}`}>{pct1(r.tyreLifePct)}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
   ]
 
@@ -129,16 +129,16 @@ export default function Fleet() {
         const eq = state.equipment.find((e) => e.id === r.equipmentId)
         return (
           <div>
-            <p className="font-mono text-[12px] text-zinc-200">{eq?.code}</p>
-            <p className="text-[11px] text-zinc-600">{eq?.name}</p>
+            <p className="font-mono text-[12px] text-ink">{eq?.code}</p>
+            <p className="text-[11px] text-ink-faintest">{eq?.name}</p>
           </div>
         )
       },
     },
     { key: 'type', header: 'Jenis', sort: (r) => r.type, render: (r) => <Badge tone={r.type === 'Major' ? 'violet' : r.type === 'Corrective' ? 'warning' : 'info'}>{r.type}</Badge> },
-    { key: 'description', header: 'Deskripsi Pekerjaan', render: (r) => <span className="text-[12px] text-zinc-400">{r.description}</span> },
-    { key: 'scheduledDate', header: 'Jadwal', sort: (r) => r.scheduledDate, render: (r) => <span className="text-zinc-400">{dmy(r.scheduledDate)}</span> },
-    { key: 'mechanic', header: 'Mekanik', render: (r) => <span className="text-[12px] text-zinc-500">{r.mechanic}</span> },
+    { key: 'description', header: 'Deskripsi Pekerjaan', render: (r) => <span className="text-[12px] text-ink-muted">{r.description}</span> },
+    { key: 'scheduledDate', header: 'Jadwal', sort: (r) => r.scheduledDate, render: (r) => <span className="text-ink-muted">{dmy(r.scheduledDate)}</span> },
+    { key: 'mechanic', header: 'Mekanik', render: (r) => <span className="text-[12px] text-ink-faint">{r.mechanic}</span> },
     { key: 'costIdr', header: 'Estimasi Biaya', align: 'right', sort: (r) => r.costIdr, render: (r) => <span className="font-mono text-emerald-400">{idr(r.costIdr)}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
   ]
@@ -333,14 +333,14 @@ export default function Fleet() {
                 {(['Preventive', 'Corrective', 'Major', 'Inspection'] as const).map((t) => {
                   const cost = sum(state.maintenance.filter((w) => w.type === t).map((w) => w.costIdr))
                   return (
-                    <div key={t} className="flex items-center justify-between border-b border-zinc-800 pb-2.5 last:border-0">
-                      <span className="text-xs text-zinc-400">{t}</span>
-                      <span className="font-mono text-sm font-semibold text-zinc-100">{idr(cost)}</span>
+                    <div key={t} className="flex items-center justify-between border-b border-line pb-2.5 last:border-0">
+                      <span className="text-xs text-ink-muted">{t}</span>
+                      <span className="font-mono text-sm font-semibold text-ink-strong">{idr(cost)}</span>
                     </div>
                   )
                 })}
-                <div className="flex items-center justify-between rounded-lg bg-zinc-950/50 px-3 py-2.5">
-                  <span className="text-xs font-semibold text-zinc-300">Total</span>
+                <div className="flex items-center justify-between rounded-lg bg-surface-2/50 px-3 py-2.5">
+                  <span className="text-xs font-semibold text-ink">Total</span>
                   <span className="font-mono text-sm font-bold text-amber-400">{idr(maintenanceCost)}</span>
                 </div>
               </div>
@@ -353,15 +353,15 @@ export default function Fleet() {
                   const units = state.equipment.filter((e) => e.type === t.type)
                   const lph = units.reduce((a, b) => a + b.fuelLph, 0) / units.length
                   return (
-                    <div key={t.type} className="flex items-center justify-between border-b border-zinc-800 pb-2.5 last:border-0">
-                      <span className="text-xs text-zinc-400">
-                        {t.type} <span className="text-zinc-600">({t.count})</span>
+                    <div key={t.type} className="flex items-center justify-between border-b border-line pb-2.5 last:border-0">
+                      <span className="text-xs text-ink-muted">
+                        {t.type} <span className="text-ink-faintest">({t.count})</span>
                       </span>
-                      <span className="font-mono text-sm text-zinc-100">{num(lph)} L/jam</span>
+                      <span className="font-mono text-sm text-ink-strong">{num(lph)} L/jam</span>
                     </div>
                   )
                 })}
-                <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] p-3 text-[11px] leading-relaxed text-amber-200/80">
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] p-3 text-[11px] leading-relaxed text-amber-600 dark:text-amber-200">
                   Estimasi konsumsi harian armada ± 145.000 liter solar, setara {idr(145000 * 14300)} per hari.
                 </div>
               </div>
@@ -369,7 +369,7 @@ export default function Fleet() {
 
             <Card>
               <CardHeader title="Unit Prioritas Servis" subtitle="Unit yang mendekati atau melewati jadwal servis" icon={<CalendarClock className="h-4 w-4" />} />
-              <div className="divide-y divide-zinc-800">
+              <div className="divide-y divide-line">
                 {[...state.equipment]
                   .sort((a, b) => a.nextServiceHm - a.hourMeter - (b.nextServiceHm - b.hourMeter))
                   .slice(0, 6)
@@ -377,14 +377,14 @@ export default function Fleet() {
                     const due = e.nextServiceHm - e.hourMeter
                     return (
                       <div key={e.id} className="flex items-center gap-3 px-5 py-3">
-                        <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${due <= 0 ? 'bg-rose-500/10 text-rose-400' : due <= 60 ? 'bg-amber-500/10 text-amber-400' : 'bg-zinc-800 text-zinc-400'}`}>
+                        <div className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${due <= 0 ? 'bg-rose-500/10 text-rose-400' : due <= 60 ? 'bg-amber-500/10 text-amber-400' : 'bg-surface-2 text-ink-muted'}`}>
                           <Cog className="h-4 w-4" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-mono text-[12px] text-zinc-200">{e.code}</p>
-                          <p className="truncate text-[11px] text-zinc-600">{e.name}</p>
+                          <p className="truncate font-mono text-[12px] text-ink">{e.code}</p>
+                          <p className="truncate text-[11px] text-ink-faintest">{e.name}</p>
                         </div>
-                        <span className={`shrink-0 font-mono text-xs ${due <= 0 ? 'text-rose-400' : due <= 60 ? 'text-amber-400' : 'text-zinc-500'}`}>
+                        <span className={`shrink-0 font-mono text-xs ${due <= 0 ? 'text-rose-400' : due <= 60 ? 'text-amber-400' : 'text-ink-faint'}`}>
                           {due <= 0 ? `${num(-due)} jam` : `${num(due)} jam`}
                         </span>
                       </div>
@@ -409,16 +409,16 @@ export default function Fleet() {
             <CardHeader title="Status Umur Ban per Unit" subtitle="Monitoring siklus pemakaian ban untuk perencanaan penggantian" actions={<Badge tone={tyreAlerts.length ? 'warning' : 'success'}>{tyreAlerts.length} unit prioritas</Badge>} />
             <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {state.equipment.map((e) => (
-                <div key={e.id} className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+                <div key={e.id} className="rounded-lg border border-line bg-surface-2/40 p-4">
                   <div className="flex items-center justify-between">
-                    <p className="font-mono text-[12px] font-medium text-zinc-200">{e.code}</p>
+                    <p className="font-mono text-[12px] font-medium text-ink">{e.code}</p>
                     <span className={`font-mono text-xs font-semibold ${e.tyreLifePct < 20 ? 'text-rose-400' : e.tyreLifePct < 45 ? 'text-amber-400' : 'text-emerald-400'}`}>{pct1(e.tyreLifePct)}</span>
                   </div>
-                  <p className="mt-0.5 truncate text-[11px] text-zinc-600">{e.name}</p>
-                  <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-zinc-800">
+                  <p className="mt-0.5 truncate text-[11px] text-ink-faintest">{e.name}</p>
+                  <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-surface-2">
                     <div className={`h-full rounded-full ${e.tyreLifePct < 20 ? 'bg-rose-500' : e.tyreLifePct < 45 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${e.tyreLifePct}%` }} />
                   </div>
-                  <p className="mt-2 text-[10px] text-zinc-600">{e.tyreLifePct < 20 ? 'Segera ganti' : e.tyreLifePct < 45 ? 'Pantau tekanan & tread' : 'Kondisi baik'}</p>
+                  <p className="mt-2 text-[10px] text-ink-faintest">{e.tyreLifePct < 20 ? 'Segera ganti' : e.tyreLifePct < 45 ? 'Pantau tekanan & tread' : 'Kondisi baik'}</p>
                 </div>
               ))}
             </div>
@@ -436,9 +436,9 @@ export default function Fleet() {
         ].map((s) => (
           <Card key={s.title}>
             <div className="p-5">
-              <p className="text-[11px] uppercase tracking-wider text-zinc-500">{s.title}</p>
+              <p className="text-[11px] uppercase tracking-wider text-ink-faint">{s.title}</p>
               <p className={`mt-1.5 font-mono text-xl font-bold ${s.tone}`}>{s.value}</p>
-              <p className="mt-1 text-[11px] text-zinc-600">{s.hint}</p>
+              <p className="mt-1 text-[11px] text-ink-faintest">{s.hint}</p>
             </div>
           </Card>
         ))}
@@ -466,16 +466,16 @@ export default function Fleet() {
       >
         {detail && (
           <div className="space-y-5">
-            <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+            <div className="flex items-center justify-between rounded-lg border border-line bg-surface-2/50 p-4">
               <div>
-                <p className="text-[11px] text-zinc-500">Status Unit</p>
+                <p className="text-[11px] text-ink-faint">Status Unit</p>
                 <div className="mt-1">
                   <StatusBadge value={detail.status} />
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[11px] text-zinc-500">Hour Meter</p>
-                <p className="font-mono text-xl font-bold text-zinc-50">{num(detail.hourMeter)} jam</p>
+                <p className="text-[11px] text-ink-faint">Hour Meter</p>
+                <p className="font-mono text-xl font-bold text-ink-strong">{num(detail.hourMeter)} jam</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -490,9 +490,9 @@ export default function Fleet() {
                 { label: 'Servis berikutnya', value: `${num(detail.nextServiceHm)} jam` },
                 { label: 'Umur ban', value: pct1(detail.tyreLifePct) },
               ].map((r) => (
-                <div key={r.label} className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
-                  <p className="text-[11px] text-zinc-500">{r.label}</p>
-                  <p className="mt-0.5 text-sm font-medium text-zinc-100">{r.value}</p>
+                <div key={r.label} className="rounded-lg border border-line bg-surface-2/50 px-3 py-2.5">
+                  <p className="text-[11px] text-ink-faint">{r.label}</p>
+                  <p className="mt-0.5 text-sm font-medium text-ink-strong">{r.value}</p>
                 </div>
               ))}
             </div>
@@ -503,17 +503,17 @@ export default function Fleet() {
                   .filter((w) => w.equipmentId === detail.id)
                   .slice(0, 4)
                   .map((w) => (
-                    <div key={w.id} className="flex items-center justify-between rounded-lg border border-zinc-800 px-3 py-2.5">
+                    <div key={w.id} className="flex items-center justify-between rounded-lg border border-line px-3 py-2.5">
                       <div className="min-w-0">
-                        <p className="truncate text-[12px] text-zinc-200">{w.description}</p>
-                        <p className="text-[11px] text-zinc-600">
+                        <p className="truncate text-[12px] text-ink">{w.description}</p>
+                        <p className="text-[11px] text-ink-faintest">
                           {w.woNo} &middot; {dmy(w.scheduledDate)}
                         </p>
                       </div>
                       <StatusBadge value={w.status} />
                     </div>
                   ))}
-                {state.maintenance.filter((w) => w.equipmentId === detail.id).length === 0 && <p className="text-xs text-zinc-600">Belum ada work order untuk unit ini.</p>}
+                {state.maintenance.filter((w) => w.equipmentId === detail.id).length === 0 && <p className="text-xs text-ink-faintest">Belum ada work order untuk unit ini.</p>}
               </div>
             </div>
           </div>

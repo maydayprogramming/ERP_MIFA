@@ -138,7 +138,7 @@ export function Field({
         {required && <span className="ml-0.5 text-amber-500">*</span>}
       </span>
       {children}
-      {hint && !error && <span className="mt-1 block text-[11px] text-zinc-600">{hint}</span>}
+      {hint && !error && <span className="mt-1 block text-[11px] text-ink-faintest">{hint}</span>}
       {error && <span className="mt-1 block text-[11px] text-rose-400">{error}</span>}
     </label>
   )
@@ -154,7 +154,7 @@ export function Select({ options, className, ...rest }: React.SelectHTMLAttribut
   return (
     <select className={cx('input', className)} {...rest}>
       {opts.map((o) => (
-        <option key={o.value} value={o.value} className="bg-zinc-900">
+        <option key={o.value} value={o.value} className="bg-surface-1">
           {o.label}
         </option>
       ))}
@@ -175,10 +175,10 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
       className="group inline-flex items-center gap-2.5"
       aria-pressed={checked}
     >
-      <span className={cx('relative h-5 w-9 rounded-full transition-colors', checked ? 'bg-amber-500' : 'bg-zinc-700')}>
+      <span className={cx('relative h-5 w-9 rounded-full transition-colors', checked ? 'bg-amber-500' : 'bg-surface-3')}>
         <span className={cx('absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all', checked ? 'left-[18px]' : 'left-0.5')} />
       </span>
-      {label && <span className="text-sm text-zinc-300">{label}</span>}
+      {label && <span className="text-sm text-ink">{label}</span>}
     </button>
   )
 }
@@ -221,19 +221,19 @@ export function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-6">
-      <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-      <div className={cx('relative my-8 w-full animate-scale-in rounded-xl border border-zinc-800 bg-zinc-900 shadow-panel', widths[size])}>
-        <header className="flex items-start justify-between gap-4 border-b border-zinc-800 px-6 py-4">
+      <div className="fixed inset-0 bg-surface-1/80 backdrop-blur-sm animate-fade-in" onClick={onClose} />
+      <div className={cx('relative my-8 w-full animate-scale-in rounded-xl border border-line bg-surface-1 shadow-panel', widths[size])}>
+        <header className="flex items-start justify-between gap-4 border-b border-line px-6 py-4">
           <div>
-            <h2 className="text-base font-semibold text-zinc-50">{title}</h2>
-            {subtitle && <p className="mt-0.5 text-xs text-zinc-500">{subtitle}</p>}
+            <h2 className="text-base font-semibold text-ink-strong">{title}</h2>
+            {subtitle && <p className="mt-0.5 text-xs text-ink-faint">{subtitle}</p>}
           </div>
           <button onClick={onClose} className="btn btn-ghost -mr-2 -mt-1 h-8 w-8 !p-0" aria-label="Tutup">
             <X className="h-4 w-4" />
           </button>
         </header>
         <div className="max-h-[70vh] overflow-y-auto px-6 py-5 scrollbar-thin">{children}</div>
-        {footer && <footer className="flex items-center justify-end gap-3 border-t border-zinc-800 px-6 py-4">{footer}</footer>}
+        {footer && <footer className="flex items-center justify-end gap-3 border-t border-line px-6 py-4">{footer}</footer>}
       </div>
     </div>
   )
@@ -252,8 +252,8 @@ export function Progress({ value, tone = 'amber', label, className }: { value: n
   }[tone]
   return (
     <div className={className}>
-      {label && <div className="mb-1 flex items-center justify-between text-[11px] text-zinc-500"><span>{label}</span><span className="font-mono text-zinc-400">{v.toFixed(0)}%</span></div>}
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+      {label && <div className="mb-1 flex items-center justify-between text-[11px] text-ink-faint"><span>{label}</span><span className="font-mono text-ink-muted">{v.toFixed(0)}%</span></div>}
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
         <div className={cx('h-full rounded-full transition-all duration-500', bg)} style={{ width: `${v}%` }} />
       </div>
     </div>
@@ -274,19 +274,19 @@ export function Tabs<T extends string>({
   className?: string
 }) {
   return (
-    <div className={cx('flex gap-1 overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/60 p-1 scrollbar-thin', className)}>
+    <div className={cx('flex gap-1 overflow-x-auto rounded-lg border border-line bg-surface-1/60 p-1 scrollbar-thin', className)}>
       {tabs.map((t) => (
         <button
           key={t.id}
           onClick={() => onChange(t.id)}
           className={cx(
             'flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
-            active === t.id ? 'bg-amber-500 text-zinc-950' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100',
+            active === t.id ? 'bg-amber-500 text-zinc-950' : 'text-ink-muted hover:bg-surface-2 hover:text-ink-strong',
           )}
         >
           {t.label}
           {t.count != null && (
-            <span className={cx('rounded px-1.5 py-0.5 text-[10px] font-semibold', active === t.id ? 'bg-zinc-950/20' : 'bg-zinc-800 text-zinc-400')}>{t.count}</span>
+            <span className={cx('rounded px-1.5 py-0.5 text-[10px] font-semibold', active === t.id ? 'bg-surface-0/20' : 'bg-surface-2 text-ink-muted')}>{t.count}</span>
           )}
         </button>
       ))}
@@ -299,10 +299,10 @@ export function Tabs<T extends string>({
 export function EmptyState({ icon, title, hint, action }: { icon?: ReactNode; title: string; hint?: string; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-      {icon && <div className="grid h-12 w-12 place-items-center rounded-full bg-zinc-800/60 text-zinc-500">{icon}</div>}
+      {icon && <div className="grid h-12 w-12 place-items-center rounded-full bg-surface-2/60 text-ink-faint">{icon}</div>}
       <div>
-        <p className="text-sm font-medium text-zinc-300">{title}</p>
-        {hint && <p className="mt-1 text-xs text-zinc-500">{hint}</p>}
+        <p className="text-sm font-medium text-ink">{title}</p>
+        {hint && <p className="mt-1 text-xs text-ink-faint">{hint}</p>}
       </div>
       {action}
     </div>
@@ -405,10 +405,10 @@ export function DataTable<T>({
   return (
     <div className="flex flex-col">
       {(searchable || toolbar || exportName) && (
-        <div className="flex flex-wrap items-center gap-3 border-b border-zinc-800 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3">
           {searchable && (
             <div className="relative min-w-[200px] flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-faintest" />
               <input
                 className="input input-sm !pl-9"
                 placeholder={searchPlaceholder}
@@ -439,7 +439,7 @@ export function DataTable<T>({
                 <th
                   key={c.key}
                   style={{ width: c.width, textAlign: c.align ?? 'left' }}
-                  className={cx(c.sort && 'cursor-pointer select-none hover:text-zinc-300')}
+                  className={cx(c.sort && 'cursor-pointer select-none hover:text-ink')}
                   onClick={() => c.sort && toggleSort(c.key)}
                 >
                   <span className="inline-flex items-center gap-1">
@@ -479,11 +479,11 @@ export function DataTable<T>({
       </div>
 
       {filtered.length > pageSize && (
-        <div className="flex items-center justify-between gap-4 border-t border-zinc-800 px-4 py-2.5 text-xs text-zinc-500">
+        <div className="flex items-center justify-between gap-4 border-t border-line px-4 py-2.5 text-xs text-ink-faint">
           <span>
-            Menampilkan <span className="font-mono text-zinc-300">{safePage * pageSize + 1}</span>–
-            <span className="font-mono text-zinc-300">{Math.min(filtered.length, (safePage + 1) * pageSize)}</span> dari{' '}
-            <span className="font-mono text-zinc-300">{filtered.length}</span> baris
+            Menampilkan <span className="font-mono text-ink">{safePage * pageSize + 1}</span>–
+            <span className="font-mono text-ink">{Math.min(filtered.length, (safePage + 1) * pageSize)}</span> dari{' '}
+            <span className="font-mono text-ink">{filtered.length}</span> baris
           </span>
           <div className="flex items-center gap-1">
             <Button size="sm" variant="ghost" className="!px-2" disabled={safePage === 0} onClick={() => setPage(safePage - 1)}>
@@ -531,21 +531,21 @@ export function StatCard({
     sky: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
     rose: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
     violet: 'text-violet-400 bg-violet-500/10 border-violet-500/20',
-    zinc: 'text-zinc-400 bg-zinc-800/60 border-zinc-700/40',
+    zinc: 'text-ink-muted bg-surface-2/60 border-line-strong/40',
   }
   const up = (delta ?? 0) >= 0
   return (
     <div
-      className={cx('panel group relative overflow-hidden p-4 transition-colors', onClick && 'cursor-pointer hover:border-zinc-700')}
+      className={cx('panel group relative overflow-hidden p-4 transition-colors', onClick && 'cursor-pointer hover:border-line-strong')}
       onClick={onClick}
     >
       <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br from-white/[0.04] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{label}</p>
+          <p className="truncate text-[11px] font-semibold uppercase tracking-wider text-ink-faint">{label}</p>
           <p className="mt-2 flex items-baseline gap-1.5">
             <span className="kpi-value">{value}</span>
-            {unit && <span className="text-xs font-medium text-zinc-500">{unit}</span>}
+            {unit && <span className="text-xs font-medium text-ink-faint">{unit}</span>}
           </p>
         </div>
         {icon && <div className={cx('grid h-9 w-9 shrink-0 place-items-center rounded-lg border', tones[tone])}>{icon}</div>}
@@ -558,7 +558,7 @@ export function StatCard({
               {Math.abs(delta).toFixed(1)}%
             </span>
           )}
-          <span className="truncate text-zinc-500">{deltaLabel ?? hint}</span>
+          <span className="truncate text-ink-faint">{deltaLabel ?? hint}</span>
         </div>
       )}
     </div>
@@ -579,11 +579,11 @@ export function ToastStack({ toasts, onDismiss }: { toasts: Array<{ id: string; 
       {toasts.map((t) => (
         <div
           key={t.id}
-          className="pointer-events-auto flex animate-slide-in-right items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-900/95 px-4 py-3 shadow-panel backdrop-blur"
+          className="pointer-events-auto flex animate-slide-in-right items-start gap-3 rounded-lg border border-line bg-surface-1/95 px-4 py-3 shadow-panel backdrop-blur"
         >
           <span className="mt-0.5 shrink-0">{icons[t.variant]}</span>
-          <p className="flex-1 text-sm text-zinc-200">{t.message}</p>
-          <button onClick={() => onDismiss(t.id)} className="shrink-0 text-zinc-600 hover:text-zinc-300">
+          <p className="flex-1 text-sm text-ink">{t.message}</p>
+          <button onClick={() => onDismiss(t.id)} className="shrink-0 text-ink-faintest hover:text-ink">
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -598,8 +598,8 @@ export function SectionTitle({ title, subtitle, actions }: { title: string; subt
   return (
     <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h2 className="text-lg font-semibold tracking-tight text-zinc-50">{title}</h2>
-        {subtitle && <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>}
+        <h2 className="text-lg font-semibold tracking-tight text-ink-strong">{title}</h2>
+        {subtitle && <p className="mt-1 text-sm text-ink-faint">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>

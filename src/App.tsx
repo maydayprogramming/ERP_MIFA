@@ -2,6 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Production from './pages/Production'
+import MinePlanning from './pages/MinePlanning'
+import Shipping from './pages/Shipping'
+import Legal from './pages/Legal'
 import Sales from './pages/Sales'
 import Purchasing from './pages/Purchasing'
 import Inventory from './pages/Inventory'
@@ -20,6 +23,9 @@ export default function App() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/production" element={<Production />} />
+        <Route path="/mine-planning" element={<MinePlanning />} />
+        <Route path="/shipping" element={<Shipping />} />
+        <Route path="/legal" element={<Legal />} />
         <Route path="/sales" element={<Sales />} />
         <Route path="/purchasing" element={<Purchasing />} />
         <Route path="/inventory" element={<Inventory />} />

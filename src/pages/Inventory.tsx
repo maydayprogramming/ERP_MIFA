@@ -70,10 +70,10 @@ export default function Inventory() {
 
   const itemColumns: Column<WarehouseItem>[] = [
     { key: 'sku', header: 'SKU', sort: (r) => r.sku, render: (r) => <span className="font-mono text-[12px] text-amber-400">{r.sku}</span> },
-    { key: 'name', header: 'Nama Barang', sort: (r) => r.name, render: (r) => <span className="text-zinc-200">{r.name}</span> },
+    { key: 'name', header: 'Nama Barang', sort: (r) => r.name, render: (r) => <span className="text-ink">{r.name}</span> },
     { key: 'category', header: 'Kategori', sort: (r) => r.category, render: (r) => <Badge tone="neutral">{r.category}</Badge> },
-    { key: 'siteId', header: 'Site', sort: (r) => siteName(r.siteId), render: (r) => <span className="text-zinc-400">{siteCode(r.siteId)}</span> },
-    { key: 'location', header: 'Lokasi', render: (r) => <span className="text-[12px] text-zinc-500">{r.location}</span> },
+    { key: 'siteId', header: 'Site', sort: (r) => siteName(r.siteId), render: (r) => <span className="text-ink-muted">{siteCode(r.siteId)}</span> },
+    { key: 'location', header: 'Lokasi', render: (r) => <span className="text-[12px] text-ink-faint">{r.location}</span> },
     {
       key: 'stock',
       header: 'Stok',
@@ -81,10 +81,10 @@ export default function Inventory() {
       sort: (r) => r.stock,
       render: (r) => (
         <div>
-          <p className="font-mono text-zinc-100">
+          <p className="font-mono text-ink-strong">
             {num(r.stock)} {r.unit}
           </p>
-          <div className="mt-1 h-1 w-24 overflow-hidden rounded-full bg-zinc-800">
+          <div className="mt-1 h-1 w-24 overflow-hidden rounded-full bg-surface-2">
             <div
               className={`h-full rounded-full ${r.stock < r.minStock ? 'bg-rose-500' : r.stock < r.minStock * 1.2 ? 'bg-amber-500' : 'bg-emerald-500'}`}
               style={{ width: `${Math.min(100, (r.stock / r.maxStock) * 100)}%` }}
@@ -93,8 +93,8 @@ export default function Inventory() {
         </div>
       ),
     },
-    { key: 'minStock', header: 'Min', align: 'right', sort: (r) => r.minStock, render: (r) => <span className="font-mono text-zinc-500">{num(r.minStock)}</span> },
-    { key: 'maxStock', header: 'Maks', align: 'right', sort: (r) => r.maxStock, render: (r) => <span className="font-mono text-zinc-500">{num(r.maxStock)}</span> },
+    { key: 'minStock', header: 'Min', align: 'right', sort: (r) => r.minStock, render: (r) => <span className="font-mono text-ink-faint">{num(r.minStock)}</span> },
+    { key: 'maxStock', header: 'Maks', align: 'right', sort: (r) => r.maxStock, render: (r) => <span className="font-mono text-ink-faint">{num(r.maxStock)}</span> },
     { key: 'unitCostIdr', header: 'Nilai Satuan', align: 'right', sort: (r) => r.unitCostIdr, render: (r) => <span className="font-mono">{idr(r.unitCostIdr)}</span> },
     {
       key: 'value',
@@ -107,7 +107,7 @@ export default function Inventory() {
   ]
 
   const movementColumns: Column<Movement>[] = [
-    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
+    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
     {
       key: 'type',
       header: 'Jenis',
@@ -119,11 +119,11 @@ export default function Inventory() {
         </span>
       ),
     },
-    { key: 'item', header: 'Barang', sort: (r) => r.item, render: (r) => <span className="text-zinc-200">{r.item}</span> },
+    { key: 'item', header: 'Barang', sort: (r) => r.item, render: (r) => <span className="text-ink">{r.item}</span> },
     { key: 'qty', header: 'Jumlah', align: 'right', sort: (r) => r.qty, render: (r) => <span className="font-mono">{num(r.qty)} {r.unit}</span> },
     { key: 'site', header: 'Site', render: (r) => <span className="chip">{r.site}</span> },
     { key: 'ref', header: 'Referensi', render: (r) => <span className="font-mono text-[12px] text-amber-400">{r.ref}</span> },
-    { key: 'pic', header: 'Petugas', render: (r) => <span className="text-[12px] text-zinc-500">{r.pic}</span> },
+    { key: 'pic', header: 'Petugas', render: (r) => <span className="text-[12px] text-ink-faint">{r.pic}</span> },
   ]
 
   const stockpileData = useMemo(
@@ -184,30 +184,30 @@ export default function Inventory() {
               const p = (s.tonnageMt / s.capacityMt) * 100
               return (
                 <Card key={s.id} className="overflow-hidden">
-                  <div className="flex items-start justify-between gap-2 border-b border-zinc-800 p-4">
+                  <div className="flex items-start justify-between gap-2 border-b border-line p-4">
                     <div className="min-w-0">
-                      <p className="truncate text-[13px] font-semibold text-zinc-100">{s.name}</p>
-                      <p className="text-[11px] text-zinc-500">{siteCode(s.siteId)} &middot; {siteName(s.siteId)}</p>
+                      <p className="truncate text-[13px] font-semibold text-ink-strong">{s.name}</p>
+                      <p className="text-[11px] text-ink-faint">{siteCode(s.siteId)} &middot; {siteName(s.siteId)}</p>
                     </div>
                     <StatusBadge value={s.status} />
                   </div>
                   <div className="p-4">
                     <div className="flex items-baseline justify-between">
-                      <span className="font-mono text-lg font-bold text-zinc-50">{mtShort(s.tonnageMt)}</span>
-                      <span className="text-[11px] text-zinc-500">dari {mtShort(s.capacityMt)}</span>
+                      <span className="font-mono text-lg font-bold text-ink-strong">{mtShort(s.tonnageMt)}</span>
+                      <span className="text-[11px] text-ink-faint">dari {mtShort(s.capacityMt)}</span>
                     </div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-zinc-800">
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2">
                       <div className={`h-full rounded-full ${p > 90 ? 'bg-rose-500' : p > 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, p)}%` }} />
                     </div>
-                    <div className="mt-3 grid grid-cols-3 gap-2 border-t border-zinc-800 pt-3 text-center">
+                    <div className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3 text-center">
                       {[
                         { label: 'GCV', value: num(s.gcvAr) },
                         { label: 'Ash', value: `${num1(s.ash)}%` },
                         { label: 'S', value: `${num1(s.sulfur)}%` },
                       ].map((x) => (
                         <div key={x.label}>
-                          <p className="font-mono text-xs font-semibold text-zinc-200">{x.value}</p>
-                          <p className="text-[10px] text-zinc-600">{x.label}</p>
+                          <p className="font-mono text-xs font-semibold text-ink">{x.value}</p>
+                          <p className="text-[10px] text-ink-faintest">{x.label}</p>
                         </div>
                       ))}
                     </div>
@@ -255,10 +255,10 @@ export default function Inventory() {
                 <tbody>
                   {state.stockpiles.map((s) => (
                     <tr key={s.id}>
-                      <td className="text-zinc-200">{s.name}</td>
-                      <td className="text-zinc-400">{siteCode(s.siteId)}</td>
+                      <td className="text-ink">{s.name}</td>
+                      <td className="text-ink-muted">{siteCode(s.siteId)}</td>
                       <td className="tbl-num">{num(s.tonnageMt)} MT</td>
-                      <td className="tbl-num text-zinc-500">{num(s.capacityMt)} MT</td>
+                      <td className="tbl-num text-ink-faint">{num(s.capacityMt)} MT</td>
                       <td className="tbl-num">
                         <span className={s.tonnageMt / s.capacityMt > 0.9 ? 'text-rose-400' : 'text-emerald-400'}>{pct1((s.tonnageMt / s.capacityMt) * 100)}</span>
                       </td>
@@ -318,14 +318,14 @@ export default function Inventory() {
                 const p = (t.levelL / t.capacityL) * 100
                 return (
                   <Card key={t.id}>
-                    <div className="flex items-start justify-between border-b border-zinc-800 p-4">
+                    <div className="flex items-start justify-between border-b border-line p-4">
                       <div className="flex items-center gap-2.5">
                         <div className="grid h-9 w-9 place-items-center rounded-lg bg-amber-500/10 text-amber-400">
                           <Fuel className="h-4 w-4" />
                         </div>
                         <div>
-                          <p className="text-[13px] font-semibold text-zinc-100">{t.name}</p>
-                          <p className="text-[11px] text-zinc-500">
+                          <p className="text-[13px] font-semibold text-ink-strong">{t.name}</p>
+                          <p className="text-[11px] text-ink-faint">
                             {siteCode(t.siteId)} &middot; {t.fuelType}
                           </p>
                         </div>
@@ -334,13 +334,13 @@ export default function Inventory() {
                     </div>
                     <div className="p-4">
                       <div className="flex items-baseline justify-between">
-                        <span className="font-mono text-lg font-bold text-zinc-50">{num(t.levelL)} L</span>
-                        <span className="text-[11px] text-zinc-500">kapasitas {num(t.capacityL)} L</span>
+                        <span className="font-mono text-lg font-bold text-ink-strong">{num(t.levelL)} L</span>
+                        <span className="text-[11px] text-ink-faint">kapasitas {num(t.capacityL)} L</span>
                       </div>
-                      <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-zinc-800">
+                      <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-surface-2">
                         <div className={`h-full rounded-full ${p < 30 ? 'bg-rose-500' : p < 60 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${p}%` }} />
                       </div>
-                      <p className="mt-2 text-[11px] text-zinc-600">Dip terakhir {dmy(t.lastDip)} &middot; {pct1(p)} terisi</p>
+                      <p className="mt-2 text-[11px] text-ink-faintest">Dip terakhir {dmy(t.lastDip)} &middot; {pct1(p)} terisi</p>
                     </div>
                   </Card>
                 )
@@ -359,12 +359,12 @@ export default function Inventory() {
                 { label: 'Nilai stok BBM', value: idr(sum(state.fuelTanks.map((t) => t.levelL)) * 14300) },
                 { label: 'Pengisian berikutnya', value: '17 Okt 2026' },
               ].map((r) => (
-                <div key={r.label} className="flex items-center justify-between border-b border-zinc-800 pb-2.5 last:border-0">
-                  <span className="text-xs text-zinc-400">{r.label}</span>
-                  <span className="font-mono text-sm font-semibold text-zinc-100">{r.value}</span>
+                <div key={r.label} className="flex items-center justify-between border-b border-line pb-2.5 last:border-0">
+                  <span className="text-xs text-ink-muted">{r.label}</span>
+                  <span className="font-mono text-sm font-semibold text-ink-strong">{r.value}</span>
                 </div>
               ))}
-              <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] p-3 text-[11px] leading-relaxed text-amber-200/80">
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] p-3 text-[11px] leading-relaxed text-amber-600 dark:text-amber-200">
                 Fuel Farm LHT-02 berada di bawah 30% kapasitas. Segera jadwalkan pengisian dari Pertamina Patra Niaga untuk menjaga kontinuitas operasional hauling.
               </div>
             </div>
@@ -408,7 +408,7 @@ export default function Inventory() {
 
         <Card className="xl:col-span-2">
           <CardHeader title="Item Perlu Perhatian" subtitle="Barang dengan stok di bawah minimum atau mendekati batas" icon={<AlertTriangle className="h-4 w-4" />} />
-          <div className="divide-y divide-zinc-800">
+          <div className="divide-y divide-line">
             {state.warehouseItems
               .filter((i) => i.stock < i.minStock * 1.2)
               .sort((a, b) => a.stock / a.minStock - b.stock / b.minStock)
@@ -419,13 +419,13 @@ export default function Inventory() {
                     <Package className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] text-zinc-200">{i.name}</p>
-                    <p className="text-[11px] text-zinc-600">
+                    <p className="truncate text-[13px] text-ink">{i.name}</p>
+                    <p className="text-[11px] text-ink-faintest">
                       {i.sku} &middot; {siteCode(i.siteId)} &middot; {i.location}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-mono text-sm text-zinc-100">
+                    <p className="font-mono text-sm text-ink-strong">
                       {num(i.stock)} / {num(i.minStock)} {i.unit}
                     </p>
                     <p className="text-[11px] text-rose-400">Defisit {num(Math.max(0, i.minStock - i.stock))} {i.unit}</p>
@@ -436,7 +436,7 @@ export default function Inventory() {
                 </div>
               ))}
             {state.warehouseItems.filter((i) => i.stock < i.minStock * 1.2).length === 0 && (
-              <div className="px-5 py-8 text-center text-sm text-zinc-500">Seluruh item berada di atas stok minimum.</div>
+              <div className="px-5 py-8 text-center text-sm text-ink-faint">Seluruh item berada di atas stok minimum.</div>
             )}
           </div>
         </Card>
@@ -469,7 +469,7 @@ export default function Inventory() {
       >
         {adjust && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+            <div className="grid grid-cols-2 gap-3 rounded-lg border border-line bg-surface-2/50 p-4">
               {[
                 { label: 'Stok saat ini', value: `${num(adjust.stock)} ${adjust.unit}` },
                 { label: 'Stok minimum', value: `${num(adjust.minStock)} ${adjust.unit}` },
@@ -477,8 +477,8 @@ export default function Inventory() {
                 { label: 'Nilai satuan', value: idrFull(adjust.unitCostIdr) },
               ].map((r) => (
                 <div key={r.label}>
-                  <p className="text-[11px] text-zinc-500">{r.label}</p>
-                  <p className="mt-0.5 font-mono text-sm font-semibold text-zinc-100">{r.value}</p>
+                  <p className="text-[11px] text-ink-faint">{r.label}</p>
+                  <p className="mt-0.5 font-mono text-sm font-semibold text-ink-strong">{r.value}</p>
                 </div>
               ))}
             </div>

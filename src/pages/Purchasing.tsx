@@ -43,23 +43,23 @@ export default function Purchasing() {
 
   const columns: Column<PurchaseOrder>[] = [
     { key: 'poNo', header: 'No. PO', sort: (r) => r.poNo, render: (r) => <span className="font-mono text-[13px] font-medium text-amber-400">{r.poNo}</span> },
-    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
-    { key: 'vendor', header: 'Vendor', sort: (r) => vendorName(r.vendorId), render: (r) => <span className="text-zinc-200">{vendorName(r.vendorId)}</span> },
+    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
+    { key: 'vendor', header: 'Vendor', sort: (r) => vendorName(r.vendorId), render: (r) => <span className="text-ink">{vendorName(r.vendorId)}</span> },
     { key: 'category', header: 'Kategori', sort: (r) => r.category, render: (r) => <CategoryBadge category={r.category} /> },
     { key: 'items', header: 'Item', align: 'right', sort: (r) => r.items, render: (r) => <span className="font-mono">{num(r.items)}</span> },
-    { key: 'siteId', header: 'Site Tujuan', sort: (r) => siteName(r.siteId), render: (r) => <span className="text-zinc-400">{siteName(r.siteId)}</span> },
+    { key: 'siteId', header: 'Site Tujuan', sort: (r) => siteName(r.siteId), render: (r) => <span className="text-ink-muted">{siteName(r.siteId)}</span> },
     { key: 'amountIdr', header: 'Nilai', align: 'right', sort: (r) => r.amountIdr, render: (r) => <span className="font-mono font-semibold text-emerald-400">{idr(r.amountIdr)}</span> },
-    { key: 'deliveryDate', header: 'Pengiriman', sort: (r) => r.deliveryDate, render: (r) => <span className="text-zinc-400">{dmy(r.deliveryDate)}</span> },
-    { key: 'requestedBy', header: 'Pemohon', render: (r) => <span className="text-[12px] text-zinc-500">{r.requestedBy}</span> },
+    { key: 'deliveryDate', header: 'Pengiriman', sort: (r) => r.deliveryDate, render: (r) => <span className="text-ink-muted">{dmy(r.deliveryDate)}</span> },
+    { key: 'requestedBy', header: 'Pemohon', render: (r) => <span className="text-[12px] text-ink-faint">{r.requestedBy}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
   ]
 
   const vendorColumns: Column<Vendor>[] = [
     { key: 'code', header: 'Kode', sort: (r) => r.code, render: (r) => <span className="font-mono text-[13px] text-amber-400">{r.code}</span> },
-    { key: 'name', header: 'Nama Vendor', sort: (r) => r.name, render: (r) => <span className="font-medium text-zinc-100">{r.name}</span> },
+    { key: 'name', header: 'Nama Vendor', sort: (r) => r.name, render: (r) => <span className="font-medium text-ink-strong">{r.name}</span> },
     { key: 'category', header: 'Kategori', sort: (r) => r.category, render: (r) => <CategoryBadge category={r.category} /> },
-    { key: 'city', header: 'Lokasi', render: (r) => <span className="text-zinc-400">{r.city}</span> },
-    { key: 'contact', header: 'Kontak', render: (r) => <span className="text-[12px] text-zinc-500">{r.contact}</span> },
+    { key: 'city', header: 'Lokasi', render: (r) => <span className="text-ink-muted">{r.city}</span> },
+    { key: 'contact', header: 'Kontak', render: (r) => <span className="text-[12px] text-ink-faint">{r.contact}</span> },
     {
       key: 'rating',
       header: 'Rating',
@@ -68,7 +68,7 @@ export default function Purchasing() {
       render: (r) => (
         <span className="inline-flex items-center gap-1 font-mono text-xs">
           {Array.from({ length: 5 }, (_, i) => (
-            <Star key={i} className={`h-3 w-3 ${i < r.rating ? 'fill-amber-400 text-amber-400' : 'text-zinc-700'}`} />
+            <Star key={i} className={`h-3 w-3 ${i < r.rating ? 'fill-amber-400 text-amber-400' : 'text-ink-faintest'}`} />
           ))}
         </span>
       ),
@@ -142,17 +142,17 @@ export default function Purchasing() {
                 icon={<ClipboardCheck className="h-4 w-4" />}
                 actions={<Badge tone="warning">{pending.length} item</Badge>}
               />
-              <div className="divide-y divide-zinc-800">
+              <div className="divide-y divide-line">
                 {pending.slice(0, 5).map((p) => (
                   <div key={p.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
                     <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-amber-400">
                       <Package className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-medium text-zinc-200">
+                      <p className="text-[13px] font-medium text-ink">
                         {p.poNo} — {vendorName(p.vendorId)}
                       </p>
-                      <p className="text-[11px] text-zinc-600">
+                      <p className="text-[11px] text-ink-faintest">
                         {p.category} &middot; {p.items} item &middot; kirim {dmy(p.deliveryDate)}
                       </p>
                     </div>
@@ -276,7 +276,7 @@ export default function Purchasing() {
                 {byCategory.slice(0, 6).map((c, i) => (
                   <div key={c.name}>
                     <Progress value={(c.value / byCategory[0].value) * 100} tone={['amber', 'sky', 'emerald', 'violet', 'rose', 'orange'][i % 6] as 'amber'} label={c.name} />
-                    <p className="mt-1 text-[11px] text-zinc-600">Rp {num1(c.value)} miliar</p>
+                    <p className="mt-1 text-[11px] text-ink-faintest">Rp {num1(c.value)} miliar</p>
                   </div>
                 ))}
               </div>
@@ -295,13 +295,13 @@ export default function Purchasing() {
         ].map((s) => (
           <Card key={s.title}>
             <div className="flex items-start gap-3 p-5">
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zinc-800/60 text-zinc-400">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-surface-2/60 text-ink-muted">
                 <s.icon className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-zinc-500">{s.title}</p>
+                <p className="text-[11px] uppercase tracking-wider text-ink-faint">{s.title}</p>
                 <p className={`mt-1 font-mono text-xl font-bold ${s.tone}`}>{s.value}</p>
-                <p className="text-[11px] text-zinc-600">{s.hint}</p>
+                <p className="text-[11px] text-ink-faintest">{s.hint}</p>
               </div>
             </div>
           </Card>
@@ -332,9 +332,9 @@ export default function Purchasing() {
       >
         {detail && (
           <div className="space-y-5">
-            <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+            <div className="flex items-center justify-between rounded-lg border border-line bg-surface-2/50 p-4">
               <div>
-                <p className="text-[11px] text-zinc-500">Nilai Purchase Order</p>
+                <p className="text-[11px] text-ink-faint">Nilai Purchase Order</p>
                 <p className="font-mono text-xl font-bold text-emerald-400">{idrFull(detail.amountIdr)}</p>
               </div>
               <StatusBadge value={detail.status} />
@@ -351,9 +351,9 @@ export default function Purchasing() {
                 { label: 'PPN (11%)', value: idr(detail.amountIdr * 0.11) },
                 { label: 'Total DPP+PPN', value: idr(detail.amountIdr * 1.11) },
               ].map((r) => (
-                <div key={r.label} className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
-                  <p className="text-[11px] text-zinc-500">{r.label}</p>
-                  <p className="mt-0.5 text-sm font-medium text-zinc-100">{r.value}</p>
+                <div key={r.label} className="rounded-lg border border-line bg-surface-2/50 px-3 py-2.5">
+                  <p className="text-[11px] text-ink-faint">{r.label}</p>
+                  <p className="mt-0.5 text-sm font-medium text-ink-strong">{r.value}</p>
                 </div>
               ))}
             </div>
@@ -384,7 +384,7 @@ const CAT_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
 function CategoryBadge({ category }: { category: string }) {
   const Icon = CAT_ICON[category] ?? Package
   return (
-    <span className="inline-flex items-center gap-1.5 text-[12px] text-zinc-300">
+    <span className="inline-flex items-center gap-1.5 text-[12px] text-ink">
       <Icon className="h-3.5 w-3.5 text-amber-400" />
       {category}
     </span>
@@ -464,14 +464,14 @@ function PurchaseOrderForm({ open, onClose }: { open: boolean; onClose: () => vo
         </Field>
       </div>
       {amount > 0 && (
-        <div className="mt-4 grid grid-cols-3 gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+        <div className="mt-4 grid grid-cols-3 gap-3 rounded-lg border border-line bg-surface-2/50 p-4">
           {[
             { label: 'DPP', value: idrFull(amount) },
             { label: 'PPN 11%', value: idrFull(amount * 0.11) },
             { label: 'Total', value: idrFull(amount * 1.11) },
           ].map((r) => (
             <div key={r.label}>
-              <p className="text-[11px] text-zinc-500">{r.label}</p>
+              <p className="text-[11px] text-ink-faint">{r.label}</p>
               <p className="mt-0.5 font-mono text-sm font-semibold text-amber-400">{r.value}</p>
             </div>
           ))}

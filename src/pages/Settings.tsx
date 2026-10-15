@@ -20,6 +20,7 @@ import { Badge, Button, Card, CardHeader, Field, Input, Modal, Progress, Section
 import { DataTable } from '../components/ui'
 import { useERP } from '../store'
 import { COMPANY } from '../data/seed'
+import { useTheme, type ThemeMode } from '../theme/ThemeProvider'
 import { dmy, num } from '../lib/format'
 
 type TabId = 'company' | 'users' | 'parameters' | 'integration'
@@ -57,6 +58,7 @@ const AUDIT_LOG = [
 
 export default function SettingsPage() {
   const { state, actions, toast } = useERP()
+  const { mode, setMode } = useTheme()
   const [tab, setTab] = useState<TabId>('company')
   const [resetOpen, setResetOpen] = useState(false)
   const [twoFactor, setTwoFactor] = useState(true)
@@ -70,19 +72,19 @@ export default function SettingsPage() {
       sort: (r) => r.name,
       render: (r) => (
         <div className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 text-[10px] font-bold text-zinc-300">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-surface-3 to-surface-2 text-[10px] font-bold text-ink">
             {r.name.split(' ').slice(0, 2).map((w) => w[0]).join('')}
           </span>
           <div>
-            <p className="text-[13px] font-medium text-zinc-100">{r.name}</p>
-            <p className="text-[11px] text-zinc-500">{r.email}</p>
+            <p className="text-[13px] font-medium text-ink-strong">{r.name}</p>
+            <p className="text-[11px] text-ink-faint">{r.email}</p>
           </div>
         </div>
       ),
     },
     { key: 'role', header: 'Peran', sort: (r) => r.role, render: (r) => <Badge tone={r.role === 'Super Admin' ? 'amber' : 'neutral'}>{r.role}</Badge> },
-    { key: 'site', header: 'Cakupan Site', render: (r) => <span className="text-zinc-400">{r.site}</span> },
-    { key: 'lastLogin', header: 'Login Terakhir', sort: (r) => r.lastLogin, render: (r) => <span className="font-mono text-[12px] text-zinc-500">{r.lastLogin}</span> },
+    { key: 'site', header: 'Cakupan Site', render: (r) => <span className="text-ink-muted">{r.site}</span> },
+    { key: 'lastLogin', header: 'Login Terakhir', sort: (r) => r.lastLogin, render: (r) => <span className="font-mono text-[12px] text-ink-faint">{r.lastLogin}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
     {
       key: 'actions',
@@ -171,26 +173,37 @@ export default function SettingsPage() {
             <div className="space-y-5 p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[13px] font-medium text-zinc-200">Autentikasi Dua Faktor</p>
-                  <p className="text-[11px] text-zinc-500">Wajib untuk peran Super Admin</p>
+                  <p className="text-[13px] font-medium text-ink">Autentikasi Dua Faktor</p>
+                  <p className="text-[11px] text-ink-faint">Wajib untuk peran Super Admin</p>
                 </div>
                 <Toggle checked={twoFactor} onChange={setTwoFactor} />
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[13px] font-medium text-zinc-200">Notifikasi Email</p>
-                  <p className="text-[11px] text-zinc-500">Kirim peringatan approval & K3LH</p>
+                  <p className="text-[13px] font-medium text-ink">Notifikasi Email</p>
+                  <p className="text-[11px] text-ink-faint">Kirim peringatan approval & K3LH</p>
                 </div>
                 <Toggle checked={emailAlert} onChange={setEmailAlert} />
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[13px] font-medium text-zinc-200">Auto-approve PO Kecil</p>
-                  <p className="text-[11px] text-zinc-500">PO di bawah Rp 100 juta</p>
+                  <p className="text-[13px] font-medium text-ink">Auto-approve PO Kecil</p>
+                  <p className="text-[11px] text-ink-faint">PO di bawah Rp 100 juta</p>
                 </div>
                 <Toggle checked={autoApprove} onChange={setAutoApprove} />
               </div>
-              <div className="space-y-3 border-t border-zinc-800 pt-4">
+              <div className="space-y-3 border-t border-line pt-4">
+                <Field label="Tema Tampilan" hint="Terapkan langsung ke seluruh aplikasi">
+                  <Select
+                    options={[
+                      { value: 'dark', label: 'Gelap (Dark)' },
+                      { value: 'light', label: 'Terang (Light)' },
+                      { value: 'system', label: 'Ikuti Sistem Operasi' },
+                    ]}
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value as ThemeMode)}
+                  />
+                </Field>
                 <Field label="Bahasa Antarmuka">
                   <Select options={['Bahasa Indonesia', 'English']} defaultValue="Bahasa Indonesia" />
                 </Field>
@@ -222,7 +235,7 @@ export default function SettingsPage() {
             searchPlaceholder="Cari pengguna, email, peran…"
             exportName="pengguna"
           />
-          <div className="border-t border-zinc-800 p-5">
+          <div className="border-t border-line p-5">
             <p className="label">Matriks Hak Akses Modul</p>
             <div className="overflow-x-auto scrollbar-thin">
               <table className="tbl">
@@ -247,10 +260,10 @@ export default function SettingsPage() {
                     { role: 'Staff Produksi', mods: [1, 0, 0, 0, 1, 0, 1] },
                   ].map((r) => (
                     <tr key={r.role}>
-                      <td className="text-zinc-200">{r.role}</td>
+                      <td className="text-ink">{r.role}</td>
                       {r.mods.map((v, i) => (
                         <td key={i} className="text-center">
-                          {v ? <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-400" /> : <span className="text-zinc-700">—</span>}
+                          {v ? <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-400" /> : <span className="text-ink-faintest">—</span>}
                         </td>
                       ))}
                     </tr>
@@ -308,8 +321,8 @@ export default function SettingsPage() {
                     { band: '2.101–3.100', rate: 8 },
                     { band: '≤ 2.100', rate: 9 },
                   ].map((r) => (
-                    <div key={r.band} className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2">
-                      <p className="text-[10px] text-zinc-500">{r.band}</p>
+                    <div key={r.band} className="rounded-lg border border-line bg-surface-2/50 px-3 py-2">
+                      <p className="text-[10px] text-ink-faint">{r.band}</p>
                       <p className="font-mono text-sm font-semibold text-amber-400">{r.rate}%</p>
                     </div>
                   ))}
@@ -329,7 +342,7 @@ export default function SettingsPage() {
                   <Input defaultValue="RKAB 2026" />
                 </Field>
               </div>
-              <div className="rounded-lg border border-sky-500/20 bg-sky-500/[0.06] p-3 text-[11px] leading-relaxed text-sky-200/80">
+              <div className="rounded-lg border border-sky-500/20 bg-sky-500/[0.06] p-3 text-[11px] leading-relaxed text-sky-600 dark:text-sky-200">
                 Parameter royalti dihitung otomatis dari nilai kalori GAR setiap produksi. Perubahan tarif mengacu pada peraturan menteri yang berlaku.
               </div>
             </div>
@@ -364,7 +377,7 @@ export default function SettingsPage() {
                       <td className="tbl-num">{r.tm}</td>
                       <td className="tbl-num">{r.ash}</td>
                       <td className="tbl-num">{r.s}</td>
-                      <td className="text-zinc-400">{r.market}</td>
+                      <td className="text-ink-muted">{r.market}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -386,14 +399,14 @@ export default function SettingsPage() {
                         <Globe2 className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="text-[13px] font-semibold text-zinc-100">{i.name}</p>
-                        <p className="mt-0.5 text-[11px] leading-relaxed text-zinc-500">{i.desc}</p>
-                        <p className="mt-1.5 text-[11px] text-zinc-600">Sinkronisasi: {i.sync}</p>
+                        <p className="text-[13px] font-semibold text-ink-strong">{i.name}</p>
+                        <p className="mt-0.5 text-[11px] leading-relaxed text-ink-faint">{i.desc}</p>
+                        <p className="mt-1.5 text-[11px] text-ink-faintest">Sinkronisasi: {i.sync}</p>
                       </div>
                     </div>
                     <StatusBadge value={i.status} />
                   </div>
-                  <div className="border-t border-zinc-800 px-4 py-2.5">
+                  <div className="border-t border-line px-4 py-2.5">
                     <Progress value={i.status === 'Terhubung' ? 98 : 42} tone={i.status === 'Terhubung' ? 'emerald' : 'rose'} />
                   </div>
                 </Card>
@@ -407,13 +420,13 @@ export default function SettingsPage() {
               {[
                 { label: 'Autentikasi dua faktor', value: twoFactor ? 'Aktif' : 'Nonaktif', tone: twoFactor ? 'text-emerald-400' : 'text-rose-400' },
                 { label: 'Kebijakan password', value: '90 hari rotasi', tone: 'text-sky-400' },
-                { label: 'Sesi aktif', value: '14 pengguna', tone: 'text-zinc-200' },
+                { label: 'Sesi aktif', value: '14 pengguna', tone: 'text-ink' },
                 { label: 'Percobaan login gagal', value: '3 (24 jam)', tone: 'text-amber-400' },
-                { label: 'Backup terakhir', value: '2026-10-15 02:00', tone: 'text-zinc-200' },
+                { label: 'Backup terakhir', value: '2026-10-15 02:00', tone: 'text-ink' },
                 { label: 'Enkripsi data', value: 'AES-256', tone: 'text-emerald-400' },
               ].map((r) => (
-                <div key={r.label} className="flex items-center justify-between border-b border-zinc-800 pb-2.5 last:border-0">
-                  <span className="text-xs text-zinc-400">{r.label}</span>
+                <div key={r.label} className="flex items-center justify-between border-b border-line pb-2.5 last:border-0">
+                  <span className="text-xs text-ink-muted">{r.label}</span>
                   <span className={`font-mono text-sm font-semibold ${r.tone}`}>{r.value}</span>
                 </div>
               ))}
@@ -442,13 +455,13 @@ export default function SettingsPage() {
             <tbody>
               {AUDIT_LOG.map((a) => (
                 <tr key={a.id}>
-                  <td className="font-mono text-[12px] text-zinc-500">{a.time}</td>
-                  <td className="text-zinc-200">{a.user}</td>
-                  <td className="text-zinc-400">{a.action}</td>
+                  <td className="font-mono text-[12px] text-ink-faint">{a.time}</td>
+                  <td className="text-ink">{a.user}</td>
+                  <td className="text-ink-muted">{a.action}</td>
                   <td>
                     <Badge tone="neutral">{a.module}</Badge>
                   </td>
-                  <td className="font-mono text-[12px] text-zinc-600">{a.ip}</td>
+                  <td className="font-mono text-[12px] text-ink-faintest">{a.ip}</td>
                 </tr>
               ))}
             </tbody>
@@ -463,8 +476,8 @@ export default function SettingsPage() {
             <AlertTriangle className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-zinc-100">Reset Data Demo</p>
-            <p className="text-[12px] leading-relaxed text-zinc-500">
+            <p className="text-sm font-semibold text-ink-strong">Reset Data Demo</p>
+            <p className="text-[12px] leading-relaxed text-ink-faint">
               Mengembalikan seluruh data aplikasi — produksi, penjualan, armada, K3LH, dan keuangan — ke kondisi awal seed. Tindakan ini tidak dapat dibatalkan.
             </p>
           </div>
@@ -482,13 +495,13 @@ export default function SettingsPage() {
         ].map((s) => (
           <Card key={s.label}>
             <div className="flex items-start gap-3 p-5">
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zinc-800/60 text-zinc-400">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-surface-2/60 text-ink-muted">
                 <s.icon className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-zinc-500">{s.label}</p>
-                <p className="mt-1 text-sm font-semibold text-zinc-100">{s.value}</p>
-                <p className="text-[11px] text-zinc-600">{s.sub}</p>
+                <p className="text-[11px] uppercase tracking-wider text-ink-faint">{s.label}</p>
+                <p className="mt-1 text-sm font-semibold text-ink-strong">{s.value}</p>
+                <p className="text-[11px] text-ink-faintest">{s.sub}</p>
               </div>
             </div>
           </Card>
@@ -519,11 +532,11 @@ export default function SettingsPage() {
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-lg border border-rose-500/25 bg-rose-500/[0.06] p-4">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-400" />
-            <p className="text-[13px] leading-relaxed text-rose-200/90">
+            <p className="text-[13px] leading-relaxed text-rose-600 dark:text-rose-200">
               Tindakan ini akan menghapus seluruh data yang Anda tambahkan atau ubahkan melalui aplikasi dan memulihkan dataset demo awal. Pastikan Anda telah mengekspor data yang diperlukan.
             </p>
           </div>
-          <p className="text-[12px] text-zinc-500">Ketik <span className="font-mono text-zinc-300">RESET</span> untuk mengonfirmasi:</p>
+          <p className="text-[12px] text-ink-faint">Ketik <span className="font-mono text-ink">RESET</span> untuk mengonfirmasi:</p>
           <Input placeholder="RESET" />
         </div>
       </Modal>

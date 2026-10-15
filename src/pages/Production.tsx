@@ -49,8 +49,8 @@ export default function Production() {
       sort: (r) => r.date,
       render: (r) => (
         <div>
-          <p className="font-medium text-zinc-200">{dmy(r.date)}</p>
-          <p className="text-[11px] text-zinc-600">{r.shift}</p>
+          <p className="font-medium text-ink">{dmy(r.date)}</p>
+          <p className="text-[11px] text-ink-faintest">{r.shift}</p>
         </div>
       ),
     },
@@ -60,12 +60,12 @@ export default function Production() {
       sort: (r) => siteName(r.siteId),
       render: (r) => (
         <div className="flex items-center gap-2">
-          <span className="grid h-6 w-6 place-items-center rounded bg-zinc-800 font-mono text-[10px] font-bold text-amber-400">{siteCode(r.siteId)}</span>
-          <span className="text-zinc-200">{siteName(r.siteId)}</span>
+          <span className="grid h-6 w-6 place-items-center rounded bg-surface-2 font-mono text-[10px] font-bold text-amber-400">{siteCode(r.siteId)}</span>
+          <span className="text-ink">{siteName(r.siteId)}</span>
         </div>
       ),
     },
-    { key: 'coalMt', header: 'Batu Bara (MT)', align: 'right', sort: (r) => r.coalMt, render: (r) => <span className="font-mono text-zinc-100">{num(r.coalMt)}</span> },
+    { key: 'coalMt', header: 'Batu Bara (MT)', align: 'right', sort: (r) => r.coalMt, render: (r) => <span className="font-mono text-ink-strong">{num(r.coalMt)}</span> },
     { key: 'obBcm', header: 'Overburden (Bcm)', align: 'right', sort: (r) => r.obBcm, render: (r) => <span className="font-mono">{num1(r.obBcm)}</span> },
     {
       key: 'sr',
@@ -245,12 +245,12 @@ export default function Production() {
 
             <Card>
               <CardHeader title="Spesifikasi Kontrak" subtitle="Parameter mutu batubara per kontrak aktif" icon={<FlaskConical className="h-4 w-4" />} />
-              <div className="divide-y divide-zinc-800">
+              <div className="divide-y divide-line">
                 {state.contracts.slice(0, 6).map((c) => (
                   <div key={c.id} className="flex items-center justify-between px-5 py-3">
                     <div className="min-w-0">
-                      <p className="truncate text-[13px] font-medium text-zinc-200">{c.qualitySpec}</p>
-                      <p className="truncate text-[11px] text-zinc-600">
+                      <p className="truncate text-[13px] font-medium text-ink">{c.qualitySpec}</p>
+                      <p className="truncate text-[11px] text-ink-faintest">
                         {c.code} &middot; {c.type}
                       </p>
                     </div>
@@ -282,16 +282,16 @@ export default function Production() {
                     <tr key={q.site.id}>
                       <td>
                         <div className="flex items-center gap-2">
-                          <span className="grid h-6 w-6 place-items-center rounded bg-zinc-800 font-mono text-[10px] font-bold text-amber-400">{q.site.code}</span>
-                          <span className="text-zinc-200">{q.site.name}</span>
+                          <span className="grid h-6 w-6 place-items-center rounded bg-surface-2 font-mono text-[10px] font-bold text-amber-400">{q.site.code}</span>
+                          <span className="text-ink">{q.site.name}</span>
                         </div>
                       </td>
-                      <td className="text-zinc-400">{q.site.coalType}</td>
+                      <td className="text-ink-muted">{q.site.coalType}</td>
                       <td className="tbl-num text-emerald-400">{num(q.gcv)}</td>
                       <td className="tbl-num">{num1(q.tm)}</td>
                       <td className="tbl-num">{num1(q.ash)}</td>
                       <td className="tbl-num">{num2(q.sulfur)}</td>
-                      <td className="text-right text-zinc-400">{q.spec.band}</td>
+                      <td className="text-right text-ink-muted">{q.spec.band}</td>
                       <td className="tbl-num">
                         <Badge tone="warning">{q.spec.rate}%</Badge>
                       </td>
@@ -300,7 +300,7 @@ export default function Production() {
                 </tbody>
               </table>
             </div>
-            <div className="border-t border-zinc-800 px-5 py-3 text-[11px] text-zinc-600">
+            <div className="border-t border-line px-5 py-3 text-[11px] text-ink-faintest">
               Tarif royalti mengacu pada PP No. 9 Tahun 2010 jo. PP No. 1 Tahun 2017 beserta perubahannya — dihitung dari nilai kalori GAR (air received basis).
             </div>
           </Card>
@@ -334,24 +334,24 @@ export default function Production() {
               <div className="space-y-5 p-5">
                 <div>
                   <Progress value={(rkabYtd / rkabPlan) * 100} tone="amber" label="Produksi batu bara" />
-                  <p className="mt-1.5 text-[11px] text-zinc-600">
+                  <p className="mt-1.5 text-[11px] text-ink-faintest">
                     {num(rkabYtd)} MT dari {num(rkabPlan)} MT
                   </p>
                 </div>
                 <div>
                   <Progress value={m.rkabPct} tone="emerald" label="Realisasi biaya RKAB" />
-                  <p className="mt-1.5 text-[11px] text-zinc-600">{pct1(m.rkabPct)} dari pagu anggaran</p>
+                  <p className="mt-1.5 text-[11px] text-ink-faintest">{pct1(m.rkabPct)} dari pagu anggaran</p>
                 </div>
                 <div>
                   <Progress value={(m.contractLifted / m.contractVolume) * 100} tone="sky" label="Volume kontrak terlaksana" />
-                  <p className="mt-1.5 text-[11px] text-zinc-600">
+                  <p className="mt-1.5 text-[11px] text-ink-faintest">
                     {num(m.contractLifted)} MT dari {num(m.contractVolume)} MT
                   </p>
                 </div>
-                <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
-                  <p className="text-[11px] text-zinc-500">Proyeksi akhir tahun</p>
+                <div className="rounded-lg border border-line bg-surface-2/50 p-3">
+                  <p className="text-[11px] text-ink-faint">Proyeksi akhir tahun</p>
                   <p className="mt-1 font-mono text-lg font-bold text-amber-400">{num(Math.round((rkabYtd / 10) * 12))} MT</p>
-                  <p className="text-[11px] text-zinc-600">{pct1(((rkabYtd / 10) * 12) / rkabPlan * 100)} dari target</p>
+                  <p className="text-[11px] text-ink-faintest">{pct1(((rkabYtd / 10) * 12) / rkabPlan * 100)} dari target</p>
                 </div>
               </div>
             </Card>
@@ -432,7 +432,7 @@ export default function Production() {
           <CardHeader title="Efisiensi Pengupasan" subtitle="Rasio overburden terhadap batubara" icon={<Layers className="h-4 w-4" />} />
           <div className="p-5">
             <Progress value={Math.min(100, (m.srMtd / 6) * 100)} tone={m.srMtd > 5 ? 'rose' : m.srMtd > 4 ? 'amber' : 'emerald'} label="Stripping ratio saat ini" />
-            <p className="mt-3 text-xs leading-relaxed text-zinc-500">
+            <p className="mt-3 text-xs leading-relaxed text-ink-faint">
               Stripping ratio {num1(m.srMtd)} Bcm/MT berada pada batas normal operasional tambang terbuka. Nilai ideal bervariasi 3,5–5,0 Bcm/MT bergantung pada geometri endapan.
             </p>
           </div>
@@ -452,13 +452,13 @@ export default function Production() {
             {(['Draft', 'Verified', 'Approved'] as const).map((st) => {
               const c = state.production.filter((p) => p.status === st).length
               return (
-                <div key={st} className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
-                  <span className="text-xs text-zinc-400">{st}</span>
+                <div key={st} className="flex items-center justify-between rounded-lg border border-line bg-surface-2/50 px-3 py-2.5">
+                  <span className="text-xs text-ink-muted">{st}</span>
                   <div className="flex items-center gap-3">
-                    <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-800">
+                    <div className="h-1.5 w-24 overflow-hidden rounded-full bg-surface-2">
                       <div className={`h-full rounded-full ${st === 'Approved' ? 'bg-emerald-500' : st === 'Verified' ? 'bg-sky-500' : 'bg-zinc-500'}`} style={{ width: `${(c / state.production.length) * 100}%` }} />
                     </div>
-                    <span className="font-mono text-xs text-zinc-200">{c}</span>
+                    <span className="font-mono text-xs text-ink">{c}</span>
                   </div>
                 </div>
               )
@@ -474,9 +474,9 @@ export default function Production() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
-      <p className="text-[11px] text-zinc-500">{label}</p>
-      <p className="mt-0.5 font-mono text-sm font-semibold text-zinc-100">{value}</p>
+    <div className="rounded-lg border border-line bg-surface-2/50 px-3 py-2.5">
+      <p className="text-[11px] text-ink-faint">{label}</p>
+      <p className="mt-0.5 font-mono text-sm font-semibold text-ink-strong">{value}</p>
     </div>
   )
 }
@@ -497,14 +497,14 @@ function SiteCard({ site }: { site: Site }) {
   const staff = state.employees.filter((e) => e.siteId === site.id).length
   return (
     <Card>
-      <div className="flex items-start justify-between gap-3 border-b border-zinc-800 p-5">
+      <div className="flex items-start justify-between gap-3 border-b border-line p-5">
         <div className="flex items-center gap-3">
           <div className="grid h-11 w-11 place-items-center rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-700/10 text-amber-400">
             <Mountain className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-zinc-50">{site.name}</h3>
-            <p className="text-[11px] text-zinc-500">
+            <h3 className="text-sm font-semibold text-ink-strong">{site.name}</h3>
+            <p className="text-[11px] text-ink-faint">
               {site.region} &middot; {site.province}
             </p>
           </div>
@@ -521,15 +521,15 @@ function SiteCard({ site }: { site: Site }) {
         <Metric label="Manajer site" value={site.manager.replace('Ir. ', '')} />
         <Metric label="Kontraktor" value={site.contractor} />
       </div>
-      <div className="grid grid-cols-3 gap-3 border-t border-zinc-800 p-5 text-center">
+      <div className="grid grid-cols-3 gap-3 border-t border-line p-5 text-center">
         {[
           { label: 'Stockpile', value: stock.length },
           { label: 'Unit Armada', value: eq.length },
           { label: 'Karyawan', value: staff },
         ].map((x) => (
           <div key={x.label}>
-            <p className="font-mono text-lg font-bold text-zinc-50">{x.value}</p>
-            <p className="text-[11px] text-zinc-500">{x.label}</p>
+            <p className="font-mono text-lg font-bold text-ink-strong">{x.value}</p>
+            <p className="text-[11px] text-ink-faint">{x.label}</p>
           </div>
         ))}
       </div>

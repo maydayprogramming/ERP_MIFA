@@ -46,7 +46,7 @@ export default function HSE() {
   )
 
   const incidentColumns: Column<Incident>[] = [
-    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
+    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
     { key: 'siteId', header: 'Site', sort: (r) => siteName(r.siteId), render: (r) => <span className="chip">{siteName(r.siteId)}</span> },
     { key: 'type', header: 'Klasifikasi', sort: (r) => r.type, render: (r) => <StatusBadge value={r.type} /> },
     {
@@ -55,35 +55,35 @@ export default function HSE() {
       sort: (r) => r.severity,
       render: (r) => <Badge tone={SEVERITY_TONE[r.severity]}>{r.severity}</Badge>,
     },
-    { key: 'description', header: 'Deskripsi Kejadian', render: (r) => <span className="text-[12px] text-zinc-300">{r.description}</span> },
-    { key: 'person', header: 'Pihak Terlibat', render: (r) => <span className="text-[12px] text-zinc-400">{r.person}</span> },
-    { key: 'department', header: 'Departemen', render: (r) => <span className="text-[12px] text-zinc-500">{r.department}</span> },
-    { key: 'lostDays', header: 'Hari Hilang', align: 'right', sort: (r) => r.lostDays, render: (r) => <span className={`font-mono ${r.lostDays > 0 ? 'text-rose-400' : 'text-zinc-500'}`}>{num(r.lostDays)}</span> },
+    { key: 'description', header: 'Deskripsi Kejadian', render: (r) => <span className="text-[12px] text-ink">{r.description}</span> },
+    { key: 'person', header: 'Pihak Terlibat', render: (r) => <span className="text-[12px] text-ink-muted">{r.person}</span> },
+    { key: 'department', header: 'Departemen', render: (r) => <span className="text-[12px] text-ink-faint">{r.department}</span> },
+    { key: 'lostDays', header: 'Hari Hilang', align: 'right', sort: (r) => r.lostDays, render: (r) => <span className={`font-mono ${r.lostDays > 0 ? 'text-rose-400' : 'text-ink-faint'}`}>{num(r.lostDays)}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
   ]
 
   const trainingColumns: Column<TrainingRecord>[] = [
-    { key: 'program', header: 'Program Pelatihan', sort: (r) => r.program, render: (r) => <span className="text-zinc-200">{r.program}</span> },
+    { key: 'program', header: 'Program Pelatihan', sort: (r) => r.program, render: (r) => <span className="text-ink">{r.program}</span> },
     { key: 'category', header: 'Kategori', sort: (r) => r.category, render: (r) => <Badge tone="neutral">{r.category}</Badge> },
-    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
+    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
     { key: 'siteId', header: 'Site', sort: (r) => siteName(r.siteId), render: (r) => <span className="chip">{siteName(r.siteId)}</span> },
     { key: 'attendees', header: 'Peserta', align: 'right', sort: (r) => r.attendees, render: (r) => <span className="font-mono">{num(r.attendees)} org</span> },
-    { key: 'trainer', header: 'Penyelenggara', render: (r) => <span className="text-[12px] text-zinc-500">{r.trainer}</span> },
+    { key: 'trainer', header: 'Penyelenggara', render: (r) => <span className="text-[12px] text-ink-faint">{r.trainer}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
   ]
 
   const envColumns: Column<EnvironmentalReading>[] = [
-    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
+    { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
     { key: 'siteId', header: 'Site', render: (r) => <span className="chip">{siteName(r.siteId)}</span> },
-    { key: 'parameter', header: 'Parameter', sort: (r) => r.parameter, render: (r) => <span className="text-zinc-200">{r.parameter}</span> },
-    { key: 'location', header: 'Lokasi Sampling', render: (r) => <span className="text-[12px] text-zinc-500">{r.location}</span> },
+    { key: 'parameter', header: 'Parameter', sort: (r) => r.parameter, render: (r) => <span className="text-ink">{r.parameter}</span> },
+    { key: 'location', header: 'Lokasi Sampling', render: (r) => <span className="text-[12px] text-ink-faint">{r.location}</span> },
     {
       key: 'value',
       header: 'Hasil',
       align: 'right',
       sort: (r) => r.value,
       render: (r) => (
-        <span className="font-mono text-zinc-100">
+        <span className="font-mono text-ink-strong">
           {num1(r.value)} {r.unit}
         </span>
       ),
@@ -94,7 +94,7 @@ export default function HSE() {
       align: 'right',
       sort: (r) => r.threshold,
       render: (r) => (
-        <span className="font-mono text-zinc-500">
+        <span className="font-mono text-ink-faint">
           {num1(r.threshold)} {r.unit}
         </span>
       ),
@@ -193,17 +193,17 @@ export default function HSE() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-[13px] font-semibold text-zinc-100">{i.type}</p>
+                        <p className="text-[13px] font-semibold text-ink-strong">{i.type}</p>
                         <Badge tone={SEVERITY_TONE[i.severity]}>{i.severity}</Badge>
                       </div>
-                      <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-zinc-400">{i.description}</p>
+                      <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-ink-muted">{i.description}</p>
                       <div className="mt-2 flex items-center gap-2">
                         <span className="chip">{siteName(i.siteId)}</span>
                         <span className="chip">{dmy(i.date)}</span>
                         <StatusBadge value={i.status} />
                       </div>
-                      <p className="mt-2 text-[11px] text-zinc-600">
-                        <span className="text-zinc-500">Tindakan:</span> {i.correctiveAction}
+                      <p className="mt-2 text-[11px] text-ink-faintest">
+                        <span className="text-ink-faint">Tindakan:</span> {i.correctiveAction}
                       </p>
                     </div>
                   </div>
@@ -211,7 +211,7 @@ export default function HSE() {
               ))}
             {state.incidents.filter((i) => i.status !== 'Closed').length === 0 && (
               <Card className="lg:col-span-3">
-                <div className="flex items-center gap-3 p-5 text-sm text-zinc-400">
+                <div className="flex items-center gap-3 p-5 text-sm text-ink-muted">
                   <ShieldCheck className="h-5 w-5 text-emerald-400" />
                   Seluruh insiden telah ditutup. Tidak ada kasus aktif yang memerlukan tindak lanjut.
                 </div>
@@ -350,14 +350,14 @@ export default function HSE() {
                 ].map((r) => (
                   <div key={r.level} className="flex items-center gap-4">
                     <div className="w-28 shrink-0">
-                      <p className="text-[13px] font-medium text-zinc-200">{r.level}</p>
-                      <p className="text-[10px] text-zinc-600">{r.count} tindakan</p>
+                      <p className="text-[13px] font-medium text-ink">{r.level}</p>
+                      <p className="text-[10px] text-ink-faintest">{r.count} tindakan</p>
                     </div>
                     <div className="flex-1">
-                      <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+                      <div className="h-2 overflow-hidden rounded-full bg-surface-2">
                         <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-sky-500" style={{ width: `${r.eff}%` }} />
                       </div>
-                      <p className="mt-1 text-[11px] text-zinc-600">{r.desc}</p>
+                      <p className="mt-1 text-[11px] text-ink-faintest">{r.desc}</p>
                     </div>
                     <span className="w-12 shrink-0 text-right font-mono text-sm font-semibold text-emerald-400">{r.eff}%</span>
                   </div>
@@ -378,13 +378,13 @@ export default function HSE() {
         ].map((s) => (
           <Card key={s.label}>
             <div className="flex items-start gap-3 p-5">
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zinc-800/60 text-zinc-400">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-surface-2/60 text-ink-muted">
                 <s.icon className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-zinc-500">{s.label}</p>
+                <p className="text-[11px] uppercase tracking-wider text-ink-faint">{s.label}</p>
                 <p className={`mt-1 font-mono text-xl font-bold ${s.tone}`}>{s.value}</p>
-                <p className="text-[11px] text-zinc-600">{s.sub}</p>
+                <p className="text-[11px] text-ink-faintest">{s.sub}</p>
               </div>
             </div>
           </Card>
@@ -421,11 +421,11 @@ export default function HSE() {
             </div>
             <div>
               <p className="label">Deskripsi Kejadian</p>
-              <p className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3 text-sm leading-relaxed text-zinc-300">{detail.description}</p>
+              <p className="rounded-lg border border-line bg-surface-2/50 p-3 text-sm leading-relaxed text-ink">{detail.description}</p>
             </div>
             <div>
               <p className="label">Tindakan Korektif</p>
-              <p className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3 text-sm leading-relaxed text-zinc-300">{detail.correctiveAction}</p>
+              <p className="rounded-lg border border-line bg-surface-2/50 p-3 text-sm leading-relaxed text-ink">{detail.correctiveAction}</p>
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {[
@@ -436,9 +436,9 @@ export default function HSE() {
                 { label: 'Tanggal', value: dmy(detail.date) },
                 { label: 'Klasifikasi', value: detail.type },
               ].map((r) => (
-                <div key={r.label} className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
-                  <p className="text-[11px] text-zinc-500">{r.label}</p>
-                  <p className="mt-0.5 text-sm font-medium text-zinc-100">{r.value}</p>
+                <div key={r.label} className="rounded-lg border border-line bg-surface-2/50 px-3 py-2.5">
+                  <p className="text-[11px] text-ink-faint">{r.label}</p>
+                  <p className="mt-0.5 text-sm font-medium text-ink-strong">{r.value}</p>
                 </div>
               ))}
             </div>

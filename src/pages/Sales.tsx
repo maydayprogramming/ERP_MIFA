@@ -66,7 +66,7 @@ export default function Sales() {
       render: (r) => (
         <div>
           <p className="font-mono text-[13px] font-medium text-amber-400">{r.soNo}</p>
-          <p className="text-[11px] text-zinc-600">{dmy(r.date)}</p>
+          <p className="text-[11px] text-ink-faintest">{dmy(r.date)}</p>
         </div>
       ),
     },
@@ -76,8 +76,8 @@ export default function Sales() {
       sort: (r) => customerName(r.customerId),
       render: (r) => (
         <div>
-          <p className="text-[13px] text-zinc-200">{customerName(r.customerId)}</p>
-          <p className="text-[11px] text-zinc-600">{contractCode(r.contractId)}</p>
+          <p className="text-[13px] text-ink">{customerName(r.customerId)}</p>
+          <p className="text-[11px] text-ink-faintest">{contractCode(r.contractId)}</p>
         </div>
       ),
     },
@@ -87,8 +87,8 @@ export default function Sales() {
       sort: (r) => customerType(r.customerId),
       render: (r) => <Badge tone={customerType(r.customerId) === 'Export' ? 'info' : 'neutral'}>{customerType(r.customerId)}</Badge>,
     },
-    { key: 'siteId', header: 'Site Muat', sort: (r) => siteName(r.siteId), render: (r) => <span className="text-zinc-400">{siteName(r.siteId)}</span> },
-    { key: 'tonnageMt', header: 'Tonase', align: 'right', sort: (r) => r.tonnageMt, render: (r) => <span className="font-mono text-zinc-100">{num(r.tonnageMt)} MT</span> },
+    { key: 'siteId', header: 'Site Muat', sort: (r) => siteName(r.siteId), render: (r) => <span className="text-ink-muted">{siteName(r.siteId)}</span> },
+    { key: 'tonnageMt', header: 'Tonase', align: 'right', sort: (r) => r.tonnageMt, render: (r) => <span className="font-mono text-ink-strong">{num(r.tonnageMt)} MT</span> },
     { key: 'priceUsdPerMt', header: 'Harga', align: 'right', sort: (r) => r.priceUsdPerMt, render: (r) => <span className="font-mono">USD {num1(r.priceUsdPerMt)}</span> },
     { key: 'value', header: 'Nilai', align: 'right', sort: soValue, render: (r) => <span className="font-mono font-semibold text-emerald-400">{usd(soValue(r))}</span> },
     {
@@ -96,22 +96,22 @@ export default function Sales() {
       header: 'Vessel / Barge',
       render: (r) => (
         <div className="flex items-center gap-1.5">
-          <Ship className="h-3.5 w-3.5 text-zinc-600" />
-          <span className="text-zinc-300">{r.vesselBarge}</span>
+          <Ship className="h-3.5 w-3.5 text-ink-faintest" />
+          <span className="text-ink">{r.vesselBarge}</span>
         </div>
       ),
     },
     { key: 'coaGcv', header: 'GCV CoA', align: 'right', sort: (r) => r.coaGcv, render: (r) => <span className="font-mono text-sky-400">{num(r.coaGcv)}</span> },
-    { key: 'surveyor', header: 'Surveyor', render: (r) => <span className="text-zinc-400">{r.surveyor}</span> },
-    { key: 'eta', header: 'ETA', sort: (r) => r.eta, render: (r) => <span className="text-zinc-400">{dmy(r.eta)}</span> },
+    { key: 'surveyor', header: 'Surveyor', render: (r) => <span className="text-ink-muted">{r.surveyor}</span> },
+    { key: 'eta', header: 'ETA', sort: (r) => r.eta, render: (r) => <span className="text-ink-muted">{dmy(r.eta)}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
   ]
 
   const contractColumns: Column<Contract>[] = [
     { key: 'code', header: 'No. Kontrak', sort: (r) => r.code, render: (r) => <span className="font-mono text-[13px] font-medium text-amber-400">{r.code}</span> },
-    { key: 'customer', header: 'Pelanggan', sort: (r) => customerName(r.customerId), render: (r) => <span className="text-zinc-200">{customerName(r.customerId)}</span> },
+    { key: 'customer', header: 'Pelanggan', sort: (r) => customerName(r.customerId), render: (r) => <span className="text-ink">{customerName(r.customerId)}</span> },
     { key: 'type', header: 'Tipe', sort: (r) => r.type, render: (r) => <Badge tone={r.type === 'Export' ? 'info' : 'neutral'}>{r.type}</Badge> },
-    { key: 'period', header: 'Periode', render: (r) => <span className="text-zinc-400">{dmy(r.startDate)} — {dmy(r.endDate)}</span> },
+    { key: 'period', header: 'Periode', render: (r) => <span className="text-ink-muted">{dmy(r.startDate)} — {dmy(r.endDate)}</span> },
     { key: 'volumeMt', header: 'Volume', align: 'right', sort: (r) => r.volumeMt, render: (r) => <span className="font-mono">{num(r.volumeMt)} MT</span> },
     { key: 'liftedMt', header: 'Terlaksana', align: 'right', sort: (r) => r.liftedMt, render: (r) => <span className="font-mono text-emerald-400">{num(r.liftedMt)} MT</span> },
     {
@@ -120,23 +120,23 @@ export default function Sales() {
       render: (r) => (
         <div className="w-32">
           <Progress value={(r.liftedMt / r.volumeMt) * 100} tone={(r.liftedMt / r.volumeMt) > 0.85 ? 'emerald' : 'amber'} />
-          <p className="mt-1 text-[10px] text-zinc-600">{pct1((r.liftedMt / r.volumeMt) * 100)}</p>
+          <p className="mt-1 text-[10px] text-ink-faintest">{pct1((r.liftedMt / r.volumeMt) * 100)}</p>
         </div>
       ),
     },
     { key: 'priceUsdPerMt', header: 'Harga', align: 'right', sort: (r) => r.priceUsdPerMt, render: (r) => <span className="font-mono">USD {num1(r.priceUsdPerMt)}</span> },
-    { key: 'qualitySpec', header: 'Spesifikasi', render: (r) => <span className="text-zinc-400">{r.qualitySpec}</span> },
+    { key: 'qualitySpec', header: 'Spesifikasi', render: (r) => <span className="text-ink-muted">{r.qualitySpec}</span> },
     { key: 'incoterm', header: 'Incoterm', render: (r) => <span className="chip">{r.incoterm}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
   ]
 
   const customerColumns: Column<Customer>[] = [
     { key: 'code', header: 'Kode', sort: (r) => r.code, render: (r) => <span className="font-mono text-[13px] text-amber-400">{r.code}</span> },
-    { key: 'name', header: 'Nama Pelanggan', sort: (r) => r.name, render: (r) => <span className="font-medium text-zinc-100">{r.name}</span> },
-    { key: 'sector', header: 'Sektor', sort: (r) => r.sector, render: (r) => <span className="text-zinc-400">{r.sector}</span> },
+    { key: 'name', header: 'Nama Pelanggan', sort: (r) => r.name, render: (r) => <span className="font-medium text-ink-strong">{r.name}</span> },
+    { key: 'sector', header: 'Sektor', sort: (r) => r.sector, render: (r) => <span className="text-ink-muted">{r.sector}</span> },
     { key: 'type', header: 'Tipe', sort: (r) => r.type, render: (r) => <Badge tone={r.type === 'Export' ? 'info' : 'neutral'}>{r.type}</Badge> },
-    { key: 'city', header: 'Lokasi', render: (r) => <span className="text-zinc-400">{r.city}</span> },
-    { key: 'contact', header: 'Kontak', render: (r) => <span className="text-[12px] text-zinc-500">{r.contact}</span> },
+    { key: 'city', header: 'Lokasi', render: (r) => <span className="text-ink-muted">{r.city}</span> },
+    { key: 'contact', header: 'Kontak', render: (r) => <span className="text-[12px] text-ink-faint">{r.contact}</span> },
     { key: 'creditLimitIdr', header: 'Limit Kredit', align: 'right', sort: (r) => r.creditLimitIdr, render: (r) => <span className="font-mono">Rp {num(r.creditLimitIdr / 1e9)} M</span> },
     {
       key: 'outstanding',
@@ -145,8 +145,8 @@ export default function Sales() {
       sort: (r) => r.outstandingIdr,
       render: (r) => (
         <div>
-          <p className="font-mono text-zinc-200">Rp {num(r.outstandingIdr / 1e9)} M</p>
-          <div className="mt-1 h-1 w-20 overflow-hidden rounded-full bg-zinc-800">
+          <p className="font-mono text-ink">Rp {num(r.outstandingIdr / 1e9)} M</p>
+          <div className="mt-1 h-1 w-20 overflow-hidden rounded-full bg-surface-2">
             <div className={`h-full rounded-full ${r.outstandingIdr / r.creditLimitIdr > 0.5 ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, (r.outstandingIdr / r.creditLimitIdr) * 100)}%` }} />
           </div>
         </div>
@@ -335,7 +335,7 @@ export default function Sales() {
                 {state.contracts.slice(0, 6).map((c) => (
                   <div key={c.id}>
                     <Progress value={(c.liftedMt / c.volumeMt) * 100} tone={(c.liftedMt / c.volumeMt) > 0.8 ? 'emerald' : 'amber'} label={`${c.code} · ${customerName(c.customerId).split(' ').slice(0, 2).join(' ')}`} />
-                    <p className="mt-1 text-[11px] text-zinc-600">
+                    <p className="mt-1 text-[11px] text-ink-faintest">
                       {num(c.liftedMt)} / {num(c.volumeMt)} MT &middot; berakhir {dmy(c.endDate)}
                     </p>
                   </div>
@@ -357,16 +357,16 @@ export default function Sales() {
             ].map((r) => (
               <div key={r.label}>
                 <div className="mb-1.5 flex items-baseline justify-between">
-                  <span className="text-xs text-zinc-400">{r.label}</span>
-                  <span className="font-mono text-sm font-semibold text-zinc-100">{usd(r.value)}</span>
+                  <span className="text-xs text-ink-muted">{r.label}</span>
+                  <span className="font-mono text-sm font-semibold text-ink-strong">{usd(r.value)}</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
+                <div className="h-2 overflow-hidden rounded-full bg-surface-2">
                   <div className={`h-full rounded-full ${r.tone}`} style={{ width: `${r.pct}%` }} />
                 </div>
-                <p className="mt-1 text-[11px] text-zinc-600">{pct1(r.pct)} dari total penjualan</p>
+                <p className="mt-1 text-[11px] text-ink-faintest">{pct1(r.pct)} dari total penjualan</p>
               </div>
             ))}
-            <div className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3 text-[11px] leading-relaxed text-zinc-500">
+            <div className="rounded-lg border border-line bg-surface-2/50 p-3 text-[11px] leading-relaxed text-ink-faint">
               Penjualan ekspor memerlukan Certificate of Analysis (CoA) dari surveyor independen (SGS/Cointeste) serta pemenuhan regulasi Denda Diri (DD) dan Denda Ekspor (EE).
             </div>
           </div>
@@ -384,10 +384,10 @@ export default function Sales() {
                 return (
                   <div key={c.id}>
                     <div className="mb-1 flex items-center justify-between text-[11px]">
-                      <span className="truncate text-zinc-400">{c.name}</span>
+                      <span className="truncate text-ink-muted">{c.name}</span>
                       <span className={`font-mono ${p > 50 ? 'text-rose-400' : 'text-emerald-400'}`}>{pct1(p)}</span>
                     </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-zinc-800">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
                       <div className={`h-full rounded-full ${p > 50 ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, p)}%` }} />
                     </div>
                   </div>
@@ -403,11 +403,11 @@ export default function Sales() {
               const c = state.salesOrders.filter((s) => s.status === st).length
               return (
                 <div key={st} className="flex items-center gap-3">
-                  <span className="w-20 text-[11px] text-zinc-400">{st}</span>
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                  <span className="w-20 text-[11px] text-ink-muted">{st}</span>
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
                     <div className="h-full rounded-full bg-amber-500" style={{ width: `${(c / state.salesOrders.length) * 100}%` }} />
                   </div>
-                  <span className="w-8 text-right font-mono text-xs text-zinc-200">{c}</span>
+                  <span className="w-8 text-right font-mono text-xs text-ink">{c}</span>
                 </div>
               )
             })}
@@ -425,9 +425,9 @@ export default function Sales() {
               { label: 'Piutang (IDR)', value: `Rp ${num((m.arOutstanding * 15850) / 1e9)} M` },
               { label: 'Royalti PNBP YTD', value: usd(m.royaltyYtd) },
             ].map((s) => (
-              <div key={s.label} className="rounded-lg border border-zinc-800 bg-zinc-950/50 p-3">
-                <p className="text-[11px] text-zinc-500">{s.label}</p>
-                <p className="mt-1 font-mono text-sm font-semibold text-zinc-100">{s.value}</p>
+              <div key={s.label} className="rounded-lg border border-line bg-surface-2/50 p-3">
+                <p className="text-[11px] text-ink-faint">{s.label}</p>
+                <p className="mt-1 font-mono text-sm font-semibold text-ink-strong">{s.value}</p>
               </div>
             ))}
           </div>
@@ -460,11 +460,11 @@ export default function Sales() {
       >
         {detail && (
           <div className="space-y-5">
-            <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/50 p-4">
+            <div className="flex items-center justify-between rounded-lg border border-line bg-surface-2/50 p-4">
               <div>
-                <p className="text-[11px] text-zinc-500">Nilai Order</p>
+                <p className="text-[11px] text-ink-faint">Nilai Order</p>
                 <p className="font-mono text-xl font-bold text-emerald-400">{usd(soValue(detail))}</p>
-                <p className="text-[11px] text-zinc-600">{usdToIdr(soValue(detail))}</p>
+                <p className="text-[11px] text-ink-faintest">{usdToIdr(soValue(detail))}</p>
               </div>
               <StatusBadge value={detail.status} />
             </div>
@@ -483,9 +483,9 @@ export default function Sales() {
                 { label: 'GCV CoA', value: `${num(detail.coaGcv)} kcal/kg` },
                 { label: 'Tanggal Order', value: dmy(detail.date) },
               ].map((r) => (
-                <div key={r.label} className="rounded-lg border border-zinc-800 bg-zinc-950/50 px-3 py-2.5">
-                  <p className="text-[11px] text-zinc-500">{r.label}</p>
-                  <p className="mt-0.5 text-sm font-medium text-zinc-100">{r.value}</p>
+                <div key={r.label} className="rounded-lg border border-line bg-surface-2/50 px-3 py-2.5">
+                  <p className="text-[11px] text-ink-faint">{r.label}</p>
+                  <p className="mt-0.5 text-sm font-medium text-ink-strong">{r.value}</p>
                 </div>
               ))}
             </div>
@@ -568,7 +568,7 @@ function SalesOrderForm({ open, onClose }: { open: boolean; onClose: () => void 
         </Field>
       </div>
       {contract && (
-        <div className="mt-4 grid grid-cols-2 gap-3 rounded-lg border border-zinc-800 bg-zinc-950/50 p-4 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 rounded-lg border border-line bg-surface-2/50 p-4 sm:grid-cols-4">
           {[
             { label: 'Harga kontrak', value: `USD ${num1(contract.priceUsdPerMt)}/MT` },
             { label: 'Spesifikasi', value: contract.qualitySpec },
@@ -576,7 +576,7 @@ function SalesOrderForm({ open, onClose }: { open: boolean; onClose: () => void 
             { label: 'Estimasi nilai', value: usd(value) },
           ].map((r) => (
             <div key={r.label}>
-              <p className="text-[11px] text-zinc-500">{r.label}</p>
+              <p className="text-[11px] text-ink-faint">{r.label}</p>
               <p className="mt-0.5 font-mono text-sm font-semibold text-amber-400">{r.value}</p>
             </div>
           ))}

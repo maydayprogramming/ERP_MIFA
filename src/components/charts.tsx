@@ -18,6 +18,7 @@ import {
 } from 'recharts'
 import { Card, CardHeader } from './ui'
 import { num1, pct1 } from '../lib/format'
+import { useChartTheme } from '../theme/ThemeProvider'
 
 export const CHART_COLORS = {
   amber: '#f59e0b',
@@ -31,16 +32,6 @@ export const CHART_COLORS = {
 } as const
 
 export const PALETTE = [CHART_COLORS.amber, CHART_COLORS.sky, CHART_COLORS.emerald, CHART_COLORS.violet, CHART_COLORS.rose, CHART_COLORS.orange]
-
-const AXIS = { stroke: '#52525b', fontSize: 11, tickLine: false, axisLine: false }
-const TOOLTIP_STYLE = {
-  background: 'rgba(24,24,27,0.96)',
-  border: '1px solid #3f3f46',
-  borderRadius: 10,
-  fontSize: 12,
-  padding: '8px 12px',
-  boxShadow: '0 24px 48px -24px rgba(0,0,0,0.9)',
-}
 
 /* ------------------------------ Frame ------------------------------- */
 
@@ -91,7 +82,21 @@ export function TrendChart({
   yTickFormatter?: (v: number) => string
   height?: number
 }) {
+  const t = useChartTheme()
   const fmt = (v: number) => (valueFormatter ? valueFormatter(v) : num1(v))
+  const axis = { stroke: t.axis, fontSize: 11, tickLine: false, axisLine: false }
+  const tooltip = {
+    contentStyle: {
+      background: t.tooltipBg,
+      border: `1px solid ${t.tooltipBorder}`,
+      borderRadius: 10,
+      fontSize: 12,
+      padding: '8px 12px',
+      boxShadow: '0 24px 48px -24px rgba(0,0,0,0.45)',
+    },
+    labelStyle: { color: t.label, fontSize: 11, marginBottom: 4 },
+    itemStyle: { color: t.item, padding: '1px 0' },
+  }
   return (
     <ResponsiveContainer width="100%" height={height}>
       <AreaChart data={data} margin={{ top: 5, right: 12, left: 4, bottom: 0 }}>
@@ -103,16 +108,11 @@ export function TrendChart({
             </linearGradient>
           ))}
         </defs>
-        <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey={xKey} {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={yTickFormatter} width={52} />
-        <Tooltip
-          contentStyle={TOOLTIP_STYLE}
-          labelStyle={{ color: '#a1a1aa', fontSize: 11, marginBottom: 4 }}
-          itemStyle={{ color: '#e4e4e7', padding: '1px 0' }}
-          formatter={(value: number | string) => [fmt(Number(value)), '']}
-        />
-        {series.length > 1 && <Legend wrapperStyle={{ fontSize: 11, color: '#a1a1aa' }} iconType="circle" iconSize={8} />}
+        <CartesianGrid stroke={t.grid} strokeDasharray="3 3" vertical={false} />
+        <XAxis dataKey={xKey} {...axis} />
+        <YAxis {...axis} tickFormatter={yTickFormatter} width={52} />
+        <Tooltip {...tooltip} formatter={(value: number | string) => [fmt(Number(value)), '']} />
+        {series.length > 1 && <Legend wrapperStyle={{ fontSize: 11, color: t.label }} iconType="circle" iconSize={8} />}
         {series.map((s, i) => {
           const color = s.color ?? PALETTE[i % PALETTE.length]
           return s.type === 'line' ? (
@@ -147,21 +147,30 @@ export function BarsChart({
   height?: number
   colorBy?: (entry: Record<string, string | number>) => string
 }) {
+  const t = useChartTheme()
   const fmt = (v: number) => (valueFormatter ? valueFormatter(v) : num1(v))
+  const axis = { stroke: t.axis, fontSize: 11, tickLine: false, axisLine: false }
+  const tooltip = {
+    cursor: { fill: t.cursor },
+    contentStyle: {
+      background: t.tooltipBg,
+      border: `1px solid ${t.tooltipBorder}`,
+      borderRadius: 10,
+      fontSize: 12,
+      padding: '8px 12px',
+      boxShadow: '0 24px 48px -24px rgba(0,0,0,0.45)',
+    },
+    labelStyle: { color: t.label, fontSize: 11, marginBottom: 4 },
+    itemStyle: { color: t.item, padding: '1px 0' },
+  }
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} margin={{ top: 5, right: 12, left: 4, bottom: 0 }} barSize={stacked ? undefined : 22}>
-        <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey={xKey} {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={yTickFormatter} width={52} />
-        <Tooltip
-          cursor={{ fill: 'rgba(63,63,70,0.16)' }}
-          contentStyle={TOOLTIP_STYLE}
-          labelStyle={{ color: '#a1a1aa', fontSize: 11, marginBottom: 4 }}
-          itemStyle={{ color: '#e4e4e7', padding: '1px 0' }}
-          formatter={(value: number | string) => [fmt(Number(value)), '']}
-        />
-        {series.length > 1 && <Legend wrapperStyle={{ fontSize: 11, color: '#a1a1aa' }} iconType="circle" iconSize={8} />}
+        <CartesianGrid stroke={t.grid} strokeDasharray="3 3" vertical={false} />
+        <XAxis dataKey={xKey} {...axis} />
+        <YAxis {...axis} tickFormatter={yTickFormatter} width={52} />
+        <Tooltip {...tooltip} formatter={(value: number | string) => [fmt(Number(value)), '']} />
+        {series.length > 1 && <Legend wrapperStyle={{ fontSize: 11, color: t.label }} iconType="circle" iconSize={8} />}
         {series.map((s, i) => (
           <Bar
             key={s.key}
@@ -171,8 +180,7 @@ export function BarsChart({
             fill={s.color ?? PALETTE[i % PALETTE.length]}
             radius={stacked ? [0, 0, 0, 0] : [4, 4, 0, 0]}
           >
-            {colorBy &&
-              data.map((entry, idx) => <Cell key={idx} fill={colorBy(entry)} />)}
+            {colorBy && data.map((entry, idx) => <Cell key={idx} fill={colorBy(entry)} />)}
           </Bar>
         ))}
       </BarChart>
@@ -195,40 +203,39 @@ export function DonutChart({
   centerValue?: string
   height?: number
 }) {
+  const t = useChartTheme()
   const total = data.reduce((a, b) => a + b.value, 0)
   return (
     <div className="relative" style={{ height }}>
       <ResponsiveContainer width="100%" height={height}>
         <PieChart>
-          <Pie
-            data={data}
-            dataKey="value"
-            nameKey="name"
-            innerRadius="62%"
-            outerRadius="88%"
-            paddingAngle={2}
-            stroke="#18181b"
-            strokeWidth={2}
-          >
+          <Pie data={data} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="88%" paddingAngle={2} stroke={t.tooltipBg} strokeWidth={2}>
             {data.map((d, i) => (
               <Cell key={d.name} fill={d.color ?? PALETTE[i % PALETTE.length]} />
             ))}
           </Pie>
           <Tooltip
-            contentStyle={TOOLTIP_STYLE}
-            labelStyle={{ color: '#a1a1aa', fontSize: 11, marginBottom: 4 }}
+            contentStyle={{
+              background: t.tooltipBg,
+              border: `1px solid ${t.tooltipBorder}`,
+              borderRadius: 10,
+              fontSize: 12,
+              padding: '8px 12px',
+              boxShadow: '0 24px 48px -24px rgba(0,0,0,0.45)',
+            }}
+            labelStyle={{ color: t.label, fontSize: 11, marginBottom: 4 }}
             formatter={(value: number | string, name: string) => [
               `${valueFormatter ? valueFormatter(Number(value)) : num1(Number(value))} (${pct1(total ? (Number(value) / total) * 100 : 0)})`,
               name,
             ]}
           />
-          <Legend wrapperStyle={{ fontSize: 11, color: '#a1a1aa' }} iconType="circle" iconSize={8} />
+          <Legend wrapperStyle={{ fontSize: 11, color: t.label }} iconType="circle" iconSize={8} />
         </PieChart>
       </ResponsiveContainer>
       {(centerValue || centerLabel) && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          {centerValue && <span className="font-mono text-xl font-bold text-zinc-50">{centerValue}</span>}
-          {centerLabel && <span className="text-[11px] text-zinc-500">{centerLabel}</span>}
+          {centerValue && <span className="font-mono text-xl font-bold text-ink-strong">{centerValue}</span>}
+          {centerLabel && <span className="text-[11px] text-ink-faint">{centerLabel}</span>}
         </div>
       )}
     </div>

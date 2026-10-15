@@ -3,11 +3,15 @@
 import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom/server'
 import { AppProvider } from '../src/store'
+import { ThemeProvider } from '../src/theme/ThemeProvider'
 import App from '../src/App'
 
 const routes = [
   '/dashboard',
   '/production',
+  '/mine-planning',
+  '/shipping',
+  '/legal',
   '/sales',
   '/purchasing',
   '/inventory',
@@ -25,9 +29,11 @@ for (const route of routes) {
   try {
     const html = renderToString(
       <StaticRouter location={route}>
-        <AppProvider>
-          <App />
-        </AppProvider>
+        <ThemeProvider>
+          <AppProvider>
+            <App />
+          </AppProvider>
+        </ThemeProvider>
       </StaticRouter>,
     )
     const text = html.replace(/<[^>]*>/g, '')

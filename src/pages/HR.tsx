@@ -69,17 +69,17 @@ export default function HR() {
       sort: (r) => r.name,
       render: (r) => (
         <div className="flex items-center gap-2.5">
-          <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-800 text-[10px] font-bold text-zinc-300">
+          <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-surface-3 to-surface-2 text-[10px] font-bold text-ink">
             {r.name.split(' ').slice(0, 2).map((w) => w[0]).join('')}
           </span>
-          <span className="font-medium text-zinc-100">{r.name}</span>
+          <span className="font-medium text-ink-strong">{r.name}</span>
         </div>
       ),
     },
-    { key: 'position', header: 'Jabatan', sort: (r) => r.position, render: (r) => <span className="text-zinc-300">{r.position}</span> },
+    { key: 'position', header: 'Jabatan', sort: (r) => r.position, render: (r) => <span className="text-ink">{r.position}</span> },
     { key: 'department', header: 'Departemen', sort: (r) => r.department, render: (r) => <Badge tone="neutral">{r.department}</Badge> },
     { key: 'siteId', header: 'Site', sort: (r) => siteName(r.siteId), render: (r) => <span className="chip">{siteName(r.siteId)}</span> },
-    { key: 'joinDate', header: 'Bergabung', sort: (r) => r.joinDate, render: (r) => <span className="text-zinc-400">{dmy(r.joinDate)}</span> },
+    { key: 'joinDate', header: 'Bergabung', sort: (r) => r.joinDate, render: (r) => <span className="text-ink-muted">{dmy(r.joinDate)}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
     { key: 'salaryIdr', header: 'Gaji Pokok', align: 'right', sort: (r) => r.salaryIdr, render: (r) => <span className="font-mono">{idr(r.salaryIdr)}</span> },
     {
@@ -88,7 +88,7 @@ export default function HR() {
       render: (r) => (
         <div className="flex max-w-[180px] flex-wrap gap-1">
           {r.certifications.length === 0 ? (
-            <span className="text-[11px] text-zinc-600">Belum ada</span>
+            <span className="text-[11px] text-ink-faintest">Belum ada</span>
           ) : (
             r.certifications.slice(0, 2).map((c) => <span key={c} className="chip !text-[10px]">{c}</span>)
           )}
@@ -227,12 +227,12 @@ export default function HR() {
                   { label: 'Jam lembur', value: `${num(sum(ATTENDANCE.map((a) => a.overtime)))} jam` },
                   { label: 'Produktivitas rata-rata', value: pct1(sum(ATTENDANCE.map((a) => a.productivity)) / ATTENDANCE.length) },
                 ].map((r) => (
-                  <div key={r.label} className="flex items-center justify-between border-b border-zinc-800 pb-2.5 last:border-0">
-                    <span className="text-xs text-zinc-400">{r.label}</span>
-                    <span className="font-mono text-sm font-semibold text-zinc-100">{r.value}</span>
+                  <div key={r.label} className="flex items-center justify-between border-b border-line pb-2.5 last:border-0">
+                    <span className="text-xs text-ink-muted">{r.label}</span>
+                    <span className="font-mono text-sm font-semibold text-ink-strong">{r.value}</span>
                   </div>
                 ))}
-                <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] p-3 text-[11px] leading-relaxed text-amber-200/80">
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/[0.06] p-3 text-[11px] leading-relaxed text-amber-600 dark:text-amber-200">
                   Shift 3 Site Tanjung Enim mencatat kehadiran terendah (95,2%). Tinjau ulang jadwal rotasi dan transportasi karyawan.
                 </div>
               </div>
@@ -244,9 +244,9 @@ export default function HR() {
             <DataTable
               data={ATTENDANCE}
               columns={[
-                { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-zinc-400">{dmy(r.date)}</span> },
+                { key: 'date', header: 'Tanggal', sort: (r) => r.date, render: (r) => <span className="text-ink-muted">{dmy(r.date)}</span> },
                 { key: 'site', header: 'Site', sort: (r) => r.site, render: (r) => <span className="chip">{r.site}</span> },
-                { key: 'shift', header: 'Shift', sort: (r) => r.shift, render: (r) => <span className="text-zinc-300">{r.shift}</span> },
+                { key: 'shift', header: 'Shift', sort: (r) => r.shift, render: (r) => <span className="text-ink">{r.shift}</span> },
                 { key: 'planned', header: 'Rencana', align: 'right', sort: (r) => r.planned, render: (r) => <span className="font-mono">{num(r.planned)}</span> },
                 { key: 'present', header: 'Hadir', align: 'right', sort: (r) => r.present, render: (r) => <span className="font-mono text-emerald-400">{num(r.present)}</span> },
                 { key: 'absent', header: 'Absen', align: 'right', sort: (r) => r.absent, render: (r) => <span className="font-mono text-rose-400">{num(r.absent)}</span> },
@@ -258,8 +258,8 @@ export default function HR() {
                   sort: (r) => r.productivity,
                   render: (r) => (
                     <div>
-                      <p className="font-mono text-zinc-100">{pct1(r.productivity)}</p>
-                      <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-zinc-800">
+                      <p className="font-mono text-ink-strong">{pct1(r.productivity)}</p>
+                      <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-surface-2">
                         <div className={`h-full rounded-full ${r.productivity > 97 ? 'bg-emerald-500' : 'bg-amber-500'}`} style={{ width: `${r.productivity}%` }} />
                       </div>
                     </div>
@@ -320,14 +320,14 @@ export default function HR() {
                   <tbody>
                     {PAYROLL_COMPONENTS.map((p) => (
                       <tr key={p.name}>
-                        <td className="text-zinc-200">{p.name}</td>
+                        <td className="text-ink">{p.name}</td>
                         <td className="tbl-num text-emerald-400">{idr(p.value)}</td>
-                        <td className="tbl-num text-zinc-400">{pct1((p.value / payrollTotal) * 100)}</td>
-                        <td className="tbl-num text-zinc-300">{idr(p.value / 1284)}</td>
+                        <td className="tbl-num text-ink-muted">{pct1((p.value / payrollTotal) * 100)}</td>
+                        <td className="tbl-num text-ink">{idr(p.value / 1284)}</td>
                       </tr>
                     ))}
-                    <tr className="bg-zinc-800/30">
-                      <td className="font-semibold text-zinc-100">Total</td>
+                    <tr className="bg-surface-2/30">
+                      <td className="font-semibold text-ink-strong">Total</td>
                       <td className="tbl-num font-semibold text-amber-400">{idrFull(payrollTotal)}</td>
                       <td className="tbl-num">100%</td>
                       <td className="tbl-num font-semibold">{idr(payrollTotal / 1284)}</td>
@@ -345,7 +345,7 @@ export default function HR() {
                     <Progress value={(s.value / state.employees.length) * 100} tone={['amber', 'sky', 'violet'][i] as 'amber'} label={`${s.name} (${s.value})`} />
                   </div>
                 ))}
-                <div className="space-y-2 border-t border-zinc-800 pt-3">
+                <div className="space-y-2 border-t border-line pt-3">
                   {[
                     { label: 'Rata-rata masa kerja', value: '5,8 tahun' },
                     { label: 'Rasio staff : operasional', value: '1 : 6,4' },
@@ -353,8 +353,8 @@ export default function HR() {
                     { label: 'Anggaran SDM RKAB', value: `${idr(312_000_000_000)} (${pct1(88.4)})` },
                   ].map((r) => (
                     <div key={r.label} className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-500">{r.label}</span>
-                      <span className="font-mono font-semibold text-zinc-200">{r.value}</span>
+                      <span className="text-ink-faint">{r.label}</span>
+                      <span className="font-mono font-semibold text-ink">{r.value}</span>
                     </div>
                   ))}
                 </div>
@@ -370,18 +370,18 @@ export default function HR() {
             <CardHeader title="Matriks Kompetensi & Sertifikasi" subtitle="Jumlah pemegang sertifikat keselamatan dan kompetensi teknis" actions={<Badge tone="info">{CERT_POOL.length} program sertifikasi</Badge>} />
             <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
               {certMatrix.map((c) => (
-                <div key={c.cert} className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3.5">
+                <div key={c.cert} className="rounded-lg border border-line bg-surface-2/40 p-3.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <FileBadge className="h-4 w-4 shrink-0 text-amber-400" />
-                      <p className="text-[13px] font-medium text-zinc-200">{c.cert}</p>
+                      <p className="text-[13px] font-medium text-ink">{c.cert}</p>
                     </div>
-                    <span className="font-mono text-sm font-bold text-zinc-100">{c.holders}</span>
+                    <span className="font-mono text-sm font-bold text-ink-strong">{c.holders}</span>
                   </div>
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800">
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
                     <div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-emerald-500" style={{ width: `${(c.holders / state.employees.length) * 100}%` }} />
                   </div>
-                  <p className="mt-1.5 text-[11px] text-zinc-600">{pct1((c.holders / state.employees.length) * 100)} dari tenaga kerja terdata</p>
+                  <p className="mt-1.5 text-[11px] text-ink-faintest">{pct1((c.holders / state.employees.length) * 100)} dari tenaga kerja terdata</p>
                 </div>
               ))}
             </div>
@@ -399,7 +399,7 @@ export default function HR() {
               ].map((r) => (
                 <Progress key={r.label} value={r.value} tone={r.tone} label={r.label} />
               ))}
-              <div className="rounded-lg border border-rose-500/20 bg-rose-500/[0.06] p-3 text-[11px] leading-relaxed text-rose-200/80">
+              <div className="rounded-lg border border-rose-500/20 bg-rose-500/[0.06] p-3 text-[11px] leading-relaxed text-rose-600 dark:text-rose-200">
                 14 karyawan memiliki sertifikat Work at Height yang akan berakhir dalam 30 hari. Jadwalkan refresh training sebelum masa berlaku habis.
               </div>
             </div>
@@ -426,13 +426,13 @@ export default function HR() {
         ].map((s) => (
           <Card key={s.label}>
             <div className="flex items-start gap-3 p-5">
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-zinc-800/60 text-zinc-400">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-surface-2/60 text-ink-muted">
                 <s.icon className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-wider text-zinc-500">{s.label}</p>
+                <p className="text-[11px] uppercase tracking-wider text-ink-faint">{s.label}</p>
                 <p className={`mt-1 font-mono text-xl font-bold ${s.tone}`}>{s.value}</p>
-                <p className="text-[11px] text-zinc-600">{s.sub}</p>
+                <p className="text-[11px] text-ink-faintest">{s.sub}</p>
               </div>
             </div>
           </Card>
