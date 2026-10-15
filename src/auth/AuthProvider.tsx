@@ -1,5 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { ACCOUNTS, canAccess, canDo, type Action, type AuthUser, type Role } from '../data/accounts'
+import {
+  ACCOUNTS,
+  authorityOf,
+  canAccess,
+  hasAuthority,
+  scopeDepartments,
+  scopeProjects,
+  type Action,
+  type Authority,
+  type AuthUser,
+  type Role,
+} from '../data/accounts'
 
 const STORAGE_KEY = 'mifa-erp-session-v1'
 
@@ -20,8 +31,19 @@ interface AuthContextValue {
   loginAs: (userId: string) => boolean
   logout: () => void
   clearError: () => void
+  /** Dimensi 1 & 3 — boleh buka modul? */
   can: (path: string) => boolean
-  canAction: (action: Action) => boolean
+  /** Tingkat kewenangan pada modul tertentu. */
+  authority: (path: string) => Authority
+  /** Kewenangan minimal setingkat `min` pada modul? */
+  canDo: (path: string, min: Authority) => boolean
+  /** Dimensi 2 — proyek & departemen yang boleh diakses. */
+  projects: string[]
+  departments: string[]
+  /** Boleh melihat data biaya/margin? */
+  canSeeCost: boolean
+  /** Admin teknis tanpa kewenangan bisnis. */
+  technicalOnly: boolean
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -32,7 +54,7 @@ function readSession(): Session | null {
     if (!raw) return null
     const parsed = JSON.parse(raw) as Session
     if (!parsed?.user?.id) return null
-    // Samakan dengan direktori akun terbaru (nama/role bisa berubah).
+    // Samakan dengan direktori akun terbaru (nama/peran bisa berubah).
     const fresh = ACCOUNTS.find((a) => a.id === parsed.user.id)
     return fresh ? { ...parsed, user: fresh } : null
   } catch {
@@ -50,7 +72,9 @@ function writeSession(s: Session | null) {
 }
 
 export function AuthProvider({ children, initialUser }: { children: ReactNode; initialUser?: AuthUser | null }) {
-  const [session, setSession] = useState<Session | null>(() => (initialUser ? { user: initialUser, loginAt: new Date().toISOString(), remember: true } : readSession()))
+  const [session, setSession] = useState<Session | null>(() =>
+    initialUser ? { user: initialUser, loginAt: new Date().toISOString(), remember: true } : readSession(),
+  )
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -73,6 +97,10 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
         setError('Kata sandi salah. Gunakan kata sandi demo yang tertera pada halaman.')
         return false
       }
+      if (found.status === 'Inactive') {
+        setError('Akun ini telah dinonaktifkan. Hubungi administrator sistem.')
+        return false
+      }
       setSession({ user: found, loginAt: new Date().toISOString(), remember })
       return true
     } finally {
@@ -86,6 +114,10 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
       setError('Akun demo tidak ditemukan.')
       return false
     }
+    if (found.status === 'Inactive') {
+      setError('Akun demo tersebut berstatus nonaktif.')
+      return false
+    }
     setError(null)
     setSession({ user: found, loginAt: new Date().toISOString(), remember: true })
     return true
@@ -94,22 +126,27 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode; i
   const logout = useCallback(() => setSession(null), [])
   const clearError = useCallback(() => setError(null), [])
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
+  const value = useMemo<AuthContextValue>(() => {
+    const role = session?.user.role
+    return {
       session,
       user: session?.user ?? null,
-      role: session?.user.role,
+      role,
       pending,
       error,
       login,
       loginAs,
       logout,
       clearError,
-      can: (path: string) => canAccess(session?.user.role, path),
-      canAction: (action: Action) => canDo(session?.user.role, action),
-    }),
-    [session, pending, error, login, loginAs, logout, clearError],
-  )
+      can: (path: string) => canAccess(role, path),
+      authority: (path: string) => authorityOf(role, path),
+      canDo: (path: string, min: Authority) => hasAuthority(role, path, min),
+      projects: scopeProjects(role),
+      departments: scopeDepartments(role),
+      canSeeCost: canAccess(role, '/biaya') || canAccess(role, '/rekonsiliasi'),
+      technicalOnly: role === 'System Admin',
+    }
+  }, [session, pending, error, login, loginAs, logout, clearError])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
@@ -122,3 +159,6 @@ export function useAuth(): AuthContextValue {
 
 /** Akun demo untuk pengisian cepat pada halaman login. */
 export const DEMO_ACCOUNTS = ACCOUNTS
+
+/** Re-export tipe aksi agar halaman dapat memakai tanpa import ganda. */
+export type { Action, Authority, Role }

@@ -5,30 +5,14 @@ import { StaticRouter } from 'react-router-dom/server'
 import { AppProvider } from '../src/store'
 import { ThemeProvider } from '../src/theme/ThemeProvider'
 import { AuthProvider } from '../src/auth/AuthProvider'
-import { ACCOUNTS } from '../src/data/accounts'
-import App from '../src/App'
+import { ACCOUNTS, MODULES, canAccess } from '../src/data/accounts'
+import App, { APP_ROUTES } from '../src/App'
 
-/* Smoke test menguji seluruh route dengan peran Super Admin (akses penuh).
+/* Smoke test menguji seluruh route dengan peran System Admin (akses teknis penuh).
    Pengujian RBAC per-peran dilakukan terpisah melalui render route 403. */
-const SESSION_USER = ACCOUNTS[0]
+const SESSION_USER = ACCOUNTS.find((a) => a.role === 'System Admin') ?? ACCOUNTS[0]
 
-const routes = [
-  '/dashboard',
-  '/production',
-  '/mine-planning',
-  '/shipping',
-  '/legal',
-  '/sales',
-  '/purchasing',
-  '/inventory',
-  '/fleet',
-  '/hse',
-  '/hr',
-  '/finance',
-  '/reports',
-  '/settings',
-  '/halaman-tidak-ada',
-]
+const routes = [...MODULES.map((m) => m.path), '/halaman-tidak-ada']
 
 let failed = 0
 for (const route of routes) {
@@ -52,5 +36,27 @@ for (const route of routes) {
     console.log(String(err).split('\n').slice(0, 8).join('\n'))
   }
 }
-console.log(failed === 0 ? '\nSEMUA ROUTE RENDER BERHASIL' : `\n${failed} ROUTE GAGAL`)
+
+/* Setiap route wajib memiliki entri pada APP_ROUTES agar kewenangan diperiksa. */
+const routedPaths = new Set(APP_ROUTES.map((r) => r.path))
+for (const m of MODULES) {
+  if (!routedPaths.has(m.path) && m.path !== '/pengaturan') {
+    failed += 1
+    console.log(`FAIL ${m.path} tidak terdaftar pada APP_ROUTES`)
+  }
+}
+if (!routedPaths.has('/pengaturan')) {
+  failed += 1
+  console.log('FAIL /pengaturan tidak terdaftar pada APP_ROUTES')
+}
+
+/* System Admin harus dapat mengakses seluruh modul. */
+for (const m of MODULES) {
+  if (!canAccess(SESSION_USER.role, m.path)) {
+    failed += 1
+    console.log(`FAIL System Admin tidak memiliki akses pada ${m.path}`)
+  }
+}
+
+console.log(failed === 0 ? `\nSEMUA ROUTE RENDER BERHASIL (${routes.length} route)` : `\n${failed} ROUTE GAGAL`)
 process.exit(failed === 0 ? 0 : 1)

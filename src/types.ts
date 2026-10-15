@@ -451,6 +451,242 @@ export interface ComplianceObligation {
   pic: string
 }
 
+
+/* ==========================================================================
+   Domain Kontraktor Tambang — Mining Contractor ERP (Modul B)
+   ========================================================================== */
+
+/** Modul 1 — Proyek & Kontrak: kesepakatan pekerjaan dengan pemilik tambang. */
+export interface ProjectContract {
+  id: ID
+  code: string
+  name: string
+  /** Pemilik tambang / pemberi kerja. */
+  owner: string
+  siteId: ID
+  startDate: string
+  endDate: string
+  /** Jenis pekerjaan yang dicakup kontrak. */
+  workTypes: Array<'OB Removal' | 'Coal Getting' | 'Hauling' | 'Road Maintenance' | 'Dewatering' | 'Lainnya'>
+  /** Satuan pembayaran kontrak. */
+  paymentUnit: 'BCM' | 'Ton' | 'Jam' | 'Km' | 'Lump Sum'
+  /** Tarif efektif per satuan (IDR). */
+  rateIdr: number
+  /** Target volume kontrak dalam satuan pembayaran. */
+  targetVolume: number
+  /** Batas nilai persetujuan (IDR) — konfigurasi, bukan hardcode di logika. */
+  approvalLimitIdr: number
+  status: 'Draft' | 'Review' | 'Active' | 'Expiring' | 'Closed'
+  /** Versi/amendment yang berlaku. */
+  version: number
+  notes: string
+}
+
+/** Modul 2 — Target produksi per shift/pit/aktivitas. */
+export interface ProductionTarget {
+  id: ID
+  code: string
+  contractId: ID
+  siteId: ID
+  period: string
+  shift: 'Shift 1' | 'Shift 2' | 'Shift 3'
+  pit: string
+  activity: 'OB Removal' | 'Coal Getting' | 'Hauling' | 'Road Maintenance' | 'Dewatering'
+  unit: 'BCM' | 'Ton' | 'Km'
+  targetQty: number
+  /** Baseline yang disetujui; revisi disimpan sebagai versi baru. */
+  version: number
+  status: 'Draft' | 'Submitted' | 'Approved' | 'Revised'
+  planner: string
+  reason: string
+}
+
+/** Modul 3 — Catatan produksi hasil lapangan. */
+export interface ProductionLog {
+  id: ID
+  code: string
+  date: string
+  shift: 'Shift 1' | 'Shift 2' | 'Shift 3'
+  siteId: ID
+  contractId: ID
+  pit: string
+  activity: 'OB Removal' | 'Coal Getting' | 'Hauling' | 'Road Maintenance' | 'Dewatering'
+  /** Unit atau kelompok unit pelaksana. */
+  unitIds: ID[]
+  qty: number
+  unit: 'BCM' | 'Ton' | 'Km'
+  /** Metode pengukuran yang disepakati. */
+  method: 'Survey' | 'Timbangan' | 'Hitung Trip' | 'Estimasi'
+  /** Jam operasi dasar yang dipakai produktivitas. */
+  operatingHours: number
+  source: 'Manual' | 'Import' | 'GPS'
+  inputBy: string
+  /** Alur verifikasi berjenjang. */
+  status: 'Draft' | 'Submitted' | 'Verified' | 'Approved' | 'Returned'
+  verifiedBy?: string
+  approvedBy?: string
+  correctionNote?: string
+}
+
+/** Modul 4 — Penugasan unit & operator ke pit/area. */
+export interface UnitAssignment {
+  id: ID
+  unitId: ID
+  operatorId: ID
+  siteId: ID
+  pit: string
+  shift: 'Shift 1' | 'Shift 2' | 'Shift 3'
+  startAt: string
+  endAt?: string
+  status: 'Active' | 'Completed' | 'Cancelled'
+  reason: string
+  assignedBy: string
+}
+
+/** Modul 6 — Peristiwa downtime unit. */
+export interface DowntimeEvent {
+  id: ID
+  code: string
+  unitId: ID
+  siteId: ID
+  startedAt: string
+  endedAt?: string
+  durationHours: number
+  /** Status unit sebelum & sesudah kejadian. */
+  statusBefore: string
+  statusAfter: string
+  category: 'Mechanical' | 'Electrical' | 'Tyre/Undercarriage' | 'Planned Maintenance' | 'Waiting Operator' | 'Waiting Fuel' | 'Waiting Material' | 'Road/Traffic' | 'Weather' | 'No Work/Front Unavailable' | 'Operational Delay' | 'Lainnya'
+  subCategory: string
+  description: string
+  reportedBy: string
+  verifiedBy?: string
+  workOrderId?: ID
+  /** Dampak terhadap produksi bila dapat dihitung. */
+  impactQty?: number
+  impactUnit?: string
+  preventiveAction?: string
+}
+
+/** Modul 8 — Transaksi pengisian BBM ke unit. */
+export interface FuelIssue {
+  id: ID
+  code: string
+  date: string
+  shift: 'Shift 1' | 'Shift 2' | 'Shift 3'
+  tankId: ID
+  unitId: ID
+  siteId: ID
+  liters: number
+  hourMeter: number
+  filledBy: string
+  receivedBy: string
+  status: 'Draft' | 'Submitted' | 'Verified' | 'Reconciled'
+  anomaly?: string
+}
+
+/** Modul 8 — Penerimaan BBM dari pemasok. */
+export interface FuelReceipt {
+  id: ID
+  code: string
+  date: string
+  tankId: ID
+  supplier: string
+  liters: number
+  docNo: string
+  status: 'Draft' | 'Verified' | 'Approved'
+}
+
+/** Modul 11 — Serah terima shift. */
+export interface ShiftHandover {
+  id: ID
+  code: string
+  date: string
+  shift: 'Shift 1' | 'Shift 2' | 'Shift 3'
+  siteId: ID
+  fromUser: string
+  toUser: string
+  items: string[]
+  openIssues: string
+  status: 'Draft' | 'Submitted' | 'Acknowledged'
+}
+
+/** Modul 12 — Tindakan korektif/preventif HSE. */
+export interface CorrectiveAction {
+  id: ID
+  code: string
+  source: 'Inspeksi' | 'Near Miss' | 'Insiden' | 'Temuan' | 'Risk Assessment'
+  description: string
+  siteId: ID
+  riskLevel: 'Rendah' | 'Sedang' | 'Tinggi' | 'Ekstrem'
+  pic: string
+  dueDate: string
+  status: 'Open' | 'In Progress' | 'Awaiting Verification' | 'Closed' | 'Overdue'
+  evidence?: string
+  verifiedBy?: string
+}
+
+/** Modul 13 — Transaksi biaya proyek. */
+export interface CostTransaction {
+  id: ID
+  code: string
+  period: string
+  contractId: ID
+  siteId: ID
+  category: 'BBM' | 'Suku Cadang' | 'Jasa Perbaikan' | 'Tenaga Kerja' | 'Sewa Alat' | 'Mobilisasi' | 'Vendor Pihak Ketiga' | 'Lainnya'
+  description: string
+  amountIdr: number
+  /** actual | committed | accrual | forecast — harus dipisahkan. */
+  costType: 'Actual' | 'Committed' | 'Accrual' | 'Forecast'
+  source: 'BBM' | 'Warehouse' | 'Purchase Order' | 'Manual'
+  sourceRef?: string
+  status: 'Draft' | 'Posted' | 'Reconciled'
+}
+
+/** Modul 14 — Rekonsiliasi volume pekerjaan & paket billing. */
+export interface BillingReconciliation {
+  id: ID
+  code: string
+  period: string
+  contractId: ID
+  siteId: ID
+  /** Volume operasional internal yang sudah disetujui. */
+  internalVolume: number
+  /** Volume yang diajukan ke pemilik tambang. */
+  submittedVolume: number
+  /** Volume yang disetujui pemilik tambang. */
+  approvedVolume: number
+  unit: 'BCM' | 'Ton' | 'Jam' | 'Km'
+  rateIdr: number
+  /** Selisih internal vs disetujui beserta alasannya. */
+  varianceReason: string
+  status: 'Draft' | 'Awaiting Owner Approval' | 'Approved' | 'Ready to Bill' | 'Invoiced' | 'Paid'
+  preparedBy: string
+  reviewedBy?: string
+}
+
+/** Item pada halaman Tugas Saya. */
+export interface TaskItem {
+  id: ID
+  title: string
+  detail: string
+  module: string
+  priority: 'Rendah' | 'Sedang' | 'Tinggi' | 'Kritis'
+  dueDate?: string
+  status: 'Open' | 'In Progress' | 'Done'
+  /** Peran yang seharusnya menangani item ini. */
+  ownerRole: string
+}
+
+/** Posisi stok bahan bakar per tangki. */
+export interface FuelStockPosition {
+  tankId: ID
+  opening: number
+  received: number
+  issued: number
+  closing: number
+  variance: number
+}
+
 /* ---------------------------- Sistem ---------------------------- */
 
 export interface Notification {
@@ -464,10 +700,15 @@ export interface Notification {
 
 export interface ActivityItem {
   id: ID
+  /** Waktu kejadian dalam format ISO agar dapat diurutkan dan difilter. */
   time: string
   user: string
   action: string
   module: string
+  /** Kategori tindakan untuk audit trail. */
+  type: 'create' | 'edit' | 'approve' | 'reject' | 'delete' | 'export' | 'login' | 'system'
+  /** Rincian teknis perubahan (nomor dokumen, nilai sebelum/sesudah). */
+  detail: string
 }
 
 export interface User {

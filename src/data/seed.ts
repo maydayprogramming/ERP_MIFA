@@ -12,6 +12,18 @@ import type {
   Vessel,
   Permit,
   ComplianceObligation,
+  ProjectContract,
+  ProductionTarget,
+  ProductionLog,
+  UnitAssignment,
+  DowntimeEvent,
+  FuelIssue,
+  FuelReceipt,
+  ShiftHandover,
+  CorrectiveAction,
+  CostTransaction,
+  BillingReconciliation,
+  TaskItem,
   ProductionRecord,
   Stockpile,
   WarehouseItem,
@@ -674,6 +686,139 @@ export const NOTIFICATIONS: Notification[] = [
   { id: 'nt-8', title: 'Pembayaran invoice terlambat', body: 'INV/2026/7002 untuk PT Indocement tunggakan > 60 hari.', time: '3 hari lalu', type: 'alert', read: true },
 ]
 
+
+/* ==========================================================================
+   Seed data domain Kontraktor Tambang (Mining Contractor ERP)
+   ========================================================================== */
+
+export const PROJECT_CONTRACTS: ProjectContract[] = [
+  { id: 'ctr-1', code: 'KTR-2026-001', name: 'Overburden Removal Berau Tahap 3', owner: 'PT Tambang Batu Bara Sejahtera', siteId: 'site-berau', startDate: '2026-01-01', endDate: '2027-06-30', workTypes: ['OB Removal', 'Hauling'], paymentUnit: 'BCM', rateIdr: 78500, targetVolume: 4200000, approvalLimitIdr: 500000000, status: 'Active', version: 2, notes: 'VO-01 menambah area Pit Timur sebesar 180.000 BCM efektif 01 Apr 2026.' },
+  { id: 'ctr-2', code: 'KTR-2026-002', name: 'Coal Getting Lahat', owner: 'PT Tambang Batu Bara Sejahtera', siteId: 'site-lht', startDate: '2026-02-01', endDate: '2027-01-31', workTypes: ['Coal Getting', 'Hauling'], paymentUnit: 'Ton', rateIdr: 42000, targetVolume: 1850000, approvalLimitIdr: 350000000, status: 'Active', version: 1, notes: 'Metode ukur timbangan weighbridge Pit Selatan.' },
+  { id: 'ctr-3', code: 'KTR-2026-003', name: 'Hauling Muara Enim', owner: 'PT Batu Bara Nusantara', siteId: 'site-me', startDate: '2026-03-15', endDate: '2027-03-14', workTypes: ['Hauling'], paymentUnit: 'Ton', rateIdr: 18500, targetVolume: 2400000, approvalLimitIdr: 250000000, status: 'Active', version: 1, notes: 'Jarak angkut rata-rata 6,8 km; tarif mencakup perawatan jalan hauling.' },
+  { id: 'ctr-4', code: 'KTR-2026-004', name: 'Road Maintenance Tanjung Enim', owner: 'PT Batu Bara Nusantara', siteId: 'site-te', startDate: '2026-01-01', endDate: '2026-12-31', workTypes: ['Road Maintenance'], paymentUnit: 'Km', rateIdr: 9500000, targetVolume: 420, approvalLimitIdr: 120000000, status: 'Expiring', version: 1, notes: 'Perpanjangan 2027 dalam pembahasan; perlu asumsi kenaikan tarif BBM.' },
+  { id: 'ctr-5', code: 'KTR-2025-005', name: 'Dewatering Lahat', owner: 'PT Tambang Batu Bara Sejahtera', siteId: 'site-lht', startDate: '2025-07-01', endDate: '2026-10-31', workTypes: ['Dewatering'], paymentUnit: 'Jam', rateIdr: 2850000, targetVolume: 9600, approvalLimitIdr: 90000000, status: 'Expiring', version: 3, notes: 'Sisa 1,5 bulan; negosiasi perpanjangan berjalan.' },
+  { id: 'ctr-6', code: 'KTR-2026-006', name: 'OB Removal Berau Tahap 4', owner: 'PT Tambang Batu Bara Sejahtera', siteId: 'site-berau', startDate: '2026-11-01', endDate: '2028-10-31', workTypes: ['OB Removal'], paymentUnit: 'BCM', rateIdr: 82000, targetVolume: 5600000, approvalLimitIdr: 750000000, status: 'Review', version: 1, notes: 'Menunggu persetujuan aktivasi oleh pejabat berwenang.' },
+]
+
+export const PRODUCTION_TARGETS: ProductionTarget[] = [
+  { id: 'tgt-1', code: 'TGT-1', contractId: 'ctr-1', siteId: 'site-berau', period: '2026-10', shift: 'Shift 1', pit: 'Pit Timur', activity: 'OB Removal', unit: 'BCM', targetQty: 42000, version: 2, status: 'Approved', planner: 'Ir. Sari Wulandari', reason: 'Revisi v2: penyesuaian produktivitas excavator EX-200 setelah penggantian bucket' },
+  { id: 'tgt-2', code: 'TGT-2', contractId: 'ctr-1', siteId: 'site-berau', period: '2026-10', shift: 'Shift 2', pit: 'Pit Timur', activity: 'OB Removal', unit: 'BCM', targetQty: 41000, version: 2, status: 'Approved', planner: 'Ir. Sari Wulandari', reason: 'Revisi v2: penyesuaian produktivitas excavator EX-200' },
+  { id: 'tgt-3', code: 'TGT-3', contractId: 'ctr-1', siteId: 'site-berau', period: '2026-10', shift: 'Shift 3', pit: 'Pit Timur', activity: 'OB Removal', unit: 'BCM', targetQty: 39500, version: 2, status: 'Approved', planner: 'Ir. Sari Wulandari', reason: 'Shift malam diasumsikan 6% lebih rendah karena visibilitas' },
+  { id: 'tgt-4', code: 'TGT-4', contractId: 'ctr-2', siteId: 'site-lht', period: '2026-10', shift: 'Shift 1', pit: 'Pit Selatan', activity: 'Coal Getting', unit: 'Ton', targetQty: 28000, version: 1, status: 'Approved', planner: 'Ir. Sari Wulandari', reason: 'Baseline awal kontrak' },
+  { id: 'tgt-5', code: 'TGT-5', contractId: 'ctr-2', siteId: 'site-lht', period: '2026-10', shift: 'Shift 2', pit: 'Pit Selatan', activity: 'Coal Getting', unit: 'Ton', targetQty: 27500, version: 1, status: 'Approved', planner: 'Ir. Sari Wulandari', reason: 'Baseline awal kontrak' },
+  { id: 'tgt-6', code: 'TGT-6', contractId: 'ctr-3', siteId: 'site-me', period: '2026-10', shift: 'Shift 1', pit: 'Pit Tengah', activity: 'Hauling', unit: 'Ton', targetQty: 31000, version: 1, status: 'Approved', planner: 'Ir. Sari Wulandari', reason: 'Baseline awal kontrak' },
+  { id: 'tgt-7', code: 'TGT-7', contractId: 'ctr-1', siteId: 'site-berau', period: '2026-11', shift: 'Shift 1', pit: 'Pit Timur', activity: 'OB Removal', unit: 'BCM', targetQty: 44000, version: 1, status: 'Submitted', planner: 'Ir. Sari Wulandari', reason: 'Rencana November — menunggu tinjauan Superintendent' },
+  { id: 'tgt-8', code: 'TGT-8', contractId: 'ctr-4', siteId: 'site-te', period: '2026-10', shift: 'Shift 1', pit: 'Jalan Hauling Utara', activity: 'Road Maintenance', unit: 'Km', targetQty: 14, version: 1, status: 'Approved', planner: 'Ir. Sari Wulandari', reason: 'Baseline awal kontrak' },
+  { id: 'tgt-9', code: 'TGT-9', contractId: 'ctr-1', siteId: 'site-berau', period: '2026-12', shift: 'Shift 1', pit: 'Pit Timur', activity: 'OB Removal', unit: 'BCM', targetQty: 46000, version: 1, status: 'Draft', planner: 'Ir. Sari Wulandari', reason: 'Draft awal — belum disusun lengkap' },
+]
+
+export const PRODUCTION_LOGS: ProductionLog[] = [
+  { id: 'pl-1', code: 'PRD-2026-1001', date: '2026-10-14', shift: 'Shift 1', siteId: 'site-berau', contractId: 'ctr-1', pit: 'Pit Timur', activity: 'OB Removal', unitIds: ['eq-1', 'eq-4', 'eq-7'], qty: 41800, unit: 'BCM', method: 'Survey', operatingHours: 21.5, source: 'Manual', inputBy: 'Budi Santoso', status: 'Approved', verifiedBy: 'Joko Prasetyo', approvedBy: 'Dedi Kurniawan' },
+  { id: 'pl-2', code: 'PRD-2026-1002', date: '2026-10-14', shift: 'Shift 2', siteId: 'site-berau', contractId: 'ctr-1', pit: 'Pit Timur', activity: 'OB Removal', unitIds: ['eq-2', 'eq-5', 'eq-8'], qty: 39400, unit: 'BCM', method: 'Survey', operatingHours: 20.8, source: 'Manual', inputBy: 'Slamet Riyadi', status: 'Verified', verifiedBy: 'Joko Prasetyo' },
+  { id: 'pl-3', code: 'PRD-2026-1003', date: '2026-10-14', shift: 'Shift 3', siteId: 'site-berau', contractId: 'ctr-1', pit: 'Pit Timur', activity: 'OB Removal', unitIds: ['eq-3', 'eq-6'], qty: 36200, unit: 'BCM', method: 'Survey', operatingHours: 18.4, source: 'GPS', inputBy: 'Budi Santoso', status: 'Submitted' },
+  { id: 'pl-4', code: 'PRD-2026-1004', date: '2026-10-14', shift: 'Shift 1', siteId: 'site-lht', contractId: 'ctr-2', pit: 'Pit Selatan', activity: 'Coal Getting', unitIds: ['eq-9', 'eq-12'], qty: 27400, unit: 'Ton', method: 'Timbangan', operatingHours: 19.2, source: 'Import', inputBy: 'Budi Santoso', status: 'Approved', verifiedBy: 'Joko Prasetyo', approvedBy: 'Dedi Kurniawan' },
+  { id: 'pl-5', code: 'PRD-2026-1005', date: '2026-10-14', shift: 'Shift 2', siteId: 'site-lht', contractId: 'ctr-2', pit: 'Pit Selatan', activity: 'Coal Getting', unitIds: ['eq-10', 'eq-13'], qty: 26800, unit: 'Ton', method: 'Timbangan', operatingHours: 18.6, source: 'Import', inputBy: 'Slamet Riyadi', status: 'Verified', verifiedBy: 'Joko Prasetyo' },
+  { id: 'pl-6', code: 'PRD-2026-1006', date: '2026-10-14', shift: 'Shift 1', siteId: 'site-me', contractId: 'ctr-3', pit: 'Pit Tengah', activity: 'Hauling', unitIds: ['eq-14', 'eq-15', 'eq-16'], qty: 30200, unit: 'Ton', method: 'Hitung Trip', operatingHours: 22.0, source: 'Manual', inputBy: 'Budi Santoso', status: 'Approved', verifiedBy: 'Joko Prasetyo', approvedBy: 'Dedi Kurniawan' },
+  { id: 'pl-7', code: 'PRD-2026-1007', date: '2026-10-14', shift: 'Shift 1', siteId: 'site-te', contractId: 'ctr-4', pit: 'Jalan Hauling Utara', activity: 'Road Maintenance', unitIds: ['eq-17', 'eq-18'], qty: 12.4, unit: 'Km', method: 'Survey', operatingHours: 9.5, source: 'Manual', inputBy: 'Budi Santoso', status: 'Verified', verifiedBy: 'Joko Prasetyo' },
+  { id: 'pl-8', code: 'PRD-2026-1008', date: '2026-10-13', shift: 'Shift 1', siteId: 'site-berau', contractId: 'ctr-1', pit: 'Pit Timur', activity: 'OB Removal', unitIds: ['eq-1', 'eq-4'], qty: 40100, unit: 'BCM', method: 'Survey', operatingHours: 20.2, source: 'Manual', inputBy: 'Budi Santoso', status: 'Approved', verifiedBy: 'Joko Prasetyo', approvedBy: 'Dedi Kurniawan' },
+  { id: 'pl-9', code: 'PRD-2026-1009', date: '2026-10-13', shift: 'Shift 2', siteId: 'site-berau', contractId: 'ctr-1', pit: 'Pit Timur', activity: 'OB Removal', unitIds: ['eq-2', 'eq-5'], qty: 37600, unit: 'BCM', method: 'Survey', operatingHours: 19.4, source: 'Manual', inputBy: 'Slamet Riyadi', status: 'Approved', verifiedBy: 'Joko Prasetyo', approvedBy: 'Dedi Kurniawan' },
+  { id: 'pl-10', code: 'PRD-2026-1010', date: '2026-10-13', shift: 'Shift 3', siteId: 'site-berau', contractId: 'ctr-1', pit: 'Pit Timur', activity: 'OB Removal', unitIds: ['eq-3', 'eq-6'], qty: 33800, unit: 'BCM', method: 'Survey', operatingHours: 17.1, source: 'GPS', inputBy: 'Budi Santoso', status: 'Approved', verifiedBy: 'Joko Prasetyo', approvedBy: 'Dedi Kurniawan' },
+  { id: 'pl-11', code: 'PRD-2026-1011', date: '2026-10-15', shift: 'Shift 1', siteId: 'site-berau', contractId: 'ctr-1', pit: 'Pit Timur', activity: 'OB Removal', unitIds: ['eq-1', 'eq-4', 'eq-7'], qty: 22600, unit: 'BCM', method: 'Survey', operatingHours: 11.2, source: 'Manual', inputBy: 'Budi Santoso', status: 'Draft', correctionNote: 'Shift berjalan — data sementara' },
+  { id: 'pl-12', code: 'PRD-2026-1012', date: '2026-10-12', shift: 'Shift 2', siteId: 'site-lht', contractId: 'ctr-2', pit: 'Pit Selatan', activity: 'Coal Getting', unitIds: ['eq-10'], qty: 24900, unit: 'Ton', method: 'Timbangan', operatingHours: 16.8, source: 'Import', inputBy: 'Slamet Riyadi', status: 'Returned', correctionNote: 'Dikembalikan foreman: tonase tidak sesuai weighbridge, mohon koreksi' },
+]
+
+export const UNIT_ASSIGNMENTS: UnitAssignment[] = [
+  { id: 'ua-1', unitId: 'eq-1', operatorId: 'emp-1', siteId: 'site-berau', pit: 'Pit Timur', shift: 'Shift 1', startAt: '2026-10-15 07:00', status: 'Active', reason: 'Penugasan rutin OB Removal', assignedBy: 'Joko Prasetyo' },
+  { id: 'ua-2', unitId: 'eq-4', operatorId: 'emp-2', siteId: 'site-berau', pit: 'Pit Timur', shift: 'Shift 1', startAt: '2026-10-15 07:00', status: 'Active', reason: 'Penugasan rutin OB Removal', assignedBy: 'Joko Prasetyo' },
+  { id: 'ua-3', unitId: 'eq-7', operatorId: 'emp-3', siteId: 'site-berau', pit: 'Pit Timur', shift: 'Shift 1', startAt: '2026-10-15 07:00', status: 'Active', reason: 'Pasangan excavator EX-200', assignedBy: 'Joko Prasetyo' },
+  { id: 'ua-4', unitId: 'eq-2', operatorId: 'emp-4', siteId: 'site-berau', pit: 'Pit Timur', shift: 'Shift 2', startAt: '2026-10-15 15:00', status: 'Active', reason: 'Penugasan rutin OB Removal', assignedBy: 'Joko Prasetyo' },
+  { id: 'ua-5', unitId: 'eq-9', operatorId: 'emp-5', siteId: 'site-lht', pit: 'Pit Selatan', shift: 'Shift 1', startAt: '2026-10-15 07:00', status: 'Active', reason: 'Coal Getting kontrak KTR-2026-002', assignedBy: 'Joko Prasetyo' },
+  { id: 'ua-6', unitId: 'eq-14', operatorId: 'emp-6', siteId: 'site-me', pit: 'Pit Tengah', shift: 'Shift 1', startAt: '2026-10-15 07:00', status: 'Active', reason: 'Hauling kontrak KTR-2026-003', assignedBy: 'Joko Prasetyo' },
+  { id: 'ua-7', unitId: 'eq-3', operatorId: 'emp-7', siteId: 'site-berau', pit: 'Pit Timur', shift: 'Shift 3', startAt: '2026-10-14 23:00', endAt: '2026-10-15 07:00', status: 'Completed', reason: 'Shift malam selesai', assignedBy: 'Joko Prasetyo' },
+  { id: 'ua-8', unitId: 'eq-17', operatorId: 'emp-8', siteId: 'site-te', pit: 'Jalan Hauling Utara', shift: 'Shift 1', startAt: '2026-10-15 07:00', status: 'Active', reason: 'Road maintenance kontrak KTR-2026-004', assignedBy: 'Joko Prasetyo' },
+  { id: 'ua-9', unitId: 'eq-5', operatorId: '', siteId: 'site-berau', pit: 'Pit Timur', shift: 'Shift 2', startAt: '2026-10-15 15:00', status: 'Cancelled', reason: 'Dibatalkan — unit breakdown, menunggu WO', assignedBy: 'Dedi Kurniawan' },
+]
+
+export const DOWNTIME_EVENTS: DowntimeEvent[] = [
+  { id: 'dt-1', code: 'DT-2026-0412', unitId: 'eq-5', siteId: 'site-berau', startedAt: '2026-10-14 09:20', endedAt: '2026-10-14 14:05', durationHours: 4.75, statusBefore: 'Running', statusAfter: 'Breakdown', category: 'Mechanical', subCategory: 'Hydraulic pump', description: 'Kebocoran selang hidrolik pada lengan excavator', reportedBy: 'Budi Santoso', verifiedBy: 'Joko Prasetyo', workOrderId: 'wo-1', impactQty: 1850, impactUnit: 'BCM', preventiveAction: 'Inspeksi selang hidrolik setiap 250 JM' },
+  { id: 'dt-2', code: 'DT-2026-0413', unitId: 'eq-6', siteId: 'site-berau', startedAt: '2026-10-14 11:00', endedAt: '2026-10-14 12:30', durationHours: 1.5, statusBefore: 'Standby', statusAfter: 'Running', category: 'Waiting Operator', subCategory: 'Operator belum hadir', description: 'Menunggu operator shift 2 yang terlambat', reportedBy: 'Budi Santoso', verifiedBy: 'Joko Prasetyo' },
+  { id: 'dt-3', code: 'DT-2026-0414', unitId: 'eq-10', siteId: 'site-lht', startedAt: '2026-10-14 08:15', endedAt: '2026-10-14 10:45', durationHours: 2.5, statusBefore: 'Running', statusAfter: 'Breakdown', category: 'Tyre/Undercarriage', subCategory: 'Ban bocor', description: 'Ban depan kanan bocor akibat benda tajam di jalan hauling', reportedBy: 'Budi Santoso', verifiedBy: 'Joko Prasetyo', workOrderId: 'wo-2', impactQty: 920, impactUnit: 'Ton' },
+  { id: 'dt-4', code: 'DT-2026-0415', unitId: 'eq-14', siteId: 'site-me', startedAt: '2026-10-14 13:00', endedAt: '2026-10-14 13:40', durationHours: 0.67, statusBefore: 'Running', statusAfter: 'Running', category: 'Waiting Fuel', subCategory: 'Antrean fuel truck', description: 'Menunggu fuel truck yang tertunda di jalan akses', reportedBy: 'Budi Santoso', verifiedBy: 'Joko Prasetyo' },
+  { id: 'dt-5', code: 'DT-2026-0416', unitId: 'eq-1', siteId: 'site-berau', startedAt: '2026-10-15 06:30', endedAt: undefined, durationHours: 1.2, statusBefore: 'Running', statusAfter: 'Waiting Inspection', category: 'Planned Maintenance', subCategory: 'Pre-start inspection', description: 'Menunggu hasil pemeriksaan awal shift — belum ada penyebab akhir', reportedBy: 'Budi Santoso' },
+  { id: 'dt-6', code: 'DT-2026-0417', unitId: 'eq-17', siteId: 'site-te', startedAt: '2026-10-13 15:20', endedAt: '2026-10-13 17:10', durationHours: 1.83, statusBefore: 'Running', statusAfter: 'Running', category: 'Weather', subCategory: 'Hujan deras', description: 'Pekerjaan road maintenance dihentikan sementara karena hujan', reportedBy: 'Budi Santoso', verifiedBy: 'Joko Prasetyo', impactQty: 2.1, impactUnit: 'Km' },
+  { id: 'dt-7', code: 'DT-2026-0418', unitId: 'eq-7', siteId: 'site-berau', startedAt: '2026-10-12 10:00', endedAt: '2026-10-12 11:15', durationHours: 1.25, statusBefore: 'Running', statusAfter: 'Running', category: 'Road/Traffic', subCategory: 'Kemacetan di ROM', description: 'Antrean dumping di area ROM karena dump truck menumpuk', reportedBy: 'Budi Santoso', verifiedBy: 'Joko Prasetyo', impactQty: 480, impactUnit: 'BCM' },
+  { id: 'dt-8', code: 'DT-2026-0419', unitId: 'eq-2', siteId: 'site-berau', startedAt: '2026-10-11 14:00', endedAt: '2026-10-11 15:30', durationHours: 1.5, statusBefore: 'Running', statusAfter: 'Breakdown', category: 'Electrical', subCategory: 'Aki lemah', description: 'Aki tidak mampu men-starter mesin setelah jeda panjang', reportedBy: 'Budi Santoso', verifiedBy: 'Joko Prasetyo', workOrderId: 'wo-3', impactQty: 610, impactUnit: 'BCM' },
+]
+
+export const FUEL_ISSUES: FuelIssue[] = [
+  { id: 'fi-1', code: 'FU-2026-3101', date: '2026-10-15', shift: 'Shift 1', tankId: 'ft-1', unitId: 'eq-1', siteId: 'site-berau', liters: 420, hourMeter: 12480, filledBy: 'Petugas Fuel', receivedBy: 'Budi Santoso', status: 'Submitted' },
+  { id: 'fi-2', code: 'FU-2026-3102', date: '2026-10-15', shift: 'Shift 1', tankId: 'ft-1', unitId: 'eq-4', siteId: 'site-berau', liters: 385, hourMeter: 8210, filledBy: 'Petugas Fuel', receivedBy: 'Budi Santoso', status: 'Submitted' },
+  { id: 'fi-3', code: 'FU-2026-3103', date: '2026-10-15', shift: 'Shift 1', tankId: 'ft-1', unitId: 'eq-7', siteId: 'site-berau', liters: 298, hourMeter: 5640, filledBy: 'Petugas Fuel', receivedBy: 'Budi Santoso', status: 'Draft', anomaly: 'Jam meter belum dicatat lengkap' },
+  { id: 'fi-4', code: 'FU-2026-3104', date: '2026-10-14', shift: 'Shift 2', tankId: 'ft-2', unitId: 'eq-2', siteId: 'site-berau', liters: 402, hourMeter: 9870, filledBy: 'Petugas Fuel', receivedBy: 'Slamet Riyadi', status: 'Verified' },
+  { id: 'fi-5', code: 'FU-2026-3105', date: '2026-10-14', shift: 'Shift 2', tankId: 'ft-2', unitId: 'eq-5', siteId: 'site-berau', liters: 378, hourMeter: 6420, filledBy: 'Petugas Fuel', receivedBy: 'Slamet Riyadi', status: 'Verified' },
+  { id: 'fi-6', code: 'FU-2026-3106', date: '2026-10-14', shift: 'Shift 1', tankId: 'ft-3', unitId: 'eq-9', siteId: 'site-lht', liters: 355, hourMeter: 7310, filledBy: 'Petugas Fuel', receivedBy: 'Budi Santoso', status: 'Reconciled' },
+  { id: 'fi-7', code: 'FU-2026-3107', date: '2026-10-14', shift: 'Shift 1', tankId: 'ft-3', unitId: 'eq-10', siteId: 'site-lht', liters: 341, hourMeter: 6890, filledBy: 'Petugas Fuel', receivedBy: 'Budi Santoso', status: 'Reconciled', anomaly: 'Konsumsi 18% di atas baseline unit sejenis' },
+  { id: 'fi-8', code: 'FU-2026-3108', date: '2026-10-13', shift: 'Shift 3', tankId: 'ft-1', unitId: 'eq-3', siteId: 'site-berau', liters: 366, hourMeter: 9120, filledBy: 'Petugas Fuel', receivedBy: 'Budi Santoso', status: 'Reconciled' },
+]
+
+export const FUEL_RECEIPTS: FuelReceipt[] = [
+  { id: 'fr-1', code: 'RCV-FU-0031', date: '2026-10-12', tankId: 'ft-1', supplier: 'PT Bahan Bakar Nusantara', liters: 20000, docNo: 'SJ-8891/BBM/X/26', status: 'Approved' },
+  { id: 'fr-2', code: 'RCV-FU-0032', date: '2026-10-12', tankId: 'ft-2', supplier: 'PT Bahan Bakar Nusantara', liters: 15000, docNo: 'SJ-8892/BBM/X/26', status: 'Approved' },
+  { id: 'fr-3', code: 'RCV-FU-0033', date: '2026-10-14', tankId: 'ft-3', supplier: 'PT Energi Tambang Sejahtera', liters: 12000, docNo: 'SJ-4410/ETS/X/26', status: 'Verified' },
+]
+
+export const SHIFT_HANDOVERS: ShiftHandover[] = [
+  { id: 'sh-1', code: 'SHO-2026-1001', date: '2026-10-15', shift: 'Shift 1', siteId: 'site-berau', fromUser: 'Joko Prasetyo', toUser: 'Foreman Shift 2', items: ['EX-200 unit eq-5 masih breakdown, WO-1 terbuka', 'Target shift 1 tercapai 41.800 BCM dari 42.000 BCM', 'Dump truck eq-7 menunggu inspeksi pre-start'], openIssues: 'Kapasitas dumping di ROM menumpuk pukul 10.00–11.00', status: 'Submitted' },
+  { id: 'sh-2', code: 'SHO-2026-1002', date: '2026-10-14', shift: 'Shift 2', siteId: 'site-berau', fromUser: 'Foreman Shift 2', toUser: 'Foreman Shift 3', items: ['eq-2 aki lemah sudah ditangani WO-3', 'Jalan hauling timur berlubang di KM 3,2', 'Sisa BBM tangki ft-2 cukup untuk 1,5 shift'], openIssues: 'Perlu grader untuk perbaikan jalan KM 3,2', status: 'Acknowledged' },
+  { id: 'sh-3', code: 'SHO-2026-1003', date: '2026-10-14', shift: 'Shift 3', siteId: 'site-berau', fromUser: 'Foreman Shift 3', toUser: 'Joko Prasetyo', items: ['eq-3 selesai shift, jam meter 9.120', 'Tidak ada insiden K3', 'Realisasi shift 3 36.200 BCM'], openIssues: '-', status: 'Acknowledged' },
+]
+
+export const CORRECTIVE_ACTIONS: CorrectiveAction[] = [
+  { id: 'ca-1', code: 'CA-2026-0089', source: 'Inspeksi', description: 'Pembatas area dumping di ROM tidak terlihat jelas pada malam hari', siteId: 'site-berau', riskLevel: 'Tinggi', pic: 'Supervisor HSE', dueDate: '2026-10-18', status: 'In Progress' },
+  { id: 'ca-2', code: 'CA-2026-0090', source: 'Near Miss', description: 'Operator melewati area blind spot excavator tanpa kontak mata', siteId: 'site-lht', riskLevel: 'Ekstrem', pic: 'Foreman Produksi', dueDate: '2026-10-12', status: 'Overdue' },
+  { id: 'ca-3', code: 'CA-2026-0091', source: 'Temuan', description: 'APAR pada workshop belum diperiksa bulanan', siteId: 'site-berau', riskLevel: 'Sedang', pic: 'Mekanik Senior', dueDate: '2026-10-20', status: 'Open' },
+  { id: 'ca-4', code: 'CA-2026-0092', source: 'Insiden', description: 'Tumpahan BBM di dekat tangki ft-2 belum dibersihkan', siteId: 'site-berau', riskLevel: 'Tinggi', pic: 'Foreman Fuel', dueDate: '2026-10-16', status: 'Awaiting Verification', evidence: 'Foto area setelah pembersihan' },
+  { id: 'ca-5', code: 'CA-2026-0093', source: 'Risk Assessment', description: 'Rambu peringatan lerangan di Pit Timur kurang pada tikungan', siteId: 'site-berau', riskLevel: 'Sedang', pic: 'Supervisor HSE', dueDate: '2026-10-25', status: 'Closed', evidence: 'Foto pemasangan rambu', verifiedBy: 'Supervisor HSE' },
+  { id: 'ca-6', code: 'CA-2026-0094', source: 'Inspeksi', description: 'Sabuk pengaman operator grader aus melewati batas', siteId: 'site-te', riskLevel: 'Tinggi', pic: 'Foreman Maintenance', dueDate: '2026-10-19', status: 'Open' },
+]
+
+export const COST_TRANSACTIONS: CostTransaction[] = [
+  { id: 'cx-1', code: 'CST-2026-0891', period: '2026-10', contractId: 'ctr-1', siteId: 'site-berau', category: 'BBM', description: 'Konsumsi BBM 8 unit OB Removal periode 1–14 Okt', amountIdr: 412500000, costType: 'Actual', source: 'BBM', sourceRef: 'FU-2026-3101 s/d 3108', status: 'Posted' },
+  { id: 'cx-2', code: 'CST-2026-0892', period: '2026-10', contractId: 'ctr-1', siteId: 'site-berau', category: 'Suku Cadang', description: 'Selang hidrolik, filter, dan kampas rem untuk WO-1..WO-3', amountIdr: 187300000, costType: 'Actual', source: 'Warehouse', sourceRef: 'WO-1, WO-2, WO-3', status: 'Posted' },
+  { id: 'cx-3', code: 'CST-2026-0893', period: '2026-10', contractId: 'ctr-1', siteId: 'site-berau', category: 'Jasa Perbaikan', description: 'Overhaul pompa hidrolik oleh vendor khusus', amountIdr: 265000000, costType: 'Committed', source: 'Purchase Order', sourceRef: 'PO-2026-0142', status: 'Posted' },
+  { id: 'cx-4', code: 'CST-2026-0894', period: '2026-10', contractId: 'ctr-1', siteId: 'site-berau', category: 'Tenaga Kerja', description: 'Upah operator & mekanik kontrak KTR-2026-001', amountIdr: 1480000000, costType: 'Actual', source: 'Manual', status: 'Posted' },
+  { id: 'cx-5', code: 'CST-2026-0895', period: '2026-10', contractId: 'ctr-1', siteId: 'site-berau', category: 'Sewa Alat', description: 'Sewa 2 unit grader cadangan', amountIdr: 180000000, costType: 'Accrual', source: 'Manual', status: 'Draft' },
+  { id: 'cx-6', code: 'CST-2026-0896', period: '2026-10', contractId: 'ctr-2', siteId: 'site-lht', category: 'BBM', description: 'Konsumsi BBM coal getting Lahat', amountIdr: 298400000, costType: 'Actual', source: 'BBM', sourceRef: 'FU-2026-3106, 3107', status: 'Posted' },
+  { id: 'cx-7', code: 'CST-2026-0897', period: '2026-10', contractId: 'ctr-2', siteId: 'site-lht', category: 'Suku Cadang', description: 'Ban haul truck eq-10 (2 unit)', amountIdr: 156000000, costType: 'Actual', source: 'Warehouse', sourceRef: 'WO-2', status: 'Posted' },
+  { id: 'cx-8', code: 'CST-2026-0898', period: '2026-10', contractId: 'ctr-3', siteId: 'site-me', category: 'BBM', description: 'Konsumsi BBM hauling Muara Enim', amountIdr: 356700000, costType: 'Actual', source: 'BBM', status: 'Posted' },
+  { id: 'cx-9', code: 'CST-2026-0899', period: '2026-10', contractId: 'ctr-1', siteId: 'site-berau', category: 'Vendor Pihak Ketiga', description: 'Jasa surveyor pengukuran volume', amountIdr: 45000000, costType: 'Committed', source: 'Purchase Order', sourceRef: 'PO-2026-0151', status: 'Draft' },
+  { id: 'cx-10', code: 'CST-2026-0900', period: '2026-11', contractId: 'ctr-1', siteId: 'site-berau', category: 'Mobilisasi', description: 'Mobilisasi 3 unit tambahan untuk Tahap 4', amountIdr: 520000000, costType: 'Forecast', source: 'Manual', status: 'Draft' },
+]
+
+export const BILLING_RECONCILIATIONS: BillingReconciliation[] = [
+  { id: 'br-1', code: 'REC-2026-0901', period: '2026-09', contractId: 'ctr-1', siteId: 'site-berau', internalVolume: 1180000, submittedVolume: 1180000, approvedVolume: 1162400, unit: 'BCM', rateIdr: 78500, varianceReason: 'Selisih 17.600 BCM: 12.000 BCM di luar batas area kontrak, 5.600 BCM koreksi bersama metode survey', status: 'Invoiced', preparedBy: 'Andi Prasetyo', reviewedBy: 'Bambang Wijaya' },
+  { id: 'br-2', code: 'REC-2026-0902', period: '2026-10', contractId: 'ctr-1', siteId: 'site-berau', internalVolume: 1180400, submittedVolume: 1180400, approvedVolume: 0, unit: 'BCM', rateIdr: 78500, varianceReason: 'Menunggu persetujuan pemilik tambang — dokumen pengukuran bersama dikirim 12 Okt', status: 'Awaiting Owner Approval', preparedBy: 'Andi Prasetyo' },
+  { id: 'br-3', code: 'REC-2026-0903', period: '2026-09', contractId: 'ctr-2', siteId: 'site-lht', internalVolume: 792000, submittedVolume: 792000, approvedVolume: 792000, unit: 'Ton', rateIdr: 42000, varianceReason: 'Tanpa selisih — metode timbangan weighbridge disepakati', status: 'Paid', preparedBy: 'Andi Prasetyo', reviewedBy: 'Bambang Wijaya' },
+  { id: 'br-4', code: 'REC-2026-0904', period: '2026-10', contractId: 'ctr-2', siteId: 'site-lht', internalVolume: 782400, submittedVolume: 782400, approvedVolume: 0, unit: 'Ton', rateIdr: 42000, varianceReason: 'Dokumen pendukung belum lengkap — CoA 3 batch masih menunggu lab', status: 'Draft', preparedBy: 'Andi Prasetyo' },
+  { id: 'br-5', code: 'REC-2026-0905', period: '2026-10', contractId: 'ctr-3', siteId: 'site-me', internalVolume: 884000, submittedVolume: 884000, approvedVolume: 884000, unit: 'Ton', rateIdr: 18500, varianceReason: 'Tanpa selisih', status: 'Ready to Bill', preparedBy: 'Andi Prasetyo', reviewedBy: 'Bambang Wijaya' },
+  { id: 'br-6', code: 'REC-2026-0906', period: '2026-09', contractId: 'ctr-4', siteId: 'site-te', internalVolume: 38.5, submittedVolume: 38.5, approvedVolume: 37.2, unit: 'Km', rateIdr: 9500000, varianceReason: 'Selisih 1,3 km: segmen KM 3,2 belum memenuhi spesifikasi kualitas kontrak', status: 'Invoiced', preparedBy: 'Andi Prasetyo', reviewedBy: 'Bambang Wijaya' },
+]
+
+export const TASKS: TaskItem[] = [
+  { id: 'tsk-1', title: 'Verifikasi laporan produksi shift 3', detail: 'PRD-2026-1003 — 36.200 BCM Pit Timur menunggu verifikasi foreman', module: '/monitoring-produksi', priority: 'Tinggi', dueDate: '2026-10-15', status: 'Open', ownerRole: 'Foreman' },
+  { id: 'tsk-2', title: 'Lengkapi jam meter pengisian BBM', detail: 'FU-2026-3103 — unit eq-7 belum mencatat jam meter', module: '/bbm', priority: 'Sedang', dueDate: '2026-10-15', status: 'Open', ownerRole: 'Operator' },
+  { id: 'tsk-3', title: 'WO kritis masih terbuka', detail: 'WO-1 excavator eq-5 — kebocoran hidrolik, sudah 1 hari', module: '/maintenance', priority: 'Kritis', dueDate: '2026-10-15', status: 'In Progress', ownerRole: 'Foreman' },
+  { id: 'tsk-4', title: 'Downtime tanpa penyebab akhir', detail: 'DT-2026-0416 — unit eq-1 menunggu hasil pemeriksaan awal shift', module: '/downtime', priority: 'Sedang', dueDate: '2026-10-15', status: 'Open', ownerRole: 'Operator' },
+  { id: 'tsk-5', title: 'Tindakan korektif melewati tenggat', detail: 'CA-2026-0090 — near miss blind spot excavator, terlambat 3 hari', module: '/hse', priority: 'Kritis', dueDate: '2026-10-12', status: 'Open', ownerRole: 'Supervisor' },
+  { id: 'tsk-6', title: 'Koreksi laporan produksi dikembalikan', detail: 'PRD-2026-1012 — tonase tidak sesuai weighbridge, dikembalikan foreman', module: '/monitoring-produksi', priority: 'Tinggi', dueDate: '2026-10-15', status: 'Open', ownerRole: 'Operator' },
+  { id: 'tsk-7', title: 'Setujui rencana produksi November', detail: 'TGT-7 — 44.000 BCM per shift menunggu tinjauan Superintendent', module: '/perencanaan', priority: 'Sedang', dueDate: '2026-10-20', status: 'Open', ownerRole: 'Superintendent' },
+  { id: 'tsk-8', title: 'Review rekonsiliasi volume Oktober', detail: 'REC-2026-0902 — 1.180.400 BCM menunggu persetujuan pemilik tambang', module: '/rekonsiliasi', priority: 'Tinggi', dueDate: '2026-10-25', status: 'Open', ownerRole: 'Commercial Manager' },
+  { id: 'tsk-9', title: 'PR part kritis belum diproses', detail: 'PR-2026-0088 — kampas rem 12 set, stok di bawah minimum', module: '/gudang', priority: 'Tinggi', dueDate: '2026-10-17', status: 'Open', ownerRole: 'Foreman' },
+  { id: 'tsk-10', title: 'Rekonsiliasi selisih stok BBM', detail: 'Tangki ft-2 selisih 340 liter melebihi ambang', module: '/bbm', priority: 'Sedang', dueDate: '2026-10-18', status: 'Open', ownerRole: 'Supervisor' },
+  { id: 'tsk-11', title: 'PO menunggu persetujuan', detail: 'PO-2026-0142 — overhaul pompa hidrolik Rp 265 juta', module: '/pengadaan', priority: 'Tinggi', dueDate: '2026-10-16', status: 'Open', ownerRole: 'Project Manager' },
+  { id: 'tsk-12', title: 'Tinjau varians biaya BBM', detail: 'Konsumsi unit eq-10 18% di atas baseline', module: '/biaya', priority: 'Sedang', dueDate: '2026-10-22', status: 'Open', ownerRole: 'Finance Manager' },
+]
+
 /* ==========================================================================
    Modul baru: Perencanaan Tambang, Pelabuhan, Legal & Compliance
    ========================================================================== */
@@ -756,16 +901,22 @@ export const COMPLIANCE: ComplianceObligation[] = [
 ]
 
 export const ACTIVITY: ActivityItem[] = [
-  { id: 'ac-1', time: '08:42', user: 'Bambang Setiawan', action: 'menyetujui rencana produksi harian Site Lahat', module: 'Produksi' },
-  { id: 'ac-2', time: '09:15', user: 'Hendra Wijaya', action: 'membuat Sales Order SO-2026-1012', module: 'Penjualan' },
-  { id: 'ac-3', time: '10:03', user: 'Siti Nurhaliza', action: 'memverifikasi CoA pengiriman barge TBH-12', module: 'Penjualan' },
-  { id: 'ac-4', time: '10:38', user: 'Agus Salim', action: 'menutup insiden Near Miss INC-2026-041', module: 'HSE' },
-  { id: 'ac-5', time: '11:20', user: 'Rudi Hartono', action: 'menyetujui PO bahan bakar Rp 2,4 M', module: 'Pembelian' },
-  { id: 'ac-6', time: '13:05', user: 'Maya Kusuma', action: 'posting jurnal penjualan JV-2026-3042', module: 'Keuangan' },
-  { id: 'ac-7', time: '14:12', user: 'Dedi Prasetyo', action: 'menyelesaikan WO preventive CAT 6015B', module: 'Armada' },
-  { id: 'ac-8', time: '15:30', user: 'Fitri Ramadani', action: 'menutup stok opname gudang utama', module: 'Inventory' },
-  { id: 'ac-9', time: '16:04', user: 'Yanti Lestari', action: 'menyetujui pengajuan cuti 12 karyawan', module: 'SDM' },
-  { id: 'ac-10', time: '16:48', user: 'Zulkifli Harahap', action: 'mengunggah laporan RKAB Oktober', module: 'Laporan' },
+  { id: 'ac-1', time: '2026-10-15 08:42', user: 'Dedi Kurniawan', action: 'Menyetujui laporan produksi PRD-2026-1001', module: 'Monitoring Produksi', type: 'approve', detail: '41.800 BCM Pit Timur Shift 1 — status Verified menjadi Approved' },
+  { id: 'ac-2', time: '2026-10-15 08:15', user: 'Joko Prasetyo', action: 'Memverifikasi laporan produksi PRD-2026-1002', module: 'Monitoring Produksi', type: 'approve', detail: '39.400 BCM Pit Timur Shift 2 — status Submitted menjadi Verified' },
+  { id: 'ac-3', time: '2026-10-15 08:05', user: 'Slamet Riyadi', action: 'Mengembalikan laporan produksi PRD-2026-1012', module: 'Monitoring Produksi', type: 'reject', detail: 'Tonase tidak sesuai weighbridge — dikembalikan untuk koreksi' },
+  { id: 'ac-4', time: '2026-10-15 07:58', user: 'Budi Santoso', action: 'Mencatat pengisian BBM FU-2026-3101', module: 'Manajemen BBM', type: 'create', detail: '420 liter ke unit eq-1 — jam meter 12.480' },
+  { id: 'ac-5', time: '2026-10-15 07:40', user: 'Joko Prasetyo', action: 'Membuat penugasan unit ua-1', module: 'Dispatch', type: 'create', detail: 'eq-1 + emp-1 ke Pit Timur Shift 1' },
+  { id: 'ac-6', time: '2026-10-14 16:20', user: 'Budi Santoso', action: 'Melaporkan downtime DT-2026-0412', module: 'Downtime', type: 'create', detail: 'eq-5 Mechanical 4,75 jam — kebocoran selang hidrolik' },
+  { id: 'ac-7', time: '2026-10-14 15:05', user: 'Ir. Agus Setiawan', action: 'Menyetujui rencana produksi November', module: 'Perencanaan Produksi', type: 'approve', detail: 'TGT-7 44.000 BCM Shift 1 — status Submitted menjadi Approved' },
+  { id: 'ac-8', time: '2026-10-14 14:12', user: 'Ir. Sari Wulandari', action: 'Merevisi rencana produksi Oktober', module: 'Perencanaan Produksi', type: 'edit', detail: 'TGT-1 v1 menjadi v2 — penyesuaian produktivitas EX-200' },
+  { id: 'ac-9', time: '2026-10-14 11:30', user: 'Ir. Bambang Wijaya', action: 'Menerbitkan purchase order PO-2026-0142', module: 'Procurement', type: 'approve', detail: 'Overhaul pompa hidrolik Rp 265.000.000 — nilai di bawah batas kewenangan' },
+  { id: 'ac-10', time: '2026-10-14 10:48', user: 'Andi Prasetyo, S.E.', action: 'Menyiapkan rekonsiliasi REC-2026-0902', module: 'Rekonsiliasi', type: 'create', detail: '1.180.400 BCM periode 2026-10 kontrak KTR-2026-001' },
+  { id: 'ac-11', time: '2026-10-14 09:15', user: 'Maya Kusuma, S.E., Ak.', action: 'Membuat transaksi biaya CST-2026-0891', module: 'Cost Control', type: 'create', detail: 'Kategori BBM Rp 412.500.000 — jenis Actual' },
+  { id: 'ac-12', time: '2026-10-14 08:55', user: 'Fajar Ramadhan', action: 'Mengubah ambang selisih stok BBM', module: 'Pengaturan Sistem', type: 'edit', detail: 'Ambang selisih 1% menjadi 0,8% — tercatat sebagai konfigurasi yang dapat diaudit' },
+  { id: 'ac-13', time: '2026-10-13 16:04', user: 'Supervisor HSE', action: 'Menutup tindakan korektif CA-2026-0093', module: 'HSE', type: 'approve', detail: 'Pemasangan rambu lerangan Pit Timur — bukti foto terlampir' },
+  { id: 'ac-14', time: '2026-10-13 14:38', user: 'Rina Hartati, S.E.', action: 'Mengekspor laporan produksi bulanan', module: 'Laporan', type: 'export', detail: 'Laporan Produksi Harian per Shift — format PDF' },
+  { id: 'ac-15', time: '2026-10-13 11:20', user: 'Dedi Kurniawan', action: 'Menutup work order WO-3', module: 'Maintenance', type: 'approve', detail: 'eq-2 penggantian aki — pengujian 30 menit berhasil' },
+  { id: 'ac-16', time: '2026-10-13 09:02', user: 'Budi Santoso', action: 'Masuk ke sistem', module: 'Sistem', type: 'login', detail: 'Sesi dari Site Berau — peran Operator' },
 ]
 
 export const CURRENT_USER: User = {

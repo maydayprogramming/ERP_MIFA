@@ -2,34 +2,29 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import * as SEED from './data/seed'
 import type {
   ActivityItem,
-  Bill,
-  BudgetLine,
-  CapexProject,
-  Contract,
-  Customer,
+  BillingReconciliation,
+  CorrectiveAction,
+  CostTransaction,
+  DowntimeEvent,
   Employee,
   EnvironmentalReading,
   Equipment,
+  FuelIssue,
+  FuelReceipt,
   FuelTank,
   Incident,
-  Invoice,
-  JournalEntry,
   MaintenanceJob,
-  MinePlan,
-  BlendingRecipe,
-  Jetty,
-  Vessel,
-  Permit,
-  ComplianceObligation,
   Notification,
+  ProductionLog,
   ProductionRecord,
+  ProductionTarget,
+  ProjectContract,
   PurchaseOrder,
-  RoyaltyRecord,
-  SalesOrder,
+  ShiftHandover,
   Site,
-  Stockpile,
+  TaskItem,
   TrainingRecord,
-  User,
+  UnitAssignment,
   Vendor,
   WarehouseItem,
 } from './types'
@@ -37,8 +32,8 @@ import type {
 export interface AppState {
   sites: Site[]
   employees: Employee[]
+  /** Ringkasan produksi harian (agregat lintas modul). */
   production: ProductionRecord[]
-  stockpiles: Stockpile[]
   warehouseItems: WarehouseItem[]
   fuelTanks: FuelTank[]
   equipment: Equipment[]
@@ -46,37 +41,33 @@ export interface AppState {
   incidents: Incident[]
   training: TrainingRecord[]
   environmental: EnvironmentalReading[]
-  minePlans: MinePlan[]
-  blendingRecipes: BlendingRecipe[]
-  jetties: Jetty[]
-  vessels: Vessel[]
-  permits: Permit[]
-  compliance: ComplianceObligation[]
-  customers: Customer[]
-  contracts: Contract[]
-  salesOrders: SalesOrder[]
   vendors: Vendor[]
   purchaseOrders: PurchaseOrder[]
-  journals: JournalEntry[]
-  invoices: Invoice[]
-  bills: Bill[]
-  budgets: BudgetLine[]
-  capex: CapexProject[]
-  royalties: RoyaltyRecord[]
+  /* ---- Domain kontraktor ---- */
+  projectContracts: ProjectContract[]
+  productionTargets: ProductionTarget[]
+  productionLogs: ProductionLog[]
+  unitAssignments: UnitAssignment[]
+  downtimeEvents: DowntimeEvent[]
+  fuelIssues: FuelIssue[]
+  fuelReceipts: FuelReceipt[]
+  shiftHandovers: ShiftHandover[]
+  correctiveActions: CorrectiveAction[]
+  costTransactions: CostTransaction[]
+  billingReconciliations: BillingReconciliation[]
+  tasks: TaskItem[]
+  /* ---- Sistem ---- */
   notifications: Notification[]
   activity: ActivityItem[]
-  currentUser: User
 }
 
 const STORAGE_KEY = 'mifa-erp-state-v1'
-const TODAY = SEED.TODAY_ISO
 
 function freshState(): AppState {
   return {
     sites: SEED.SITES,
     employees: SEED.EMPLOYEES,
     production: SEED.PRODUCTION,
-    stockpiles: SEED.STOCKPILES,
     warehouseItems: SEED.WAREHOUSE_ITEMS,
     fuelTanks: SEED.FUEL_TANKS,
     equipment: SEED.EQUIPMENT,
@@ -84,26 +75,22 @@ function freshState(): AppState {
     incidents: SEED.INCIDENTS,
     training: SEED.TRAINING,
     environmental: SEED.ENVIRONMENTAL,
-    minePlans: SEED.MINE_PLANS,
-    blendingRecipes: SEED.BLENDING_RECIPES,
-    jetties: SEED.JETTIES,
-    vessels: SEED.VESSELS,
-    permits: SEED.PERMITS,
-    compliance: SEED.COMPLIANCE,
-    customers: SEED.CUSTOMERS,
-    contracts: SEED.CONTRACTS,
-    salesOrders: SEED.SALES_ORDERS,
     vendors: SEED.VENDORS,
     purchaseOrders: SEED.PURCHASE_ORDERS,
-    journals: SEED.JOURNALS,
-    invoices: SEED.INVOICES,
-    bills: SEED.BILLS,
-    budgets: SEED.BUDGETS,
-    capex: SEED.CAPEX_PROJECTS,
-    royalties: SEED.ROYALTIES,
+    projectContracts: SEED.PROJECT_CONTRACTS,
+    productionTargets: SEED.PRODUCTION_TARGETS,
+    productionLogs: SEED.PRODUCTION_LOGS,
+    unitAssignments: SEED.UNIT_ASSIGNMENTS,
+    downtimeEvents: SEED.DOWNTIME_EVENTS,
+    fuelIssues: SEED.FUEL_ISSUES,
+    fuelReceipts: SEED.FUEL_RECEIPTS,
+    shiftHandovers: SEED.SHIFT_HANDOVERS,
+    correctiveActions: SEED.CORRECTIVE_ACTIONS,
+    costTransactions: SEED.COST_TRANSACTIONS,
+    billingReconciliations: SEED.BILLING_RECONCILIATIONS,
+    tasks: SEED.TASKS,
     notifications: SEED.NOTIFICATIONS,
     activity: SEED.ACTIVITY,
-    currentUser: SEED.CURRENT_USER,
   }
 }
 
@@ -113,7 +100,8 @@ function loadState(): AppState {
     if (!raw) return freshState()
     const parsed = JSON.parse(raw) as Partial<AppState>
     const base = freshState()
-    return { ...base, ...parsed }
+    // Gabungkan agar koleksi yang belum tersimpan tetap terisi seed.
+    return { ...base, ...parsed } as AppState
   } catch {
     return freshState()
   }
@@ -134,35 +122,52 @@ interface AppContextValue {
   toast: (message: string, variant?: Toast['variant']) => void
   dismissToast: (id: string) => void
   actions: {
-    addProduction: (r: Omit<ProductionRecord, 'id' | 'status' | 'createdBy'>) => void
-    setProductionStatus: (id: string, status: ProductionRecord['status']) => void
-    addSalesOrder: (r: Omit<SalesOrder, 'id' | 'status' | 'soNo'>) => void
-    setSalesOrderStatus: (id: string, status: SalesOrder['status']) => void
-    addContract: (r: Omit<Contract, 'id' | 'liftedMt' | 'status' | 'code'>) => void
-    addPurchaseOrder: (r: Omit<PurchaseOrder, 'id' | 'status' | 'poNo'>) => void
-    setPurchaseOrderStatus: (id: string, status: PurchaseOrder['status']) => void
+    /* --- Modul 3: Monitoring produksi --- */
+    addProductionLog: (r: Omit<ProductionLog, 'id' | 'code' | 'status'>) => void
+    setProductionLogStatus: (id: string, status: ProductionLog['status'], note?: string) => void
+    /* --- Modul 2: Perencanaan produksi --- */
+    addProductionTarget: (r: Omit<ProductionTarget, 'id' | 'status'>) => void
+    setProductionTargetStatus: (id: string, status: ProductionTarget['status'], reason?: string) => void
+    /* --- Modul 4: Dispatch --- */
+    addUnitAssignment: (r: Omit<UnitAssignment, 'id' | 'code'| 'status'>) => void
+    setUnitAssignmentStatus: (id: string, status: UnitAssignment['status']) => void
+    /* --- Modul 6: Downtime --- */
+    addDowntimeEvent: (r: Omit<DowntimeEvent, 'id' | 'code'| 'status'>) => void
+    setDowntimeStatus: (id: string, patch: Partial<DowntimeEvent>) => void
+    /* --- Modul 7: Maintenance --- */
     addMaintenance: (r: Omit<MaintenanceJob, 'id' | 'status' | 'woNo'>) => void
     setMaintenanceStatus: (id: string, status: MaintenanceJob['status']) => void
     setEquipmentStatus: (id: string, status: Equipment['status']) => void
-    addIncident: (r: Omit<Incident, 'id' | 'status' | 'lostDays'>) => void
-    setIncidentStatus: (id: string, status: Incident['status']) => void
-    addTraining: (r: Omit<TrainingRecord, 'id' | 'status'>) => void
+    /* --- Modul 8: BBM --- */
+    addFuelIssue: (r: Omit<FuelIssue, 'id' | 'code' | 'status'>) => void
+    setFuelIssueStatus: (id: string, status: FuelIssue['status']) => void
+    addFuelReceipt: (r: Omit<FuelReceipt, 'id' | 'code' | 'status'>) => void
+    /* --- Modul 9: Inventory --- */
     addWarehouseItem: (r: Omit<WarehouseItem, 'id'>) => void
     adjustStock: (id: string, delta: number) => void
-    addEmployee: (r: Omit<Employee, 'id' | 'nip'>) => void
-    addBudget: (r: Omit<BudgetLine, 'id'>) => void
-    addCapex: (r: Omit<CapexProject, 'id'>) => void
-    addCustomer: (r: Omit<Customer, 'id' | 'outstandingIdr' | 'status' | 'code'>) => void
+    /* --- Modul 10: Procurement --- */
+    addPurchaseOrder: (r: Omit<PurchaseOrder, 'id' | 'status' | 'poNo'>) => void
+    setPurchaseOrderStatus: (id: string, status: PurchaseOrder['status']) => void
     addVendor: (r: Omit<Vendor, 'id' | 'totalSpendIdr' | 'status' | 'rating' | 'code'>) => void
-    addMinePlan: (r: Omit<MinePlan, 'id' | 'code' | 'actualCoalMt' | 'actualObBcm' | 'status'>) => void
-    setMinePlanStatus: (id: string, status: MinePlan['status']) => void
-    addBlendingRecipe: (r: Omit<BlendingRecipe, 'id' | 'code' | 'status'>) => void
-    setBlendingStatus: (id: string, status: BlendingRecipe['status']) => void
-    setVesselStatus: (id: string, status: Vessel['status']) => void
-    addVessel: (r: Omit<Vessel, 'id' | 'code' | 'status' | 'loadedMt' | 'blNumber'>) => void
-    addPermit: (r: Omit<Permit, 'id' | 'code' | 'status'>) => void
-    setPermitStatus: (id: string, status: Permit['status']) => void
-    setComplianceStatus: (id: string, status: ComplianceObligation['status']) => void
+    /* --- Modul 1: Proyek & kontrak --- */
+    addProjectContract: (r: Omit<ProjectContract, 'id' | 'version' | 'status'>) => void
+    setProjectContractStatus: (id: string, status: ProjectContract['status']) => void
+    /* --- Modul 11: Personel --- */
+    addEmployee: (r: Omit<Employee, 'id' | 'nip'>) => void
+    addTraining: (r: Omit<TrainingRecord, 'id' | 'status'>) => void
+    /* --- Modul 12: HSE --- */
+    addIncident: (r: Omit<Incident, 'id' | 'status' | 'lostDays'>) => void
+    setIncidentStatus: (id: string, status: Incident['status']) => void
+    addCorrectiveAction: (r: Omit<CorrectiveAction, 'id' | 'code'| 'status'>) => void
+    setCorrectiveActionStatus: (id: string, status: CorrectiveAction['status'], evidence?: string) => void
+    /* --- Modul 13: Cost control --- */
+    addCostTransaction: (r: Omit<CostTransaction, 'id' | 'code'| 'status'>) => void
+    /* --- Modul 14: Rekonsiliasi --- */
+    addBillingReconciliation: (r: Omit<BillingReconciliation, 'id' | 'code'| 'status'>) => void
+    setBillingReconciliationStatus: (id: string, status: BillingReconciliation['status'], patch?: Partial<BillingReconciliation>) => void
+    /* --- Tugas Saya --- */
+    setTaskStatus: (id: string, status: TaskItem['status']) => void
+    /* --- Sistem --- */
     markNotificationRead: (id: string) => void
     markAllNotificationsRead: () => void
     resetData: () => void
@@ -179,262 +184,236 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     } catch {
-      /* storage penuh / tidak tersedia — abaikan */
+      /* storage penuh / tidak tersedia */
     }
   }, [state])
+
+  const toast = useCallback((message: string, variant: Toast['variant'] = 'success') => {
+    const id = uid('t')
+    setToasts((t) => [...t, { id, message, variant }])
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4200)
+  }, [])
 
   const dismissToast = useCallback((id: string) => {
     setToasts((t) => t.filter((x) => x.id !== id))
   }, [])
 
-  const toast = useCallback(
-    (message: string, variant: Toast['variant'] = 'success') => {
-      const id = uid('toast')
-      setToasts((t) => [...t, { id, message, variant }])
-      window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000)
+  /** Mencatat entri audit trail untuk setiap perubahan data penting. */
+  const log = useCallback((action: string, detail: string, type: ActivityItem['type']) => {
+    setState((s) => ({
+      ...s,
+      activity: [
+        { id: uid('act'), action, detail, user: 'Sesi aktif', time: new Date().toISOString(), module: 'Umum', type },
+        ...s.activity,
+      ].slice(0, 200),
+    }))
+  }, [])
+
+  const patch = useCallback(
+    <K extends keyof AppState>(key: K, updater: (items: AppState[K]) => AppState[K]) => {
+      setState((s) => ({ ...s, [key]: updater(s[key]) }))
     },
     [],
   )
 
-  const logActivity = useCallback((action: string, module: string) => {
-    setState((s) => ({
-      ...s,
-      activity: [
-        {
-          id: uid('ac'),
-          time: new Date().toTimeString().slice(0, 5),
-          user: s.currentUser.name,
-          action,
-          module,
-        },
-        ...s.activity,
-      ].slice(0, 40),
-    }))
-  }, [])
+  const actions = useMemo<AppContextValue['actions']>(() => {
+    const nextCode = (prefix: string, existing: Array<{ code?: string }>, pattern: RegExp) => {
+      let max = 0
+      for (const e of existing) {
+        const m = e.code?.match(pattern)
+        if (m) max = Math.max(max, Number(m[1]))
+      }
+      return `${prefix}-${String(max + 1).padStart(4, '0')}`
+    }
 
-  const pushNotification = useCallback((title: string, body: string, type: Notification['type']) => {
-    setState((s) => ({
-      ...s,
-      notifications: [
-        { id: uid('nt'), title, body, time: 'Baru saja', type, read: false },
-        ...s.notifications,
-      ].slice(0, 30),
-    }))
-  }, [])
+    return {
+      /* --- Modul 3 --- */
+      addProductionLog: (r) => {
+        const code = nextCode('PRD', r as never, /PRD-\d{4}-(\d+)/)
+        const item: ProductionLog = { ...r, id: uid('pl'), code, status: 'Draft' }
+        patch('productionLogs', (x) => [item, ...x])
+        log('Input produksi', `${code} — ${r.qty} ${r.unit} ${r.pit}`, 'create')
+      },
+      setProductionLogStatus: (id, status, note) => {
+        patch('productionLogs', (x) =>
+          x.map((l) =>
+            l.id === id
+              ? { ...l, status, correctionNote: note ?? l.correctionNote, approvedBy: status === 'Approved' ? 'Sesi aktif' : l.approvedBy, verifiedBy: status === 'Verified' || status === 'Approved' ? 'Sesi aktif' : l.verifiedBy }
+              : l,
+          ),
+        )
+        log('Status produksi', `${id} → ${status}`, status === 'Approved' ? 'approve' : 'edit')
+      },
 
-  const actions = useMemo<AppContextValue['actions']>(
-    () => ({
-      addProduction: (r) => {
-        setState((s) => ({
-          ...s,
-          production: [{ ...r, id: uid('prd'), status: 'Draft', createdBy: s.currentUser.name }, ...s.production],
-        }))
-        logActivity(`menginput laporan produksi ${r.date}`, 'Produksi')
-        toast('Laporan produksi berhasil disimpan', 'success')
+      /* --- Modul 2 --- */
+      addProductionTarget: (r) => {
+        const code = nextCode('TGT', r as never, /TGT-(\d+)/)
+        patch('productionTargets', (x) => [{ ...r, id: uid('tgt'), code, status: 'Draft' } as ProductionTarget, ...x])
+        log('Rencana produksi', `${code} — ${r.targetQty} ${r.unit} ${r.pit}`, 'create')
       },
-      setProductionStatus: (id, status) => {
-        setState((s) => ({
-          ...s,
-          production: s.production.map((p) => (p.id === id ? { ...p, status } : p)),
-        }))
-        toast(`Status laporan produksi → ${status}`, 'info')
+      setProductionTargetStatus: (id, status, reason) => {
+        patch('productionTargets', (x) =>
+          x.map((t) => (t.id === id ? { ...t, status, version: status === 'Revised' ? t.version + 1 : t.version, reason: reason ?? t.reason } : t)),
+        )
+        log('Status rencana', `${id} → ${status}`, status === 'Approved' ? 'approve' : 'edit')
       },
-      addSalesOrder: (r) => {
-        const soNo = `SO-2026-${String(1022 + Math.floor(Math.random() * 900))}`
-        setState((s) => ({
-          ...s,
-          salesOrders: [{ ...r, id: uid('so'), soNo, status: 'Draft' }, ...s.salesOrders],
-        }))
-        logActivity(`membuat Sales Order ${soNo}`, 'Penjualan')
-        pushNotification('Sales Order baru dibuat', `${soNo} menunggu verifikasi tim komersial.`, 'info')
-        toast(`Sales Order ${soNo} berhasil dibuat`, 'success')
+
+      /* --- Modul 4 --- */
+      addUnitAssignment: (r) => {
+        const code = nextCode('UA', r as never, /UA-(\d+)/)
+        patch('unitAssignments', (x) => [{ ...r, id: uid('ua'), code, status: 'Active' } as UnitAssignment, ...x])
+        log('Dispatch unit', `Unit ${r.unitId} → ${r.pit} ${r.shift}`, 'create')
       },
-      setSalesOrderStatus: (id, status) => {
-        setState((s) => ({
-          ...s,
-          salesOrders: s.salesOrders.map((o) => (o.id === id ? { ...o, status } : o)),
-        }))
-        toast(`Status SO diperbarui → ${status}`, 'info')
+      setUnitAssignmentStatus: (id, status) => {
+        patch('unitAssignments', (x) => x.map((u) => (u.id === id ? { ...u, status, endAt: status === 'Completed' ? new Date().toISOString().slice(0, 16) : u.endAt } : u)))
+        log('Status penugasan', `${id} → ${status}`, 'edit')
       },
-      addContract: (r) => {
-        const code = `KTR/2026/${String(Math.floor(Math.random() * 900) + 100)}`
-        setState((s) => ({
-          ...s,
-          contracts: [{ ...r, id: uid('ctr'), code, liftedMt: 0, status: 'Draft' }, ...s.contracts],
-        }))
-        logActivity(`membuat kontrak ${code}`, 'Penjualan')
-        toast(`Kontrak ${code} berhasil dibuat`, 'success')
+
+      /* --- Modul 6 --- */
+      addDowntimeEvent: (r) => {
+        const code = nextCode('DT', r as never, /DT-\d{4}-(\d+)/)
+        patch('downtimeEvents', (x) => [{ ...r, id: uid('dt'), code } as DowntimeEvent, ...x])
+        log('Laporan downtime', `${code} — ${r.category} ${r.durationHours} jam`, 'create')
       },
-      addPurchaseOrder: (r) => {
-        const poNo = `PO-2026-${String(Math.floor(Math.random() * 900) + 2100)}`
-        setState((s) => ({
-          ...s,
-          purchaseOrders: [{ ...r, id: uid('po'), poNo, status: 'Pending Approval' }, ...s.purchaseOrders],
-        }))
-        logActivity(`membuat Purchase Order ${poNo}`, 'Pembelian')
-        pushNotification('PO menunggu persetujuan', `${poNo} — ${r.category} menunggu approval.`, 'warning')
-        toast(`Purchase Order ${poNo} diajukan`, 'success')
+      setDowntimeStatus: (id, p) => {
+        patch('downtimeEvents', (x) => x.map((d) => (d.id === id ? { ...d, ...p } : d)))
+        log('Perbarui downtime', id, 'edit')
       },
-      setPurchaseOrderStatus: (id, status) => {
-        setState((s) => ({
-          ...s,
-          purchaseOrders: s.purchaseOrders.map((p) => (p.id === id ? { ...p, status } : p)),
-        }))
-        toast(`PO diperbarui → ${status}`, status === 'Approved' ? 'success' : 'info')
-      },
+
+      /* --- Modul 7 --- */
       addMaintenance: (r) => {
-        const woNo = `WO-2026-${String(Math.floor(Math.random() * 900) + 1100)}`
-        setState((s) => ({
-          ...s,
-          maintenance: [{ ...r, id: uid('mt'), woNo, status: 'Scheduled' }, ...s.maintenance],
-        }))
-        logActivity(`membuat Work Order ${woNo}`, 'Armada')
-        toast(`Work Order ${woNo} dijadwalkan`, 'success')
+        const code = nextCode('WO', r as never, /WO-(\d+)/)
+        patch('maintenance', (x) => [{ ...r, id: uid('wo'), woNo: code, status: 'Scheduled' } as MaintenanceJob, ...x])
+        log('Work order', `${code} — ${r.description}`, 'create')
       },
       setMaintenanceStatus: (id, status) => {
-        setState((s) => ({
-          ...s,
-          maintenance: s.maintenance.map((m) => (m.id === id ? { ...m, status } : m)),
-        }))
-        toast(`Work Order → ${status}`, 'info')
+        patch('maintenance', (x) => x.map((w) => (w.id === id ? { ...w, status } : w)))
+        log('Status work order', `${id} → ${status}`, status === 'Completed' ? 'approve' : 'edit')
       },
       setEquipmentStatus: (id, status) => {
-        setState((s) => ({
-          ...s,
-          equipment: s.equipment.map((e) => (e.id === id ? { ...e, status } : e)),
-        }))
+        patch('equipment', (x) => x.map((e) => (e.id === id ? { ...e, status } : e)))
+        log('Status unit', `${id} → ${status}`, 'edit')
       },
-      addIncident: (r) => {
-        setState((s) => ({
-          ...s,
-          incidents: [{ ...r, id: uid('inc'), status: 'Open', lostDays: 0 }, ...s.incidents],
-        }))
-        logActivity('melaporkan insiden baru', 'HSE')
-        pushNotification('Insiden baru dilaporkan', r.description.slice(0, 80), 'alert')
-        toast('Laporan insiden tercatat', 'success')
+
+      /* --- Modul 8 --- */
+      addFuelIssue: (r) => {
+        const code = nextCode('FU', r as never, /FU-\d{4}-(\d+)/)
+        patch('fuelIssues', (x) => [{ ...r, id: uid('fi'), code, status: 'Draft' } as FuelIssue, ...x])
+        log('Pengisian BBM', `${code} — ${r.liters} liter ke ${r.unitId}`, 'create')
       },
-      setIncidentStatus: (id, status) => {
-        setState((s) => ({
-          ...s,
-          incidents: s.incidents.map((i) => (i.id === id ? { ...i, status } : i)),
-        }))
-        toast(`Insiden → ${status}`, 'info')
+      setFuelIssueStatus: (id, status) => {
+        patch('fuelIssues', (x) => x.map((f) => (f.id === id ? { ...f, status } : f)))
+        log('Status BBM', `${id} → ${status}`, 'edit')
       },
-      addTraining: (r) => {
-        setState((s) => ({
-          ...s,
-          training: [{ ...r, id: uid('tr'), status: 'Scheduled' }, ...s.training],
-        }))
-        logActivity(`menjadwalkan pelatihan ${r.program}`, 'HSE')
-        toast('Pelatihan dijadwalkan', 'success')
+      addFuelReceipt: (r) => {
+        const code = nextCode('RCV-FU', r as never, /RCV-FU-(\d+)/)
+        patch('fuelReceipts', (x) => [{ ...r, id: uid('fr'), code, status: 'Draft' } as FuelReceipt, ...x])
+        log('Penerimaan BBM', `${code} — ${r.liters} liter`, 'create')
       },
+
+      /* --- Modul 9 --- */
       addWarehouseItem: (r) => {
-        setState((s) => ({ ...s, warehouseItems: [{ ...r, id: uid('wh') }, ...s.warehouseItems] }))
-        toast('Item gudang ditambahkan', 'success')
+        patch('warehouseItems', (x) => [{ ...r, id: uid('wh') }, ...x])
+        log('Master barang', r.name, 'create')
       },
       adjustStock: (id, delta) => {
-        setState((s) => ({
-          ...s,
-          warehouseItems: s.warehouseItems.map((i) => (i.id === id ? { ...i, stock: Math.max(0, i.stock + delta) } : i)),
-        }))
+        patch('warehouseItems', (x) => x.map((w) => (w.id === id ? { ...w, stock: Math.max(0, w.stock + delta) } : w)))
+        log('Penyesuaian stok', `${id} ${delta > 0 ? '+' : ''}${delta}`, 'edit')
       },
-      addEmployee: (r) => {
-        const nip = `2026${String(Math.floor(Math.random() * 9000) + 1000)}`
-        setState((s) => ({ ...s, employees: [{ ...r, id: uid('emp'), nip }, ...s.employees] }))
-        logActivity(`menambahkan karyawan ${r.name}`, 'SDM')
-        toast('Karyawan baru terdaftar', 'success')
+
+      /* --- Modul 10 --- */
+      addPurchaseOrder: (r) => {
+        const code = nextCode('PO', r as never, /PO-\d{4}-(\d+)/)
+        patch('purchaseOrders', (x) => [{ ...r, id: uid('po'), poNo: code, status: 'Pending Approval' } as PurchaseOrder, ...x])
+        log('Purchase order', `${code} — ${r.category} Rp ${r.amountIdr.toLocaleString('id-ID')}`, 'create')
       },
-      addBudget: (r) => {
-        setState((s) => ({ ...s, budgets: [{ ...r, id: uid('bud') }, ...s.budgets] }))
-        toast('Anggaran RKAB ditambahkan', 'success')
-      },
-      addCapex: (r) => {
-        setState((s) => ({ ...s, capex: [{ ...r, id: uid('cx') }, ...s.capex] }))
-        toast('Proyek investasi dibuat', 'success')
-      },
-      addCustomer: (r) => {
-        const code = `CUS-${String(Math.floor(Math.random() * 900) + 110)}`
-        setState((s) => ({
-          ...s,
-          customers: [{ ...r, id: uid('cus'), code, outstandingIdr: 0, status: 'Active' }, ...s.customers],
-        }))
-        toast('Pelanggan terdaftar', 'success')
+      setPurchaseOrderStatus: (id, status) => {
+        patch('purchaseOrders', (x) => x.map((p) => (p.id === id ? { ...p, status } : p)))
+        log('Status PO', `${id} → ${status}`, status === 'Approved' ? 'approve' : 'edit')
       },
       addVendor: (r) => {
-        const code = `VND-${String(Math.floor(Math.random() * 900) + 110)}`
-        setState((s) => ({
-          ...s,
-          vendors: [{ ...r, id: uid('vnd'), code, totalSpendIdr: 0, status: 'Pending', rating: 3 }, ...s.vendors],
-        }))
-        toast('Vendor terdaftar', 'success')
+        const code = nextCode('VND', r as never, /VND-(\d+)/)
+        patch('vendors', (x) => [{ ...r, id: uid('vnd'), code, totalSpendIdr: 0, status: 'Pending', rating: 0 } as Vendor, ...x])
+        log('Vendor baru', r.name, 'create')
       },
-      addMinePlan: (r) => {
-        const code = `MP-${r.period}-${String(Math.floor(Math.random() * 900) + 100)}`
-        setState((s) => ({ ...s, minePlans: [{ ...r, id: uid('mp'), code, actualCoalMt: 0, actualObBcm: 0, status: 'Draft' }, ...s.minePlans] }))
-        logActivity(`membuat rencana tambang ${code}`, 'Perencanaan Tambang')
-        toast('Rencana tambang berhasil dibuat', 'success')
+
+      /* --- Modul 1 --- */
+      addProjectContract: (r) => {
+        const code = nextCode('KTR', r as never, /KTR-\d{4}-(\d+)/)
+        patch('projectContracts', (x) => [{ ...r, id: uid('ctr'), code, version: 1, status: 'Draft' } as ProjectContract, ...x])
+        log('Kontrak proyek', `${code} — ${r.name}`, 'create')
       },
-      setMinePlanStatus: (id, status) => {
-        setState((s) => ({ ...s, minePlans: s.minePlans.map((m) => (m.id === id ? { ...m, status } : m)) }))
-        toast(`Status rencana tambang menjadi ${status}`, 'info')
+      setProjectContractStatus: (id, status) => {
+        patch('projectContracts', (x) => x.map((c) => (c.id === id ? { ...c, status, version: status === 'Active' ? c.version : c.version } : c)))
+        log('Status kontrak', `${id} → ${status}`, status === 'Active' ? 'approve' : 'edit')
       },
-      addBlendingRecipe: (r) => {
-        const code = `BLD-${String(Math.floor(Math.random() * 900) + 100)}`
-        setState((s) => ({ ...s, blendingRecipes: [{ ...r, id: uid('bl'), code, status: 'Draft' }, ...s.blendingRecipes] }))
-        logActivity(`membuat resep blending ${code}`, 'Perencanaan Tambang')
-        toast('Resep blending berhasil dibuat', 'success')
+
+      /* --- Modul 11 --- */
+      addEmployee: (r) => {
+        patch('employees', (x) => [{ ...r, id: uid('emp'), nip: `EMP-${x.length + 1}` } as Employee, ...x])
+        log('Personel baru', r.name, 'create')
       },
-      setBlendingStatus: (id, status) => {
-        setState((s) => ({ ...s, blendingRecipes: s.blendingRecipes.map((b) => (b.id === id ? { ...b, status } : b)) }))
-        toast(`Resep blending menjadi ${status}`, 'info')
+      addTraining: (r) => {
+        patch('training', (x) => [{ ...r, id: uid('tr'), status: 'Scheduled' } as TrainingRecord, ...x])
+        log('Pelatihan', r.program, 'create')
       },
-      setVesselStatus: (id, status) => {
-        setState((s) => ({
-          ...s,
-          vessels: s.vessels.map((v) =>
-            v.id === id ? { ...v, status, blNumber: status === 'Sailed' && !v.blNumber ? `BL-2026-${String(Math.floor(Math.random() * 900) + 1000)}` : v.blNumber } : v,
-          ),
-        }))
-        toast(`Status kapal/barge menjadi ${status}`, 'info')
+
+      /* --- Modul 12 --- */
+      addIncident: (r) => {
+        patch('incidents', (x) => [{ ...r, id: uid('inc'), status: 'Open', lostDays: 0 } as Incident, ...x])
+        log('Insiden HSE', r.description, 'create')
       },
-      addVessel: (r) => {
-        const code = `VSL-${String(Math.floor(Math.random() * 900) + 100)}`
-        setState((s) => ({ ...s, vessels: [{ ...r, id: uid('vsl'), code, status: 'Waiting', loadedMt: 0, blNumber: '' }, ...s.vessels] }))
-        logActivity(`menjadwalkan kedatangan ${code}`, 'Pelabuhan')
-        toast('Jadwal kapal/barge terdaftar', 'success')
+      setIncidentStatus: (id, status) => {
+        patch('incidents', (x) => x.map((i) => (i.id === id ? { ...i, status } : i)))
+        log('Status insiden', `${id} → ${status}`, status === 'Closed' ? 'approve' : 'edit')
       },
-      addPermit: (r) => {
-        const code = `IZN-${String(Math.floor(Math.random() * 900) + 100)}`
-        setState((s) => ({ ...s, permits: [{ ...r, id: uid('prm'), code, status: 'Aktif' }, ...s.permits] }))
-        logActivity(`mendaftarkan izin ${code}`, 'Legal & Compliance')
-        toast('Izin berhasil didaftarkan', 'success')
+      addCorrectiveAction: (r) => {
+        const code = nextCode('CA', r as never, /CA-\d{4}-(\d+)/)
+        patch('correctiveActions', (x) => [{ ...r, id: uid('ca'), code, status: 'Open' } as CorrectiveAction, ...x])
+        log('Tindakan korektif', `${code} — ${r.description}`, 'create')
       },
-      setPermitStatus: (id, status) => {
-        setState((s) => ({ ...s, permits: s.permits.map((p) => (p.id === id ? { ...p, status } : p)) }))
-        toast(`Status izin menjadi ${status}`, 'info')
+      setCorrectiveActionStatus: (id, status, evidence) => {
+        patch('correctiveActions', (x) => x.map((c) => (c.id === id ? { ...c, status, evidence: evidence ?? c.evidence, verifiedBy: status === 'Closed' ? 'Sesi aktif' : c.verifiedBy } : c)))
+        log('Status korektif', `${id} → ${status}`, status === 'Closed' ? 'approve' : 'edit')
       },
-      setComplianceStatus: (id, status) => {
-        setState((s) => ({ ...s, compliance: s.compliance.map((c) => (c.id === id ? { ...c, status } : c)) }))
-        toast(`Kewajiban kepatuhan menjadi ${status}`, 'info')
+
+      /* --- Modul 13 --- */
+      addCostTransaction: (r) => {
+        const code = nextCode('CST', r as never, /CST-\d{4}-(\d+)/)
+        patch('costTransactions', (x) => [{ ...r, id: uid('cx'), code, status: 'Draft' } as CostTransaction, ...x])
+        log('Transaksi biaya', `${code} — ${r.category} Rp ${r.amountIdr.toLocaleString('id-ID')}`, 'create')
       },
+
+      /* --- Modul 14 --- */
+      addBillingReconciliation: (r) => {
+        const code = nextCode('REC', r as never, /REC-\d{4}-(\d+)/)
+        patch('billingReconciliations', (x) => [{ ...r, id: uid('br'), code, status: 'Draft' } as BillingReconciliation, ...x])
+        log('Rekonsiliasi', `${code} — ${r.internalVolume} ${r.unit}`, 'create')
+      },
+      setBillingReconciliationStatus: (id, status, p) => {
+        patch('billingReconciliations', (x) => x.map((b) => (b.id === id ? { ...b, status, ...p } : b)))
+        log('Status rekonsiliasi', `${id} → ${status}`, status === 'Invoiced' ? 'approve' : 'edit')
+      },
+
+      /* --- Tugas Saya --- */
+      setTaskStatus: (id, status) => {
+        patch('tasks', (x) => x.map((t) => (t.id === id ? { ...t, status } : t)))
+        log('Tugas', `${id} → ${status}`, 'edit')
+      },
+
+      /* --- Sistem --- */
       markNotificationRead: (id) => {
-        setState((s) => ({
-          ...s,
-          notifications: s.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
-        }))
+        patch('notifications', (x) => x.map((n) => (n.id === id ? { ...n, read: true } : n)))
       },
       markAllNotificationsRead: () => {
-        setState((s) => ({ ...s, notifications: s.notifications.map((n) => ({ ...n, read: true })) }))
+        patch('notifications', (x) => x.map((n) => ({ ...n, read: true })))
       },
-      resetData: () => {
-        setState(freshState())
-        toast('Data demo dikembalikan ke kondisi awal', 'info')
-      },
-    }),
-    [logActivity, pushNotification, toast],
-  )
+      resetData: () => setState(freshState()),
+    }
+  }, [patch, log])
 
   const value = useMemo<AppContextValue>(() => ({ state, toasts, toast, dismissToast, actions }), [state, toasts, toast, dismissToast, actions])
+
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }
 
@@ -443,5 +422,3 @@ export function useERP(): AppContextValue {
   if (!ctx) throw new Error('useERP harus digunakan di dalam <AppProvider>')
   return ctx
 }
-
-export { TODAY }

@@ -5,8 +5,8 @@ import { canAccess } from '../data/accounts'
 import Forbidden from '../pages/Forbidden'
 
 /**
- * Penjaga route: memastikan pengguna sudah login DAN memiliki hak akses
- * terhadap modul yang dituju. Belum login → /login; tanpa hak akses → 403.
+ * Penjaga route: memastikan pengguna sudah login DAN memiliki kewenangan
+ * terhadap modul yang dituju. Belum login → /login; tanpa wewenang → 403.
  */
 export function RequireAuth({ path, children }: { path: string; children: ReactNode }) {
   const { user } = useAuth()

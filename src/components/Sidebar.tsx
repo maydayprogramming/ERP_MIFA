@@ -1,20 +1,25 @@
 import { NavLink } from 'react-router-dom'
 import {
   Anchor,
+  BadgeCheck,
   BarChart3,
-  Blend,
+  Bell,
   Boxes,
   ClipboardList,
+  Fuel,
+  Gauge,
+  Hammer,
   LayoutDashboard,
+  ListChecks,
   Mountain,
+  Pickaxe,
   Scale,
   Settings,
   ShieldCheck,
-  ShoppingCart,
   Truck,
   Users,
   Wallet,
-  X,
+  Wrench,
 } from 'lucide-react'
 import { useERP } from '../store'
 import { useAuth } from '../auth/AuthProvider'
@@ -24,47 +29,55 @@ export interface NavItem {
   to: string
   label: string
   icon: React.ComponentType<{ className?: string }>
-  badge?: number
 }
 
 export const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
   {
     label: 'Utama',
     items: [
-      { to: '/dashboard', label: 'Dashboard Eksekutif', icon: LayoutDashboard },
-      { to: '/reports', label: 'Pusat Laporan', icon: BarChart3 },
+      { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { to: '/tugas-saya', label: 'Tugas Saya', icon: ListChecks },
+      { to: '/laporan', label: 'Laporan & Audit Trail', icon: BarChart3 },
     ],
   },
   {
-    label: 'Operasional Tambang',
+    label: 'Operasional',
     items: [
-      { to: '/production', label: 'Produksi & Pit', icon: Mountain },
-      { to: '/mine-planning', label: 'Perencanaan Tambang', icon: Blend },
-      { to: '/fleet', label: 'Armada & Maintenance', icon: Truck },
-      { to: '/inventory', label: 'Inventory & Logistik', icon: Boxes },
-      { to: '/hse', label: 'K3LH & Lingkungan', icon: ShieldCheck },
+      { to: '/perencanaan', label: 'Perencanaan Produksi', icon: ClipboardList },
+      { to: '/monitoring-produksi', label: 'Monitoring Produksi', icon: Mountain },
+      { to: '/dispatch', label: 'Dispatch & Alokasi Armada', icon: Anchor },
+      { to: '/master-unit', label: 'Master Unit & Alat', icon: Truck },
+      { to: '/downtime', label: 'Downtime & Performa Alat', icon: Gauge },
+    ],
+  },
+  {
+    label: 'Pemeliharaan',
+    items: [
+      { to: '/maintenance', label: 'Maintenance & Work Order', icon: Wrench },
+      { to: '/bbm', label: 'Manajemen BBM', icon: Fuel },
+      { to: '/gudang', label: 'Inventory & Gudang', icon: Boxes },
     ],
   },
   {
     label: 'Komersial',
     items: [
-      { to: '/sales', label: 'Penjualan & Kontrak', icon: ClipboardList },
-      { to: '/shipping', label: 'Pelabuhan & Bongkar Muat', icon: Anchor },
-      { to: '/legal', label: 'Legal & Compliance IUP', icon: Scale },
-      { to: '/purchasing', label: 'Pembelian & Vendor', icon: ShoppingCart },
+      { to: '/proyek-kontrak', label: 'Proyek & Kontrak', icon: BadgeCheck },
+      { to: '/pengadaan', label: 'Procurement & Pembelian', icon: Hammer },
+      { to: '/biaya', label: 'Cost Control', icon: Wallet },
+      { to: '/rekonsiliasi', label: 'Rekonsiliasi & Billing', icon: Scale },
     ],
   },
   {
-    label: 'SDM & Keuangan',
+    label: 'SDM & K3LH',
     items: [
-      { to: '/hr', label: 'SDM & Pengupahan', icon: Users },
-      { to: '/finance', label: 'Keuangan & RKAB', icon: Wallet },
+      { to: '/personel', label: 'Personel, Shift & Kompetensi', icon: Users },
+      { to: '/hse', label: 'HSE & Tindakan Korektif', icon: ShieldCheck },
     ],
   },
   {
     label: 'Sistem',
     items: [
-      { to: '/settings', label: 'Pengaturan', icon: Settings },
+      { to: '/pengaturan', label: 'Pengaturan Sistem', icon: Settings },
     ],
   },
 ]
@@ -73,19 +86,15 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { state } = useERP()
   const { user, can } = useAuth()
 
-  const openPOs = state.purchaseOrders.filter((p) => p.status === 'Pending Approval').length
+  const openWO = state.maintenance.filter((w) => w.status !== 'Completed').length
   const openIncidents = state.incidents.filter((i) => i.status !== 'Closed').length
+  const criticalStock = state.warehouseItems.filter((w) => w.stock <= w.minStock).length
+
   const badgeFor = (to: string): number | undefined => {
-    if (to === '/purchasing') return openPOs || undefined
+    if (to === '/maintenance') return openWO || undefined
     if (to === '/hse') return openIncidents || undefined
-    if (to === '/legal') {
-      const n = state.permits.filter((p) => p.status === 'Expired' || p.status === 'Akan Berakhir').length + state.compliance.filter((c) => c.status === 'Terlambat').length
-      return n || undefined
-    }
-    if (to === '/shipping') {
-      const n = state.vessels.filter((v) => v.status === 'Waiting').length
-      return n || undefined
-    }
+    if (to === '/gudang') return criticalStock || undefined
+    if (to === '/pengadaan') return state.purchaseOrders.filter((p) => p.status === 'Pending Approval').length || undefined
     return undefined
   }
 
@@ -94,13 +103,13 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       {/* Logo */}
       <div className="flex h-16 shrink-0 items-center gap-3 border-b border-line px-5">
         <div className="relative grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 shadow-glow">
-          <Mountain className="h-5 w-5 text-zinc-950" />
+          <Pickaxe className="h-5 w-5 text-zinc-950" />
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-bold tracking-tight text-ink-strong">
-            MIFA <span className="text-amber-400">ERP</span>
+            MIFA <span className="text-amber-400">Kontraktor</span>
           </p>
-          <p className="truncate text-[10px] font-medium uppercase tracking-[0.16em] text-ink-faintest">Coal Mining Suite</p>
+          <p className="truncate text-[10px] font-medium uppercase tracking-[0.16em] text-ink-faintest">Mining Contractor ERP</p>
         </div>
       </div>
 
@@ -143,11 +152,11 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <div className="rounded-lg border border-line bg-surface-1/60 p-3">
           <div className="flex items-center gap-2.5">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-[11px] font-bold text-white">
-              {user?.avatar ?? state.currentUser.avatar}
+              {user?.avatar ?? '—'}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-ink">{user?.name ?? state.currentUser.name}</p>
-              <p className="truncate text-[10px] text-ink-faint">{user?.role ?? state.currentUser.role}</p>
+              <p className="truncate text-xs font-semibold text-ink">{user?.name ?? 'Belum masuk'}</p>
+              <p className="truncate text-[10px] text-ink-faint">{user?.role ?? '-'}</p>
             </div>
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-line pt-2.5">
@@ -168,19 +177,27 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <>
-      {/* Mobile overlay */}
-      {open && <div className="fixed inset-0 z-40 bg-surface-1/70 backdrop-blur-sm lg:hidden" onClick={onClose} />}
-      <aside
-        className={cx(
-          'fixed inset-y-0 left-0 z-50 w-[264px] border-r border-line transition-transform duration-300 lg:translate-x-0',
-          open ? 'translate-x-0' : '-translate-x-full',
-        )}
-      >
-        <button onClick={onClose} className="absolute right-3 top-4 text-ink-faintest hover:text-ink lg:hidden" aria-label="Tutup menu">
-          <X className="h-5 w-5" />
-        </button>
-        <SidebarContent onNavigate={onClose} />
+      {/* Desktop */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[264px] border-r border-line bg-surface-0 lg:block">
+        <SidebarContent />
       </aside>
+
+      {/* Mobile drawer */}
+      {open && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+          <aside className="absolute inset-y-0 left-0 w-[280px] border-r border-line bg-surface-0 animate-slide-in-right">
+            <SidebarContent onNavigate={onClose} />
+            <button
+              onClick={onClose}
+              className="absolute right-3 top-4 text-ink-faintest hover:text-ink"
+              aria-label="Tutup menu"
+            >
+              ✕
+            </button>
+          </aside>
+        </div>
+      )}
     </>
   )
 }

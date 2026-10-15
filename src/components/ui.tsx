@@ -86,7 +86,7 @@ export function CardHeader({
 
 /* =============================== Badge ============================== */
 
-type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'violet' | 'amber' | 'emerald' | 'sky' | 'rose'
+type BadgeTone = 'neutral' | 'zinc' | 'success' | 'warning' | 'danger' | 'info' | 'violet' | 'amber' | 'emerald' | 'sky' | 'rose'
 
 export function Badge({ tone = 'neutral', children, className, dot }: { tone?: BadgeTone; children: ReactNode; className?: string; dot?: boolean }) {
   return (
