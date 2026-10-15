@@ -15,6 +15,7 @@ import { PageHeader } from '../components/Topbar'
 import { Badge, Button, Card, CardHeader, DataTable, Field, Input, Modal, Progress, SectionTitle, Select, StatCard, StatusBadge, Tabs, Textarea, type Column } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart, TrendChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { useMetrics } from '../lib/metrics'
 import { dmy, idr, num, num1, pct1, sum } from '../lib/format'
 import type { Equipment, MaintenanceJob } from '../types'
@@ -241,9 +242,9 @@ export default function Fleet() {
             initialSort={{ key: 'code', dir: 'asc' }}
             onRowClick={setDetail}
             actions={(r) => (
-              <Button size="sm" variant="outline" onClick={() => actions.setEquipmentStatus(r.id, STATUS_ACTION[r.status])}>
+              <ActionButton action="fleet.wo" size="sm" variant="outline" onClick={() => actions.setEquipmentStatus(r.id, STATUS_ACTION[r.status])}>
                 → {STATUS_ACTION[r.status]}
-              </Button>
+              </ActionButton>
             )}
           />
         </Card>
@@ -268,9 +269,9 @@ export default function Fleet() {
             actions={(r) => (
               <>
                 {r.status !== 'Completed' && (
-                  <Button size="sm" variant="ghost" onClick={() => actions.setMaintenanceStatus(r.id, r.status === 'Scheduled' ? 'In Progress' : 'Completed')}>
+                  <ActionButton action="fleet.wo" size="sm" variant="ghost" onClick={() => actions.setMaintenanceStatus(r.id, r.status === 'Scheduled' ? 'In Progress' : 'Completed')}>
                     {r.status === 'Scheduled' ? 'Mulai' : 'Selesaikan'}
-                  </Button>
+                  </ActionButton>
                 )}
                 {r.status === 'Completed' && <StatusBadge value="Completed" />}
               </>

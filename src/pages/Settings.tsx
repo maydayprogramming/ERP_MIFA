@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
   Building2,
@@ -6,6 +7,8 @@ import {
   Database,
   Globe2,
   KeyRound,
+  Lock,
+  LogOut,
   Mail,
   Phone,
   RefreshCw,
@@ -21,20 +24,12 @@ import { DataTable } from '../components/ui'
 import { useERP } from '../store'
 import { COMPANY } from '../data/seed'
 import { useTheme, type ThemeMode } from '../theme/ThemeProvider'
-import { dmy, num } from '../lib/format'
+import { ACCOUNTS, ACTION_LABEL, ACTION_MATRIX, ACCESS_MATRIX, MODULES, ROLE_DESC, ROLE_ORDER, ROLE_TONE, type Action } from '../data/accounts'
+import { useAuth } from '../auth/AuthProvider'
+import { cx, dmy, num } from '../lib/format'
 
 type TabId = 'company' | 'users' | 'parameters' | 'integration'
 
-const USERS = [
-  { id: 'usr-1', name: 'Ir. Bambang Setiawan', email: 'bambang@mifacoal.co.id', role: 'Super Admin', site: 'Semua Site', status: 'Active', lastLogin: '2026-10-15 08:12' },
-  { id: 'usr-2', name: 'Ir. Hendra Wijaya', email: 'hendra@mifacoal.co.id', role: 'GM Operasional', site: 'Semua Site', status: 'Active', lastLogin: '2026-10-15 07:45' },
-  { id: 'usr-3', name: 'Maya Kusuma, S.E., Ak.', email: 'maya@mifacoal.co.id', role: 'Manager Keuangan', site: 'Kantor Pusat', status: 'Active', lastLogin: '2026-10-14 16:20' },
-  { id: 'usr-4', name: 'Siti Nurhaliza, S.T.', email: 'siti@mifacoal.co.id', role: 'Manager HSE', site: 'Semua Site', status: 'Active', lastLogin: '2026-10-15 06:58' },
-  { id: 'usr-5', name: 'Dedi Prasetyo', email: 'dedi@mifacoal.co.id', role: 'Staff Produksi', site: 'Site Lahat', status: 'Active', lastLogin: '2026-10-15 08:30' },
-  { id: 'usr-6', name: 'Fitri Ramadani', email: 'fitri@mifacoal.co.id', role: 'Staff Produksi', site: 'Site Muara Enim', status: 'Active', lastLogin: '2026-10-14 14:05' },
-  { id: 'usr-7', name: 'Agus Salim, S.T.', email: 'agus@mifacoal.co.id', role: 'Manager HSE', site: 'Site Berau', status: 'Active', lastLogin: '2026-10-13 09:15' },
-  { id: 'usr-8', name: 'Yanti Lestari', email: 'yanti@mifacoal.co.id', role: 'Staff Produksi', site: 'Site Tanjung Enim', status: 'Inactive', lastLogin: '2026-08-02 11:40' },
-]
 
 const INTEGRATIONS = [
   { id: 'int-1', name: 'E-SPN BPMP Sumsel', desc: 'Pelaporan produksi & PNBP ke pemerintah provinsi', status: 'Terhubung', sync: '5 menit lalu' },
@@ -58,6 +53,8 @@ const AUDIT_LOG = [
 
 export default function SettingsPage() {
   const { state, actions, toast } = useERP()
+  const { user, logout, can, canAction } = useAuth()
+  const navigate = useNavigate()
   const { mode, setMode } = useTheme()
   const [tab, setTab] = useState<TabId>('company')
   const [resetOpen, setResetOpen] = useState(false)
@@ -65,7 +62,7 @@ export default function SettingsPage() {
   const [emailAlert, setEmailAlert] = useState(true)
   const [autoApprove, setAutoApprove] = useState(false)
 
-  const userColumns: Column<(typeof USERS)[number]>[] = [
+  const userColumns: Column<(typeof ACCOUNTS)[number]>[] = [
     {
       key: 'name',
       header: 'Nama Pengguna',
@@ -73,7 +70,7 @@ export default function SettingsPage() {
       render: (r) => (
         <div className="flex items-center gap-2.5">
           <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-surface-3 to-surface-2 text-[10px] font-bold text-ink">
-            {r.name.split(' ').slice(0, 2).map((w) => w[0]).join('')}
+            {r.avatar}
           </span>
           <div>
             <p className="text-[13px] font-medium text-ink-strong">{r.name}</p>
@@ -82,7 +79,7 @@ export default function SettingsPage() {
         </div>
       ),
     },
-    { key: 'role', header: 'Peran', sort: (r) => r.role, render: (r) => <Badge tone={r.role === 'Super Admin' ? 'amber' : 'neutral'}>{r.role}</Badge> },
+    { key: 'role', header: 'Peran', sort: (r) => r.role, render: (r) => <Badge tone={ROLE_TONE[r.role]}>{r.role}</Badge> },
     { key: 'site', header: 'Cakupan Site', render: (r) => <span className="text-ink-muted">{r.site}</span> },
     { key: 'lastLogin', header: 'Login Terakhir', sort: (r) => r.lastLogin, render: (r) => <span className="font-mono text-[12px] text-ink-faint">{r.lastLogin}</span> },
     { key: 'status', header: 'Status', sort: (r) => r.status, render: (r) => <StatusBadge value={r.status} /> },
@@ -111,17 +108,68 @@ export default function SettingsPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Pengguna Aktif" value={num(USERS.filter((u) => u.status === 'Active').length)} unit="akun" hint={`${USERS.length} total terdaftar`} icon={<Users className="h-4 w-4" />} />
+        <StatCard label="Pengguna Aktif" value={num(ACCOUNTS.filter((u) => u.status === 'Active').length)} unit="akun" hint={`${ACCOUNTS.length} total terdaftar`} icon={<Users className="h-4 w-4" />} />
         <StatCard label="Integrasi Terhubung" value={num(INTEGRATIONS.filter((i) => i.status === 'Terhubung').length)} unit="sistem" hint="Dari 6 endpoint" icon={<Globe2 className="h-4 w-4" />} tone="emerald" />
         <StatCard label="Uptime Sistem" value={pctStr(99.7)} hint="30 hari terakhir" icon={<Shield className="h-4 w-4" />} tone="sky" />
         <StatCard label="Data Tersimpan" value="18,4 MB" hint="Penyimpanan lokal browser" icon={<Database className="h-4 w-4" />} tone="violet" />
+      </div>
+
+      <div className="mb-5 grid gap-4 sm:grid-cols-3">
+        <Card className="sm:col-span-2">
+          <CardHeader
+            title="Sesi Aktif"
+            subtitle="Identitas pengguna yang sedang masuk dan cakupan wewenangnya"
+            icon={<Shield className="h-4 w-4" />}
+            actions={
+              <Button variant="outline" size="sm" icon={<LogOut className="h-3.5 w-3.5" />} onClick={() => { logout(); navigate('/login') }}>
+                Akhiri Sesi
+              </Button>
+            }
+          />
+          <div className="flex flex-wrap items-center gap-4 p-5">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-amber-400 to-orange-600 text-sm font-bold text-zinc-950">
+              {user?.avatar ?? '—'}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink-strong">{user?.name ?? 'Belum masuk'}</p>
+              <p className="text-[11px] text-ink-faint">{user?.email ?? '-'}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone={ROLE_TONE[user?.role ?? 'Super Admin']}>{user?.role ?? '-'}</Badge>
+              <Badge tone="neutral">{user?.site ?? 'Semua Site'}</Badge>
+              <Badge tone="emerald">
+                {MODULES.filter((m) => can(m.path)).length}/{MODULES.length} modul
+              </Badge>
+              <Badge tone="sky">
+                {(Object.keys(ACTION_LABEL) as Action[]).filter((a) => ACTION_MATRIX[user?.role ?? 'Super Admin'][a]).length}/
+                {Object.keys(ACTION_LABEL).length} tindakan
+              </Badge>
+            </div>
+          </div>
+        </Card>
+        <Card>
+          <CardHeader title="Status Kontrol Akses" subtitle="Ringkasan penerapan RBAC pada aplikasi" icon={<KeyRound className="h-4 w-4" />} />
+          <div className="space-y-2.5 p-5">
+            {[
+              { l: 'Menu & route terkontrol', v: 'Aktif', tone: 'text-emerald-400' },
+              { l: 'Tombol aksi terkontrol', v: 'Aktif', tone: 'text-emerald-400' },
+              { l: 'Filter cakupan site', v: 'Aktif', tone: 'text-emerald-400' },
+              { l: 'Halaman 403 khusus', v: 'Tersedia', tone: 'text-sky-400' },
+            ].map((r) => (
+              <div key={r.l} className="flex items-center justify-between border-b border-line pb-2 last:border-0">
+                <span className="text-xs text-ink-muted">{r.l}</span>
+                <span className={cx('font-mono text-xs font-semibold', r.tone)}>{r.v}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
       </div>
 
       <div className="mt-6">
         <Tabs
           tabs={[
             { id: 'company', label: 'Profil Perusahaan' },
-            { id: 'users', label: 'Pengguna & Hak Akses', count: USERS.length },
+            { id: 'users', label: 'Pengguna & Hak Akses', count: ACCOUNTS.length },
             { id: 'parameters', label: 'Parameter Sistem' },
             { id: 'integration', label: 'Integrasi & Audit' },
           ]}
@@ -224,10 +272,24 @@ export default function SettingsPage() {
           <CardHeader
             title="Daftar Pengguna"
             subtitle="Manajemen akun, peran, dan cakupan akses modul"
-            actions={<Badge tone="amber">4 tingkat hak akses</Badge>}
+            actions={
+              <div className="flex items-center gap-2">
+                <Badge tone="amber">{ROLE_ORDER.length} tingkat hak akses</Badge>
+                <Badge tone={ROLE_TONE[user?.role ?? 'Super Admin']}>{user?.role ?? 'Super Admin'}</Badge>
+              </div>
+            }
           />
+          {!canAction('users.manage') && (
+            <div className="mx-5 mt-4 flex items-start gap-2.5 rounded-lg border border-amber-500/25 bg-amber-500/5 px-3.5 py-3 text-xs leading-relaxed text-amber-600 dark:text-amber-200/90">
+              <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                Anda sedang masuk sebagai <span className="font-semibold">{user?.role}</span>. Pengelolaan pengguna dan hak akses
+                hanya dapat dilakukan oleh <span className="font-semibold">Super Admin</span>. Tampilan berikut bersifat hanya-baca.
+              </span>
+            </div>
+          )}
           <DataTable
-            data={USERS}
+            data={ACCOUNTS}
             columns={userColumns}
             rowKey={(r) => r.id}
             pageSize={10}
@@ -237,33 +299,81 @@ export default function SettingsPage() {
           />
           <div className="border-t border-line p-5">
             <p className="label">Matriks Hak Akses Modul</p>
+            <p className="mb-3 text-[11px] text-ink-faint">
+              Matriks ini adalah sumber tunggal kontrol akses — menu sidebar, route, dan tombol aksi mengacu pada tabel berikut.
+            </p>
             <div className="overflow-x-auto scrollbar-thin">
               <table className="tbl">
                 <thead>
                   <tr>
-                    <th>Peran</th>
-                    <th className="text-center">Produksi</th>
-                    <th className="text-center">Penjualan</th>
-                    <th className="text-center">Pembelian</th>
-                    <th className="text-center">Keuangan</th>
-                    <th className="text-center">K3LH</th>
-                    <th className="text-center">SDM</th>
-                    <th className="text-center">Laporan</th>
+                    <th className="sticky left-0 bg-surface-1">Peran</th>
+                    {MODULES.map((m) => (
+                      <th key={m.path} className="whitespace-nowrap text-center text-[11px]">
+                        {m.label}
+                      </th>
+                    ))}
+                    <th className="text-center">Total Modul</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { role: 'Super Admin', mods: [1, 1, 1, 1, 1, 1, 1] },
-                    { role: 'GM Operasional', mods: [1, 1, 1, 1, 1, 1, 1] },
-                    { role: 'Manager Keuangan', mods: [1, 1, 1, 1, 0, 1, 1] },
-                    { role: 'Manager HSE', mods: [1, 0, 0, 0, 1, 1, 1] },
-                    { role: 'Staff Produksi', mods: [1, 0, 0, 0, 1, 0, 1] },
-                  ].map((r) => (
-                    <tr key={r.role}>
-                      <td className="text-ink">{r.role}</td>
-                      {r.mods.map((v, i) => (
-                        <td key={i} className="text-center">
-                          {v ? <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-400" /> : <span className="text-ink-faintest">—</span>}
+                  {ROLE_ORDER.map((role) => {
+                    const total = MODULES.filter((m) => ACCESS_MATRIX[role][m.path]).length
+                    return (
+                      <tr key={role}>
+                        <td className="sticky left-0 bg-surface-1">
+                          <p className="font-medium text-ink">{role}</p>
+                          <p className="max-w-[220px] text-[10px] leading-snug text-ink-faintest">{ROLE_DESC[role]}</p>
+                        </td>
+                        {MODULES.map((m) => (
+                          <td key={m.path} className="text-center">
+                            {ACCESS_MATRIX[role][m.path] ? (
+                              <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-400" />
+                            ) : (
+                              <span className="text-ink-faintest">—</span>
+                            )}
+                          </td>
+                        ))}
+                        <td className="text-center">
+                          <Badge tone={total === MODULES.length ? 'amber' : 'neutral'}>
+                            {total}/{MODULES.length}
+                          </Badge>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="border-t border-line p-5">
+            <p className="label">Matriks Hak Akses Tindakan</p>
+            <p className="mb-3 text-[11px] text-ink-faint">
+              Kontrol pada lapisan tombol aksi — peran tanpa wewenang melihat tombol dalam keadaan nonaktif beserta alasannya.
+            </p>
+            <div className="overflow-x-auto scrollbar-thin">
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th className="sticky left-0 bg-surface-1">Tindakan</th>
+                    {ROLE_ORDER.map((r) => (
+                      <th key={r} className="whitespace-nowrap text-center text-[11px]">
+                        {r}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(Object.keys(ACTION_LABEL) as Action[]).map((a) => (
+                    <tr key={a}>
+                      <td className="sticky left-0 bg-surface-1 text-ink">{ACTION_LABEL[a]}</td>
+                      {ROLE_ORDER.map((r) => (
+                        <td key={r} className="text-center">
+                          {ACTION_MATRIX[r][a] ? (
+                            <CheckCircle2 className="mx-auto h-4 w-4 text-emerald-400" />
+                          ) : (
+                            <span className="text-ink-faintest">—</span>
+                          )}
                         </td>
                       ))}
                     </tr>
@@ -271,6 +381,27 @@ export default function SettingsPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          <div className="border-t border-line p-5">
+            <p className="label">Sesi &amp; Keamanan Login</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                { l: 'Pengguna terdaftar', v: String(ACCOUNTS.length) },
+                { l: 'Tingkat peran', v: String(ROLE_ORDER.length) },
+                { l: 'Modul terkontrol', v: String(MODULES.length) },
+              ].map((k) => (
+                <div key={k.l} className="rounded-xl border border-line bg-surface-2/40 p-3.5">
+                  <p className="text-[11px] uppercase tracking-wider text-ink-faint">{k.l}</p>
+                  <p className="mt-1 text-lg font-bold text-ink">{k.v}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/5 px-3.5 py-3 text-[11px] leading-relaxed text-amber-600 dark:text-amber-200/90">
+              Catatan: pada versi ini autentikasi masih berjalan di sisi klien untuk keperluan demo (kata sandi demo{' '}
+              <span className="font-mono font-semibold">mifa2026</span>). Autentikasi sesungguhnya dengan hash sandi, token sesi, dan
+              rate limiting akan diimplementasikan pada backend API.
+            </p>
           </div>
         </Card>
       )}

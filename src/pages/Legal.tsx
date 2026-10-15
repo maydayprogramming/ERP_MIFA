@@ -33,6 +33,7 @@ import {
 } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { TODAY } from '../store'
 import { cx, dmy, daysBetween, isOverdue, num, num1, pct1, sum, toCSV } from '../lib/format'
 import type { ComplianceObligation, Permit, PermitType } from '../types'
@@ -214,19 +215,19 @@ export default function Legal() {
       render: (r) => (
         <div className="flex justify-end gap-1.5">
           {r.status === 'Aktif' && !isOverdue(r.expiryDate, TODAY) && daysBetween(TODAY, r.expiryDate) <= 365 && (
-            <Button size="sm" variant="outline" onClick={() => actions.setPermitStatus(r.id, 'Proses Perpanjangan')}>
+            <ActionButton action="legal.manage" size="sm" variant="outline" onClick={() => actions.setPermitStatus(r.id, 'Proses Perpanjangan')}>
               Perpanjang
-            </Button>
+            </ActionButton>
           )}
           {r.status === 'Proses Perpanjangan' && (
-            <Button size="sm" variant="success" onClick={() => actions.setPermitStatus(r.id, 'Aktif')}>
+            <ActionButton action="legal.manage" size="sm" variant="success" onClick={() => actions.setPermitStatus(r.id, 'Aktif')}>
               Setujui
-            </Button>
+            </ActionButton>
           )}
           {r.status === 'Expired' && (
-            <Button size="sm" variant="primary" onClick={() => actions.setPermitStatus(r.id, 'Proses Perpanjangan')}>
+            <ActionButton action="legal.manage" size="sm" variant="primary" onClick={() => actions.setPermitStatus(r.id, 'Proses Perpanjangan')}>
               Ajukan Ulang
-            </Button>
+            </ActionButton>
           )}
         </div>
       ),
@@ -279,9 +280,9 @@ export default function Legal() {
             <CheckCircle2 className="h-3.5 w-3.5" /> Terpenuhi
           </span>
         ) : (
-          <Button size="sm" variant="success" onClick={() => actions.setComplianceStatus(r.id, 'Terpenuhi')}>
+          <ActionButton action="legal.manage" size="sm" variant="success" onClick={() => actions.setComplianceStatus(r.id, 'Terpenuhi')}>
             Tandai Terpenuhi
-          </Button>
+          </ActionButton>
         ),
     },
   ]
@@ -316,9 +317,9 @@ export default function Legal() {
             >
               Ekspor
             </Button>
-            <Button icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
+            <ActionButton action="legal.manage" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
               Daftarkan Izin
-            </Button>
+            </ActionButton>
           </>
         }
       >

@@ -15,6 +15,7 @@ import { PageHeader } from '../components/Topbar'
 import { Badge, Button, Card, CardHeader, DataTable, Field, Input, Modal, Progress, SectionTitle, Select, StatCard, StatusBadge, Tabs, Textarea, type Column } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { dmy, idr, idrFull, num, num1, pct1, sum } from '../lib/format'
 import type { Employee } from '../types'
 
@@ -134,9 +135,9 @@ export default function HR() {
         title="SDM & Pengupahan"
         subtitle="Manajemen data karyawan, kehadiran shift, biaya pengupahan, serta monitoring kompetensi dan sertifikasi keselamatan kerja."
         actions={
-          <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
+          <ActionButton action="hr.employee" variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
             Tambah Karyawan
-          </Button>
+          </ActionButton>
         }
       />
 

@@ -36,6 +36,7 @@ import {
 } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart, TrendChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { useMetrics } from '../lib/metrics'
 import { cx, mtShort, num, num1, num2, pct1, sum, toCSV } from '../lib/format'
 import type { BlendingRecipe, MinePlan, Stockpile } from '../types'
@@ -219,19 +220,19 @@ export default function MinePlanning() {
       render: (r) => (
         <div className="flex justify-end gap-1.5">
           {r.status === 'Draft' && (
-            <Button size="sm" variant="outline" onClick={() => actions.setMinePlanStatus(r.id, 'Approved')}>
+            <ActionButton action="planning.approve" size="sm" variant="outline" onClick={() => actions.setMinePlanStatus(r.id, 'Approved')}>
               Setujui
-            </Button>
+            </ActionButton>
           )}
           {r.status === 'Approved' && (
-            <Button size="sm" variant="outline" onClick={() => actions.setMinePlanStatus(r.id, 'In Progress')}>
+            <ActionButton action="planning.approve" size="sm" variant="outline" onClick={() => actions.setMinePlanStatus(r.id, 'In Progress')}>
               Mulai
-            </Button>
+            </ActionButton>
           )}
           {r.status === 'In Progress' && (
-            <Button size="sm" variant="success" onClick={() => actions.setMinePlanStatus(r.id, 'Completed')}>
+            <ActionButton action="planning.approve" size="sm" variant="success" onClick={() => actions.setMinePlanStatus(r.id, 'Completed')}>
               Selesaikan
-            </Button>
+            </ActionButton>
           )}
         </div>
       ),
@@ -344,9 +345,9 @@ export default function MinePlanning() {
             >
               Ekspor
             </Button>
-            <Button icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
+            <ActionButton action="planning.create" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
               Rencana Baru
-            </Button>
+            </ActionButton>
           </>
         }
       >
@@ -517,9 +518,9 @@ export default function MinePlanning() {
               title="Formulasi Blending"
               subtitle="Resep pencampuran batubara dari beberapa stockpile untuk memenuhi spesifikasi kontrak"
               actions={
-                <Button size="sm" variant="outline" icon={<FlaskConical className="h-4 w-4" />} onClick={() => setBlendOpen(true)}>
+                <ActionButton action="blending.manage" size="sm" variant="outline" icon={<FlaskConical className="h-4 w-4" />} onClick={() => setBlendOpen(true)}>
                   Resep Baru
-                </Button>
+                </ActionButton>
               }
             />
             <DataTable

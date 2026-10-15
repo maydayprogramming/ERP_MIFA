@@ -33,6 +33,7 @@ import {
 } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { bcm, dmy, mtShort, num, num1, pct1, sum, toCSV } from '../lib/format'
 import { TODAY } from '../store'
 import type { Jetty, Vessel } from '../types'
@@ -211,24 +212,24 @@ export default function Shipping() {
       render: (r) => (
         <div className="flex justify-end gap-1.5">
           {r.status === 'Waiting' && (
-            <Button size="sm" variant="outline" onClick={() => actions.setVesselStatus(r.id, 'Loading')}>
+            <ActionButton action="shipping.schedule" size="sm" variant="outline" onClick={() => actions.setVesselStatus(r.id, 'Loading')}>
               Mulai Muat
-            </Button>
+            </ActionButton>
           )}
           {r.status === 'Loading' && (
-            <Button size="sm" variant="success" onClick={() => actions.setVesselStatus(r.id, 'Loaded')}>
+            <ActionButton action="shipping.schedule" size="sm" variant="success" onClick={() => actions.setVesselStatus(r.id, 'Loaded')}>
               Selesai Muat
-            </Button>
+            </ActionButton>
           )}
           {r.status === 'Loaded' && (
-            <Button size="sm" variant="primary" onClick={() => actions.setVesselStatus(r.id, 'Sailed')}>
+            <ActionButton action="shipping.release" size="sm" variant="primary" onClick={() => actions.setVesselStatus(r.id, 'Sailed')}>
               Lepas Tambat
-            </Button>
+            </ActionButton>
           )}
           {(r.status === 'Waiting' || r.status === 'Loading') && (
-            <Button size="sm" variant="ghost" onClick={() => actions.setVesselStatus(r.id, 'Cancelled')}>
+            <ActionButton action="shipping.release" size="sm" variant="ghost" onClick={() => actions.setVesselStatus(r.id, 'Cancelled')}>
               Batal
-            </Button>
+            </ActionButton>
           )}
         </div>
       ),
@@ -269,9 +270,9 @@ export default function Shipping() {
             >
               Ekspor
             </Button>
-            <Button icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
+            <ActionButton action="shipping.schedule" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
               Jadwalkan Kapal
-            </Button>
+            </ActionButton>
           </>
         }
       >

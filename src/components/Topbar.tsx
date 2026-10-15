@@ -21,9 +21,10 @@ import {
   Truck,
 } from 'lucide-react'
 import { useERP } from '../store'
+import { useAuth } from '../auth/AuthProvider'
 import { cx } from '../lib/format'
 import { TODAY } from '../store'
-import { Button } from './ui'
+import { Badge, Button } from './ui'
 import { useTheme } from '../theme/ThemeProvider'
 
 const PAGE_META: Record<string, { title: string; section: string }> = {
@@ -59,6 +60,7 @@ const QUICK_ACTIONS: Array<{ label: string; to: string; icon: React.ComponentTyp
 
 export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { state, actions } = useERP()
+  const { user, logout } = useAuth()
   const { theme, toggle } = useTheme()
   const location = useLocation()
   const navigate = useNavigate()
@@ -255,19 +257,23 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         <div ref={userRef} className="relative">
           <button onClick={() => setUserOpen((v) => !v)} className="flex items-center gap-2 rounded-lg p-1 hover:bg-surface-2/60">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-amber-400 to-orange-600 text-[11px] font-bold text-zinc-950">
-              {state.currentUser.avatar}
+              {user?.avatar ?? state.currentUser.avatar}
             </span>
             <span className="hidden text-left lg:block">
-              <span className="block text-xs font-semibold text-ink">{state.currentUser.name}</span>
-              <span className="block text-[10px] text-ink-faint">{state.currentUser.role}</span>
+              <span className="block text-xs font-semibold text-ink">{user?.name ?? state.currentUser.name}</span>
+              <span className="block text-[10px] text-ink-faint">{user?.role ?? state.currentUser.role}</span>
             </span>
             <ChevronDown className="hidden h-3.5 w-3.5 text-ink-faintest lg:block" />
           </button>
           {userOpen && (
             <div className="absolute right-0 top-11 w-56 overflow-hidden rounded-lg border border-line bg-surface-1/95 shadow-panel backdrop-blur animate-fade-in">
               <div className="border-b border-line px-4 py-3">
-                <p className="text-sm font-semibold text-ink-strong">{state.currentUser.name}</p>
-                <p className="truncate text-[11px] text-ink-faint">{state.currentUser.email}</p>
+                <p className="text-sm font-semibold text-ink-strong">{user?.name ?? state.currentUser.name}</p>
+                <p className="truncate text-[11px] text-ink-faint">{user?.email ?? state.currentUser.email}</p>
+                <p className="mt-1.5 flex items-center gap-1.5">
+                  <Badge tone="amber">{user?.role ?? state.currentUser.role}</Badge>
+                  <span className="truncate text-[10px] text-ink-faintest">{user?.site ?? 'Semua Site'}</span>
+                </p>
               </div>
               <Link to="/settings" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-surface-2/60">
                 <CircleUser className="h-4 w-4 text-ink-faint" /> Profil Saya
@@ -275,7 +281,14 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
               <Link to="/settings" onClick={() => setUserOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-ink hover:bg-surface-2/60">
                 <Settings2 className="h-4 w-4 text-ink-faint" /> Preferensi Sistem
               </Link>
-              <button className="flex w-full items-center gap-2.5 border-t border-line px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10">
+              <button
+                onClick={() => {
+                  setUserOpen(false)
+                  logout()
+                  navigate('/login', { replace: true })
+                }}
+                className="flex w-full items-center gap-2.5 border-t border-line px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10"
+              >
                 <LogOut className="h-4 w-4" /> Keluar
               </button>
             </div>

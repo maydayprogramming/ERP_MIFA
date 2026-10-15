@@ -17,6 +17,7 @@ import { PageHeader } from '../components/Topbar'
 import { Badge, Button, Card, CardHeader, DataTable, Field, Input, Modal, Progress, SectionTitle, Select, StatCard, StatusBadge, Tabs, Textarea, type Column } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { useMetrics } from '../lib/metrics'
 import { dmy, idr, idrFull, mtShort, num, num1, pct1, sum } from '../lib/format'
 import type { Stockpile, WarehouseItem } from '../types'
@@ -297,9 +298,9 @@ export default function Inventory() {
             initialSort={{ key: 'stock', dir: 'asc' }}
             actions={(r) => (
               <>
-                <Button size="sm" variant="ghost" onClick={() => actions.adjustStock(r.id, 10)} title="Tambah stok">
+                <ActionButton action="inventory.adjust" size="sm" variant="ghost" onClick={() => actions.adjustStock(r.id, 10)} title="Tambah stok">
                   +10
-                </Button>
+                </ActionButton>
                 <Button size="sm" variant="ghost" onClick={() => setAdjust(r)}>
                   Sesuaikan
                 </Button>
@@ -430,9 +431,9 @@ export default function Inventory() {
                     </p>
                     <p className="text-[11px] text-rose-400">Defisit {num(Math.max(0, i.minStock - i.stock))} {i.unit}</p>
                   </div>
-                  <Button size="sm" variant="outline" onClick={() => actions.adjustStock(i.id, i.minStock - i.stock)}>
+                  <ActionButton action="inventory.adjust" size="sm" variant="outline" onClick={() => actions.adjustStock(i.id, i.minStock - i.stock)}>
                     Isi ke minimum
-                  </Button>
+                  </ActionButton>
                 </div>
               ))}
             {state.warehouseItems.filter((i) => i.stock < i.minStock * 1.2).length === 0 && (

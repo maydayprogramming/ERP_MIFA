@@ -4,7 +4,13 @@ import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom/server'
 import { AppProvider } from '../src/store'
 import { ThemeProvider } from '../src/theme/ThemeProvider'
+import { AuthProvider } from '../src/auth/AuthProvider'
+import { ACCOUNTS } from '../src/data/accounts'
 import App from '../src/App'
+
+/* Smoke test menguji seluruh route dengan peran Super Admin (akses penuh).
+   Pengujian RBAC per-peran dilakukan terpisah melalui render route 403. */
+const SESSION_USER = ACCOUNTS[0]
 
 const routes = [
   '/dashboard',
@@ -30,9 +36,11 @@ for (const route of routes) {
     const html = renderToString(
       <StaticRouter location={route}>
         <ThemeProvider>
-          <AppProvider>
-            <App />
-          </AppProvider>
+          <AuthProvider initialUser={SESSION_USER}>
+            <AppProvider>
+              <App />
+            </AppProvider>
+          </AuthProvider>
         </ThemeProvider>
       </StaticRouter>,
     )

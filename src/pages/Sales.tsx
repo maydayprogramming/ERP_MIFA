@@ -16,6 +16,7 @@ import { PageHeader } from '../components/Topbar'
 import { Badge, Button, Card, CardHeader, DataTable, Field, Input, Modal, Progress, SectionTitle, Select, StatCard, StatusBadge, Tabs, Textarea, type Column } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart, TrendChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { useMetrics } from '../lib/metrics'
 import { dmy, mtShort, num, num1, pct1, sum, usd, usdToIdr } from '../lib/format'
 import type { Contract, Customer, SalesOrder } from '../types'
@@ -179,9 +180,9 @@ export default function Sales() {
             <Button variant="secondary" icon={<FileSignature className="h-4 w-4" />} onClick={() => setContractOpen(true)}>
               Kontrak Baru
             </Button>
-            <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
+            <ActionButton action="sales.create" variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
               Sales Order
-            </Button>
+            </ActionButton>
           </>
         }
       />
@@ -242,9 +243,9 @@ export default function Sales() {
             actions={(r) => {
               const next = NEXT_STATUS[r.status]
               return next ? (
-                <Button size="sm" variant="outline" onClick={() => actions.setSalesOrderStatus(r.id, next)}>
+                <ActionButton action="sales.approve" size="sm" variant="outline" onClick={() => actions.setSalesOrderStatus(r.id, next)}>
                   → {next}
-                </Button>
+                </ActionButton>
               ) : (
                 <Badge tone={r.status === 'Cancelled' ? 'danger' : 'success'}>{r.status}</Badge>
               )
@@ -451,9 +452,9 @@ export default function Sales() {
               Tutup
             </Button>
             {detail && NEXT_STATUS[detail.status] && (
-              <Button variant="primary" onClick={() => { actions.setSalesOrderStatus(detail.id, NEXT_STATUS[detail.status]!); setDetail(null) }}>
+              <ActionButton action="sales.approve" variant="primary" onClick={() => { actions.setSalesOrderStatus(detail.id, NEXT_STATUS[detail.status]!); setDetail(null) }}>
                 Lanjutkan → {NEXT_STATUS[detail.status]}
-              </Button>
+              </ActionButton>
             )}
           </>
         }

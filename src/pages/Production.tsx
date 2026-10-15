@@ -15,6 +15,7 @@ import { PageHeader } from '../components/Topbar'
 import { Badge, Button, Card, CardHeader, DataTable, EmptyState, Field, Input, Modal, Progress, SectionTitle, Select, StatCard, StatusBadge, Tabs, Textarea, type Column } from '../components/ui'
 import { BarsChart, ChartFrame, TrendChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { useMetrics } from '../lib/metrics'
 import { dmy, num, num1, num2, pct1, sum, toCSV } from '../lib/format'
 import type { ProductionRecord, Site } from '../types'
@@ -146,9 +147,9 @@ export default function Production() {
             <Button variant="secondary" icon={<FileSpreadsheet className="h-4 w-4" />} onClick={exportDaily}>
               Ekspor CSV
             </Button>
-            <Button variant="primary" icon={<CalendarPlus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
+            <ActionButton action="production.input" variant="primary" icon={<CalendarPlus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
               Lapor Produksi
-            </Button>
+            </ActionButton>
           </>
         }
       />
@@ -209,10 +210,10 @@ export default function Production() {
             onRowClick={setDetail}
             actions={(r) =>
               r.status !== 'Approved' ? (
-                <Button size="sm" variant="ghost" onClick={() => actions.setProductionStatus(r.id, r.status === 'Draft' ? 'Verified' : 'Approved')}>
+                <ActionButton action="production.approve" size="sm" variant="ghost" onClick={() => actions.setProductionStatus(r.id, r.status === 'Draft' ? 'Verified' : 'Approved')}>
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   {r.status === 'Draft' ? 'Verifikasi' : 'Approve'}
-                </Button>
+                </ActionButton>
               ) : (
                 <Badge tone="success">Selesai</Badge>
               )

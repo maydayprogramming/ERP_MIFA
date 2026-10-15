@@ -17,6 +17,7 @@ import { PageHeader } from '../components/Topbar'
 import { Badge, Button, Card, CardHeader, DataTable, EmptyState, Field, Input, Modal, Progress, SectionTitle, Select, StatCard, StatusBadge, Tabs, Textarea, type Column } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { useMetrics } from '../lib/metrics'
 import { dmy, idr, idrFull, num, num1, pct1, sum } from '../lib/format'
 import type { PurchaseOrder, Vendor } from '../types'
@@ -105,9 +106,9 @@ export default function Purchasing() {
             <Button variant="secondary" icon={<Building2 className="h-4 w-4" />} onClick={() => setVendorOpen(true)}>
               Vendor Baru
             </Button>
-            <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
+            <ActionButton action="purchasing.create" variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setFormOpen(true)}>
               Purchase Order
-            </Button>
+            </ActionButton>
           </>
         }
       />
@@ -158,7 +159,7 @@ export default function Purchasing() {
                     </div>
                     <span className="font-mono text-sm font-semibold text-emerald-400">{idr(p.amountIdr)}</span>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="success" onClick={() => actions.setPurchaseOrderStatus(p.id, 'Approved')}>Setujui</Button>
+                      <ActionButton action="purchasing.approve" size="sm" variant="success" onClick={() => actions.setPurchaseOrderStatus(p.id, 'Approved')}>Setujui</ActionButton>
                       <Button size="sm" variant="danger" onClick={() => actions.setPurchaseOrderStatus(p.id, 'Rejected')}>Tolak</Button>
                     </div>
                   </div>
@@ -201,11 +202,11 @@ export default function Purchasing() {
               actions={(r) =>
                 r.status === 'Pending Approval' ? (
                   <>
-                    <Button size="sm" variant="success" onClick={() => actions.setPurchaseOrderStatus(r.id, 'Approved')}>Setujui</Button>
+                    <ActionButton action="purchasing.approve" size="sm" variant="success" onClick={() => actions.setPurchaseOrderStatus(r.id, 'Approved')}>Setujui</ActionButton>
                     <Button size="sm" variant="ghost" onClick={() => actions.setPurchaseOrderStatus(r.id, 'Rejected')}>Tolak</Button>
                   </>
                 ) : r.status === 'Approved' ? (
-                  <Button size="sm" variant="outline" onClick={() => actions.setPurchaseOrderStatus(r.id, 'Received')}>Terima Barang</Button>
+                  <ActionButton action="purchasing.approve" size="sm" variant="outline" onClick={() => actions.setPurchaseOrderStatus(r.id, 'Received')}>Terima Barang</ActionButton>
                 ) : (
                   <StatusBadge value={r.status} />
                 )
@@ -324,7 +325,7 @@ export default function Purchasing() {
             {detail?.status === 'Pending Approval' && (
               <>
                 <Button variant="danger" onClick={() => { actions.setPurchaseOrderStatus(detail.id, 'Rejected'); setDetail(null) }}>Tolak</Button>
-                <Button variant="primary" onClick={() => { actions.setPurchaseOrderStatus(detail.id, 'Approved'); setDetail(null) }}>Setujui</Button>
+                <ActionButton action="purchasing.approve" variant="primary" onClick={() => { actions.setPurchaseOrderStatus(detail.id, 'Approved'); setDetail(null) }}>Setujui</ActionButton>
               </>
             )}
           </>

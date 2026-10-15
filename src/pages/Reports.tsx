@@ -18,6 +18,7 @@ import { PageHeader } from '../components/Topbar'
 import { Badge, Button, Card, CardHeader, DataTable, EmptyState, Field, Input, Modal, SectionTitle, Select, StatCard, StatusBadge, Tabs, type Column } from '../components/ui'
 import { ChartFrame, DonutChart, BarsChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { useMetrics, monthLabel } from '../lib/metrics'
 import { dmy, idr, mtShort, num, num1, pct1, sum, toCSV, usd } from '../lib/format'
 
@@ -638,7 +639,8 @@ export default function Reports() {
               <Button variant="primary" size="sm" icon={<FileBarChart className="h-3.5 w-3.5" />} onClick={() => setActive(r)} className="flex-1">
                 Generate
               </Button>
-              <Button
+              <ActionButton
+                action="reports.export"
                 variant="ghost"
                 size="sm"
                 icon={<Download className="h-3.5 w-3.5" />}
@@ -648,7 +650,7 @@ export default function Reports() {
                 }}
               >
                 CSV
-              </Button>
+              </ActionButton>
             </div>
           </Card>
         ))}
@@ -722,7 +724,8 @@ function ReportViewer({ report, onClose }: { report: ReportDef | null; onClose: 
           <Button variant="secondary" icon={<Printer className="h-4 w-4" />} onClick={() => toast('Laporan dikirim ke antrean cetak', 'info')}>
             Cetak
           </Button>
-          <Button
+          <ActionButton
+            action="reports.export"
             variant="primary"
             icon={<Download className="h-4 w-4" />}
             onClick={() => {
@@ -731,7 +734,7 @@ function ReportViewer({ report, onClose }: { report: ReportDef | null; onClose: 
             }}
           >
             Ekspor Data
-          </Button>
+          </ActionButton>
         </>
       }
     >

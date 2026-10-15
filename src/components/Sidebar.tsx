@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react'
 import { useERP } from '../store'
+import { useAuth } from '../auth/AuthProvider'
 import { cx } from '../lib/format'
 
 export interface NavItem {
@@ -70,6 +71,7 @@ export const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
 
 export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const { state } = useERP()
+  const { user, can } = useAuth()
 
   const openPOs = state.purchaseOrders.filter((p) => p.status === 'Pending Approval').length
   const openIncidents = state.incidents.filter((i) => i.status !== 'Closed').length
@@ -104,32 +106,36 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 pb-4 scrollbar-thin">
-        {NAV_GROUPS.map((group) => (
-          <div key={group.label}>
-            <p className="nav-group-label">{group.label}</p>
-            <div className="space-y-0.5">
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  onClick={onNavigate}
-                  className={({ isActive }) => cx('nav-link', isActive && 'nav-link-active')}
-                >
-                  {({ isActive }) => (
-                    <>
-                      {isActive && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-amber-400" />}
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      <span className="flex-1 truncate">{item.label}</span>
-                      {badgeFor(item.to) && (
-                        <span className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">{badgeFor(item.to)}</span>
-                      )}
-                    </>
-                  )}
-                </NavLink>
-              ))}
+        {NAV_GROUPS.map((group) => {
+          const items = group.items.filter((item) => can(item.to))
+          if (items.length === 0) return null
+          return (
+            <div key={group.label}>
+              <p className="nav-group-label">{group.label}</p>
+              <div className="space-y-0.5">
+                {items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    onClick={onNavigate}
+                    className={({ isActive }) => cx('nav-link', isActive && 'nav-link-active')}
+                  >
+                    {({ isActive }) => (
+                      <>
+                        {isActive && <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-amber-400" />}
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        <span className="flex-1 truncate">{item.label}</span>
+                        {badgeFor(item.to) && (
+                          <span className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">{badgeFor(item.to)}</span>
+                        )}
+                      </>
+                    )}
+                  </NavLink>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </nav>
 
       {/* Footer */}
@@ -137,15 +143,17 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         <div className="rounded-lg border border-line bg-surface-1/60 p-3">
           <div className="flex items-center gap-2.5">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-[11px] font-bold text-white">
-              {state.currentUser.avatar}
+              {user?.avatar ?? state.currentUser.avatar}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-ink">{state.currentUser.name}</p>
-              <p className="truncate text-[10px] text-ink-faint">{state.currentUser.role}</p>
+              <p className="truncate text-xs font-semibold text-ink">{user?.name ?? state.currentUser.name}</p>
+              <p className="truncate text-[10px] text-ink-faint">{user?.role ?? state.currentUser.role}</p>
             </div>
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-line pt-2.5">
-            <span className="text-[10px] text-ink-faintest">v1.0.0 &middot; RKAB 2026</span>
+            <span className="truncate text-[10px] text-ink-faintest" title={user?.site}>
+              {user?.site ?? 'Semua Site'}
+            </span>
             <span className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
               Online

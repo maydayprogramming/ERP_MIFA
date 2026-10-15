@@ -16,6 +16,7 @@ import { PageHeader } from '../components/Topbar'
 import { Badge, Button, Card, CardHeader, DataTable, Field, Input, Modal, Progress, SectionTitle, Select, StatCard, StatusBadge, Tabs, Textarea, type Column } from '../components/ui'
 import { BarsChart, ChartFrame, DonutChart, TrendChart } from '../components/charts'
 import { useERP } from '../store'
+import { ActionButton } from '../auth/ActionButton'
 import { useMetrics, monthLabel } from '../lib/metrics'
 import { dmy, num, num1, pct1, sum } from '../lib/format'
 import type { EnvironmentalReading, Incident, TrainingRecord } from '../types'
@@ -244,9 +245,9 @@ export default function HSE() {
               onRowClick={setDetail}
               actions={(r) =>
                 r.status !== 'Closed' ? (
-                  <Button size="sm" variant="outline" onClick={() => actions.setIncidentStatus(r.id, r.status === 'Open' ? 'Investigation' : 'Closed')}>
+                  <ActionButton action="hse.incident" size="sm" variant="outline" onClick={() => actions.setIncidentStatus(r.id, r.status === 'Open' ? 'Investigation' : 'Closed')}>
                     {r.status === 'Open' ? 'Investigasi' : 'Tutup Kasus'}
-                  </Button>
+                  </ActionButton>
                 ) : (
                   <StatusBadge value="Closed" />
                 )

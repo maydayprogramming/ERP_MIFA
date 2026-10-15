@@ -32,8 +32,11 @@ npm run test:smoke # render test seluruh route (SSR)
 | 7 | **Pembelian & Vendor** | `/purchasing` | Purchase order + antrean persetujuan, master vendor & rating, analisis pengadaan per kategori & site |
 | 8 | **SDM & Pengupahan** | `/hr` | Direktori karyawan, absensi & produktivitas shift, komponen pengupahan, matriks kompetensi & sertifikasi |
 | 9 | **Keuangan & RKAB** | `/finance` | Buku besar jurnal, piutang & aging AR, utang & aging AP, RKAB vs realisasi, investasi CAPEX, royalti PNBP & kewajiban pajak |
-| 10 | **Pusat Laporan** | `/reports` | 12 template laporan dengan generator, pratinjau data, parameter periode/site, ekspor CSV, katalog per kategori & otoritas |
-| 11 | **Pengaturan** | `/settings` | Profil perusahaan, pengguna & matriks hak akses, parameter operasional & tarif royalti, spesifikasi mutu kontrak, integrasi sistem, audit trail |
+| 10 | **Pusat Laporan** | `/reports` | 15 template laporan dengan generator, pratinjau data, parameter periode/site, ekspor CSV, katalog per kategori & otoritas |
+| 11 | **Perencanaan Tambang & Blending** | `/mine-planning` | Rencana produksi & pengupasan per pit/bench (RKAB), realisasi vs rencana per site, stripping ratio, formulasi blending multi-stockpile terhadap target GCV/Ash/Sulfur |
+| 12 | **Pelabuhan & Bongkar Muat** | `/shipping` | Fasilitas jetty & barge loader (kapasitas, draft), jadwal kapal/barge ETA-ETB, monitoring progres muat + estimasi sisa waktu, draft survey & Bill of Lading |
+| 13 | **Legal & Compliance IUP** | `/legal` | Registrasi IUP OP/OPK, PKP2B, AMDAL, UKL-UPL, RKAB, SIMBAT, HO, PNBP dengan masa berlaku, kewajiban kepatuhan (ESDM, DJP, BPJS), matriks jenis perizinan, rencana aksi prioritas |
+| 14 | **Pengaturan** | `/settings` | Profil perusahaan, pengguna & matriks hak akses, parameter operasional & tarif royalti, spesifikasi mutu kontrak, integrasi sistem, audit trail, sesi aktif |
 
 ---
 
@@ -61,6 +64,38 @@ npm run test:smoke # render test seluruh route (SSR)
 - Semua perubahan data tersimpan di `localStorage` dan dapat di-*reset* dari Pengaturan
 
 ---
+
+## Autentikasi & Hak Akses (RBAC)
+
+Aplikasi menerapkan **Role-Based Access Control** pada tiga lapisan:
+
+| Lapisan | Mekanisme |
+|---|---|
+| **Modul** | Menu sidebar & seluruh route dijaga `RequireAuth`; peran tanpa wewenang dialihkan ke halaman **403 Akses Ditolak** |
+| **Tindakan** | Tombol aksi (buat, setujui, tutup, ekspor) dibungkus `ActionButton` — disembunyikan atau dinonaktifkan dengan penjelasan alasan |
+| **Data** | Cakupan site per pengguna ditampilkan pada sidebar & topbar |
+
+**5 peran** dengan matriks akses yang dapat dilihat lengkap di menu **Pengaturan → Pengguna & Hak Akses** (14 modul × 5 peran, plus 20 tindakan × 5 peran). Matriks tersebut adalah *sumber tunggal* — sidebar, route, dan tombol aksi semuanya merujuk ke `src/data/accounts.ts`.
+
+| Peran | Cakupan |
+|---|---|
+| Super Admin | Seluruh 14 modul + kelola pengguna & konfigurasi sistem |
+| GM Operasional | 13 modul operasional & komersial (tanpa konfigurasi sistem) |
+| Manager Keuangan | 10 modul — fokus keuangan, penjualan, pembelian, SDM, pelaporan fiskal |
+| Manager HSE | 7 modul — fokus K3LH, lingkungan, kepatuhan AMDAL |
+| Staff Produksi | 8 modul — input harian produksi, armada, K3LH di site penugasan |
+
+**Akun demo** (kata sandi `mifa2026`) — klik salah satu peran pada halaman login untuk masuk langsung dan melihat perbedaan hak akses:
+
+| Email | Peran | Cakupan Site |
+|---|---|---|
+| `bambang@mifacoal.co.id` | Super Admin | Semua Site |
+| `hendra@mifacoal.co.id` | GM Operasional | Semua Site |
+| `maya@mifacoal.co.id` | Manager Keuangan | Kantor Pusat |
+| `siti@mifacoal.co.id` | Manager HSE | Semua Site |
+| `dedi@mifacoal.co.id` | Staff Produksi | Site Lahat |
+
+> Catatan: autentikasi versi ini berjalan di sisi klien untuk keperluan demo. Autentikasi sesungguhnya (hash sandi, token sesi, rate limiting) akan diimplementasikan pada backend API.
 
 ## Arsitektur
 
@@ -95,10 +130,21 @@ Dataset awal bersifat deterministik (seeded) sehingga tampilan selalu konsisten:
 - 10 pelanggan, 9 kontrak, 22 sales order, 10 vendor, 24 purchase order
 - Register insiden, pelatihan, 126 pembacaan parameter lingkungan
 - Jurnal keuangan, invoice, tagihan, 14 kategori RKAB, 6 proyek CAPEX, 10 periode royalti
+- 10 rencana tambang, 5 resep blending, 4 fasilitas muat, 12 kapal/barge, 16 izin pertambangan, 12 kewajiban kepatuhan
+- 8 akun pengguna pada 5 tingkat peran beserta matriks hak akses
 
 > Aplikasi ini merupakan **prototipe/demo fungsional**. Seluruh data bersifat simulasi dan tidak terhubung ke sistem produksi. Untuk implementasi nyata, lapisan `data/seed.ts` dan `store.tsx` perlu diganti dengan API backend/database.
 
 ---
+
+## Pengujian
+
+```bash
+npm run typecheck   # tsc --noEmit
+npm run build       # build produksi
+npm run test:smoke  # render SSR 15 route
+npm run test:rbac   # 52 pemeriksaan autentikasi & RBAC
+```
 
 ## Teknologi
 
